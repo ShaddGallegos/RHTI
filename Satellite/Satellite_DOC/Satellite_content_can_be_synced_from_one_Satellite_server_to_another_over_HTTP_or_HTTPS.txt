@@ -1,0 +1,38 @@
+Satellite_content_can_be_synced_from_one_Satellite_server_to_another_over_HTTP_or_HTTPS
+
+Environment
+Satellite 6.3 or later
+Issue
+Satellite content can be synced from one Satellite server to another over HTTP or HTTPS. This is helpful, for instance, when you have one external Satellite that can access the Red Hat Content Delivery Network (CDN) along with a second internal instance that cannot access the CDN but requires Red Hat content. This differs from traditional Inter-Satellite Sync (ISS) in that content doesn’t need to be exported to a file system.
+
+Note: Currently we only support yum content for ISS over HTTP/HTTPS.
+
+Resolution
+Note: The first Satellite’s Red Hat repositories must have their download policy set to “Immediate.” This resolution is not supported for repositories with a download policy of “On Demand” or “Background.”
+
+On the first Satellite, create a symlink from the published default environment to a directory in /var/www/html/pub.
+
+Raw
+ln -s /var/lib/pulp/published/yum/https/repos/Default_Organization/Library /var/www/html/pub/iss
+You may have to then restart apache for the directory to show up:
+
+Raw
+sudo systemctl restart httpd
+After you restart apache, confirm that the symlinked directory exists by navigating to your pub directory in a browser (e.g. http://sat1.example.com/pub).
+
+If you’re using HTTPS, next you must install the CA certificate from the first Satellite on the second Satellite server.
+
+Raw
+curl -O http://sat1.example.com/pub/katello-server-ca.crt
+sudo update-ca-trust enable
+sudo cp katello-server-ca.crt /etc/pki/ca-trust/source/anchors
+sudo update-ca-trust
+This will add the CA certificate to the second Satellite’s trust store. To check that the certificate is properly installed, issue a curl request from the second Satellite without the “--insecure/-k” option:
+
+Raw
+curl https://sat1.example.com
+On the second Satellite, first set the CDN url to point to your first Satellite (e.g. “https://sat1.example.com/pub/iss”). This can be done from Manage Manifest page in the web UI.
+
+Next, upload a manifest to the second Satellite. You need to ensure that the second manifest contains subscriptions that are also available in the first Satellite. If you add subscriptions to products not enabled and synchronized on the first Satellite you will get errors enabling and synchronizing repositories that are not available.
+
+Enable Red Hat repositories on the second Satellite, and perform a sync as usual.

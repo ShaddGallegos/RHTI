@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: root
+
+  tasks:
+    - name: install firewalld
+      when: ansible_hostname != 'node03' 
+      yum: name=firewalld state=present
+      notify: restart firewalld
+
+    - name: ensure that firewalld is started and enable at boot
+      when: ansible_hostname != 'node03'
+      service: name=firewalld enabled=yes state=started
+
+  handlers:
+    - name: restart firewalld
+      service: name=firewalld state=restarted
+
+
