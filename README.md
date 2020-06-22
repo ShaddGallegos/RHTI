@@ -76,7 +76,7 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 | Workshop   | Presentation Deck  | Exercises  | Workshop Type Var   |
 |---|---|---|---|
-| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90  | `workshop_type: rhel_90`  |
+| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90)  | `workshop_type: rhel_90`  |
 
 #### Lab Provisioner
  - [AWS Lab Provisioner](https://github.com/ansible/workshops/tree/devel/provisioner) - playbook that spins up instances on AWS for students to perform the exercises provided above.
@@ -108,3 +108,5 @@ Working in tandem, this is what the optimal Management system would look like fr
  * [REDHATTOOLSINSTALLER-6.7-4.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/4a5891a4674f9d46ea4ed5ebc2df67dbe36b1b84/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
 [5. Useful Scripts](./Useful_Scripts)
+
+more to come 
