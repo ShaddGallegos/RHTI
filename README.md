@@ -28,7 +28,8 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 [1. Ansible Tower](./Ansible_Tower)
 
-        Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your your journey into automation
+        Ansible and Ansible Tower should be the linchpin in your Enterprise and 
+        the foundation for your your journey into automation
 
         Ansible can:
 
