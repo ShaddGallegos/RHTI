@@ -28,6 +28,21 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 [1. Ansible Tower](./Ansible_Tower)
 
+        Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your your journey into automation
+
+        Ansible can:
+
+           * Get you started on your way to automation of everything.
+           * Has a lower cost of implamentation (easy to learn/master).
+           * Anybody can do it.  
+           * Ansible will reduce: development time, operations costs, time to market, suppot costs, delivery/expense costs and time on site.
+           * Ansible Tower will help build better customer relationships, increase margin, allow you to franchise your Playbooks, Roles, 
+             or Collections bringing in revinue streams (internal or external) to your Enterprise or Organization within.
+           * As an individual this is a tool that you can put in your tool bag that can replace just about every management, orchastration, admin 
+             tool out there (Windows, Linux, Unix, IoT) just think of the opportunity you create for yourself.
+           * Best part Ansible is free, Ansible Tower comes at a cost however you can request a license for personal use to manage upto 10 nodes FOREVER for FREE, 
+             Or you can request an eval at the link below. Check it out I really think it is worth your time.            
+
  ** [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
  
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
@@ -38,6 +53,7 @@ Working in tandem, this is what the optimal Management system would look like fr
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md )
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md )
+ * [Ansible, from the Commandline](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
         NOTE: Ansible Tower is one of the easiest things to install at Red Hat the 
@@ -108,5 +124,10 @@ Working in tandem, this is what the optimal Management system would look like fr
  * [REDHATTOOLSINSTALLER-6.7-4.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/4a5891a4674f9d46ea4ed5ebc2df67dbe36b1b84/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
 [5. Useful Scripts](./Useful_Scripts)
+
+[6. intergrations](./Intergrations)
+
+ * Satellite/Ansible Tower
+ * Ansible Tower/ServiceNow
 
 more to come 
