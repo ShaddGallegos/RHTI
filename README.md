@@ -43,10 +43,12 @@ Working in tandem, this is what the optimal Management system would look like fr
              to your Enterprise or Organization within.
            * As an individual this is a tool that you can put in your tool bag 
              that can replace just about every management, orchastration, admin 
-             tool out there (Windows, Linux, Unix, IoT) just think of the opportunity you create for yourself.
+             tool out there (Windows, Linux, Unix, IoT) just think of the opportunity
+             you create for yourself.
            * Best part Ansible is free, Ansible Tower comes at a cost 
-             however you can request a license for personal use to manage upto 10 nodes FOREVER for FREE, 
-             Or for your Enterprise you can request an eval at the link below. Check it out I really think it is worth your time.            
+             however you can request a license for personal use to manage upto 10 nodes 
+             FOREVER for FREE, Or for your Enterprise you can request an eval at the link 
+             below. Check it out I really think it is worth your time.            
 
  ** [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
  
