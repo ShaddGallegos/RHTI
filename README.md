@@ -4,6 +4,7 @@
 In every environment there is a core set of servers/services that are required to allow your users to interface with the systems they use daily in seamless operation. The Red Hat Management Portfolio can provide you with the tools you need from a User Front End, Provisioning, Orchestration, Automation, and Management for your environment. These systems will allow you to provide that next level of IT service to your end users/customers. 
 
 My work is focused on: 
+
 * Ansible Tower
 * Satellite
 * InSights
@@ -24,35 +25,34 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 ![E2E Management Portfolio](./PNG/E2E_RedHat_Management_Portfolio.png)
 
+
 ## Table of Contents
+-----------------------
 
 [1. Ansible Tower](./Ansible_Tower)
 
-        Ansible and Ansible Tower should be the linchpin in your Enterprise and 
-        the foundation for your your journey into automation
+Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your
+your journey into automation
 
-        Ansible can:
+Ansible can:
 
-           * Get you started on your way to automation of everything.
-           * Has a lower cost of implamentation (easy to learn/master).
-           * Anybody can do it.  
-           * Ansible will reduce: development time, operations costs, time to 
-             market, suppot costs, delivery/expense costs and time on site.
-           * Ansible Tower will help build better customer relationships, increase 
-             margin, allow you to franchise your Playbooks, Roles, 
-             or Collections bringing in revinue streams (internal or external) 
-             to your Enterprise or Organization within.
-           * As an individual this is a tool that you can put in your tool bag 
-             that can replace just about every management, orchastration, admin 
-             tool out there (Windows, Linux, Unix, IoT) just think of the opportunity
-             you create for yourself.
-           * Best part Ansible is free, Ansible Tower comes at a cost 
-             however you can request a license for personal use to manage upto 10 nodes 
-             FOREVER for FREE, Or for your Enterprise you can request an eval at the link 
-             below. Check it out I really think it is worth your time.            
+  * Get you started on your way to automation of everything.
+  * Has a lower cost of implamentation (easy to learn/master).
+  * Anybody can do it.
+  * Ansible will reduce: development time, operations costs, time to market, suppot costs, 
+    delivery/expense costs and time on site.
+  * Ansible Tower will help build better customer relationships, increase margin, allow you to franchise 
+    your Playbooks, Roles, or Collections bringing in new revinue streams (internal or external) to 
+    your Enterprise or Organization within.
+  * As an individual this is a tool that you can put in your tool bag that can replace just about every
+    management, orchastration, admin tool out there (Windows, Linux, Unix, IoT) just think of the opportunity
+    you create for yourself.
+  * Best part Ansible is free, Ansible Tower comes at a cost however you can request a license for personal use to 
+    manage upto 10 nodes FOREVER for FREE, Or for your Enterprise you can request an eval at the link 
+    below. Check it out I really think it is worth your time.
 
- ** [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
- 
+[Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
+
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC)
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF)
@@ -61,9 +61,10 @@ Working in tandem, this is what the optimal Management system would look like fr
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md )
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md )
- * [Ansible, from the Commandline](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
+ * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
+        
         NOTE: Ansible Tower is one of the easiest things to install at Red Hat the 
               scripts below are something I made to help a windows person install Ansible Tower 
               on a linux system without thought. The scripts only install on a standalone if you 
@@ -82,7 +83,7 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 [2. Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
   
-[3. Redhat Workshops](https://github.com/ansible/workshops) - Code for building workshops.
+[3. Red Hat Workshops](https://github.com/ansible/workshops) - Code for building workshops.
 
 #### Instructor-led Workshops
 
