@@ -23,7 +23,7 @@ A predictive analytic tool with real-time, in-depth analysis of your Red Hat inf
 
 Working in tandem, this is what the optimal Management system would look like from a Red Hat perspective.
 
-![E2E Management Portfolio](./PNG/E2E_RedHat_Management_Portfolio.png)
+![E2E Management Portfolio](./PNG/E2E_RedHat_Management_PortfoliowServiceNow.png)
 
 
 ## Table of Contents
@@ -116,7 +116,8 @@ Ansible can:
  ** [Request Satellite License](https://www.redhat.com/en/technologies/management/smart-management)
 
         NOTE: Satellite has a lot of features so the request will be started with a conversation with 
-              your sales person and the technical account team to assist in the archatecturewhen you request a evaluation 
+              your sales person and the technical account team to assist in the archatecturewhen
+              you request a evaluation 
 
  * [Satellite_PDF](./Satellite/Satellite_PDF)
  * [Satellite_DOC](./Satellite/Satellite_DOC)

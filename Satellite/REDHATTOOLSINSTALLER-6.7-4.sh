@@ -709,7 +709,7 @@ yum-config-manager --enable epel
 subscription-manager repos --enable=rhel-7-server-extras-rpms
 yum clean all ; rm -rf /var/cache/yum
 sleep 2
-yum install -y qemu-kvm libvirt virt-install bridge-utils screen syslinux python-pip python3-pip rubygems lorax yum-utils vim gcc gcc-c++ git make automake kernel-devel libvirt-client bind dhcp tftp libvirt augeas ruby git --skip-broken
+yum install -y qemu-kvm libvirt virt-install virt-install virt-viewer bridge-utils screen syslinux python-pip python3-pip rubygems lorax yum-utils vim gcc gcc-c++ git make automake kernel-devel libvirt-client bind dhcp tftp libvirt augeas ruby git --skip-broken
 sleep 2
 echo " "
 echo " "
