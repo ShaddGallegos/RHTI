@@ -201,11 +201,13 @@ Ansible Tower Features:
 
 ![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
 
+[Requiremants to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
+
  * [REDHATTOOLSINSTALLER-6.7-4.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
-[5. Useful Scripts](./Useful_Scripts)
+[3. Useful Scripts](./Useful_Scripts)
 
-[6. intergrations](./Intergrations)
+[4. intergrations](./Intergrations)
 
  * [Satellite/Ansible Tower](./Intergrations/Satellite-Ansible_Tower) - in Progress
  * [Ansible Tower/ServiceNow](./Intergrations/Ansible_Tower-ServiceNow) - in progress
