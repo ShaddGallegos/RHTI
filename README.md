@@ -38,6 +38,7 @@ Working in tandem, this is what the optimal Management system would look like fr
         at any scale you can bring. 
 
        [Community vs. Enterprise](https://www.ansible.com/products/engine)
+
         Both the Ansible project and Ansible Engine are open source technologies. The Ansible project
         is built by the community (ansible.com/community) for the benefit of the community. 
         Ansible Engine is developed by Red Hat with the explicit intent of being used as an 
@@ -47,6 +48,7 @@ Working in tandem, this is what the optimal Management system would look like fr
         investment with an enterprise automation platform that delivers agility and flexibility.
 
        [ANSIBLE TOWER](https://www.ansible.com/products/tower)
+
         Solve problems once. Scale automation with control and insight. Collaborate across teams. 
         Manage policy enforcement and governance. Bring the power of automation to your whole 
         organization.
