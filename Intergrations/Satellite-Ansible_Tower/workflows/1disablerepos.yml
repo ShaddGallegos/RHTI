@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: root
+
+  tasks:
+
+    - name: Disabling all repos
+      command: yum-config-manager --disable '*'
+      tags: 
+        - disable 
+
+

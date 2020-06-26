@@ -1,0 +1,58 @@
+
+- name: Prepare Interfaces data
+  set_fact: 
+    new_iface: 
+      identifier: "{{ item.identifier }}"
+      mac: "{{ item.mac | default(omit) }}"
+      type: "{{ item.type }}"
+      managed: "{{ item.managed }}"
+      primary: "{{ item.primary }}"
+      provision: "{{ item.provision }}"
+      ip: "{{ item.ip | default(omit) }}"
+      attached_devices: "{{ item.attached_devices | default(omit) }}"
+      mode: "{{ item.mode | default(omit) }}"
+      bond_options: "{{ item.bond_options | default(omit) }}"
+      subnet_id: "{{ sat_subnets.json.results | selectattr('name', 'equalto', item.subnet | default(omit) ) | map(attribute='id') | first | default(omit) }}"
+      domain_id: "{{ sat_domains.json.results | selectattr('name', 'equalto', item.domain | default(omit) ) | map(attribute='id') | first | default(omit) }}"
+      name: "{{ item.name | default(omit) }}"
+  loop: "{{ newhost.interfaces_attributes }}"
+  register: new_ifaces
+    
+- name: POST New Host
+  uri:
+    url: "{{ sat_newhost_url }}"
+    user: "{{ sat_username }}"
+    password: "{{ sat_password }}"
+    force_basic_auth: true
+    return_content: true
+    validate_certs: false
+    body_format: json
+    method: POST
+    body: 
+      host: 
+        name: "{{ newhost.name }}"
+        location_id:        "{{ sat_locations.json.results        | selectattr('name', 'equalto', newhost.location)         | map(attribute='id') | first }}"
+        organization_id:    "{{ sat_organizations.json.results    | selectattr('name', 'equalto', newhost.organization)     | map(attribute='id') | first }}"
+        architecture_id:    "{{ sat_architectures.json.results    | selectattr('name', 'equalto', newhost.architecture | default(omit) )     | map(attribute='id') | first | default(omit) }}"
+        operatingsystem_id: "{{ sat_operatingsystems.json.results | selectattr('title', 'equalto', newhost.operatingsystem| default(omit) ) | map(attribute='id') | first | default(omit) }}"
+        medium_id:          "{{ sat_media.json.results            | selectattr('name', 'equalto', newhost.medium| default(omit) )           | map(attribute='id') | first | default(omit) }}"
+        ptable_id:          "{{ sat_ptables.json.results          | selectattr('name', 'equalto', newhost.ptable| default(omit) )           | map(attribute='id') | first | default(omit) }}"
+        interfaces_attributes: "{{ new_ifaces.results             | map(attribute='ansible_facts.new_iface')                | list }}"
+        hostgroup_id: "{{ sat_hostgroups.json.results             | selectattr('name', 'equalto', newhost.hostgroup)           | map(attribute='id') | first }}"
+        content_facet_attributes:
+          content_view_id: "{{ sat_contentviews.json.results | selectattr('organization.name', 'equalto', newhost.organization) | selectattr('name', 'equalto', newhost.content_view | default(omit)) | map(attribute='id') | first | default(omit) }}"
+          lifecycle_environment_id: "{{ sat_lifecycleenvironments.json.results      | selectattr('organization.name', 'equalto', newhost.organization) |  selectattr('name', 'equalto', newhost.lifecycle_environment | default(omit) ) | map(attribute='id') | first | default(omit) }}"
+          content_source_id: "{{ sat_smartproxies.json.results | selectattr('name', 'equalto', newhost.content_source | default(omit) ) | map(attribute='id') | first | default(omit) }}"
+        host_parameters_attributes: "{{ newhost.host_parameters_attributes | default(omit) }}"
+        comment: "{{ newhost.comment | default(omit) }}"
+        build: "{{ newhost.build | default(omit) }}"
+        enabled: "{{ newhost.enabled | default(omit) }}"
+        provision_method: "{{ newhost.provision_method | default(omit) }}"
+        managed: "{{ newhost.managed | default(omit) }}"
+
+    status_code: 
+    - 200
+    - 201
+  changed_when: host_create.status == 201
+  register: host_create
+
