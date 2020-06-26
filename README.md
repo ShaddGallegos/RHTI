@@ -47,7 +47,7 @@ Working in tandem, this is what the optimal Management system would look like fr
         Automation requires an investment in time, technology, and people. Make the most of your 
         investment with an enterprise automation platform that delivers agility and flexibility.
 
-[ANSIBLE TOWER](https://www.ansible.com/products/tower)
+[Ansible Tower](https://www.ansible.com/products/tower)
 
         Solve problems once. Scale automation with control and insight. Collaborate across teams. 
         Manage policy enforcement and governance. Bring the power of automation to your whole 
@@ -213,5 +213,6 @@ Ansible Tower Features:
 
  * [Satellite/Ansible Tower](./Intergrations/Satellite-Ansible_Tower) - in Progress
  * [Ansible Tower/ServiceNow](./Intergrations/Ansible_Tower-ServiceNow) - in progress
+ * [Red Hat Tiger Team member Michael Fords Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85/cloud-deploy)
 
 more to come 

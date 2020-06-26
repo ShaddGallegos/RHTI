@@ -1,15 +1,15 @@
 ---
-- hosts: all
+- name: Enable repos depending RHEL Distro
+  hosts: all
   become: root
 
   tasks:
     - name: Enabling RHEL 6 needed repos on nodes
-      command: subscription-manager repos --enable rhel-7-server-rh-common-rpms --enable rhel-7-server-extras-rpms --enable rhel-7-server-optional-rpms --enable rhel-7-server-supplementary-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-rpms --enable rhel-7-server-ansible-2.9-rpms
-
+      command:  subscription-manager repos --enable rhel-6-server-rpms
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
 
     - name: Enabling RHEL 7 needed repos on nodes
-      command: subscription-manager repos --enable rhel-7-server-rpms
+      command: subscription-manager repos --enable rhel-7-server-rh-common-rpms --enable rhel-7-server-extras-rpms --enable rhel-7-server-optional-rpms --enable rhel-7-server-supplementary-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-rpms --enable rhel-7-server-ansible-2.9-rpms
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
 
 
