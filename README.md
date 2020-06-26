@@ -5,9 +5,9 @@ In every environment there is a core set of servers/services that are required t
 
 My work is focused on: 
 
-* Ansible Tower
-* Satellite
-* InSights
+ * Ansible Tower
+ * Satellite
+ * InSights
 
 ![Red Hat Management](./PNG/Red_Hat_Management.png)
 
@@ -62,16 +62,16 @@ your journey into automation
 
 Ansible Features:
 
- * Simple
- * Powerful - hundreds of use cases 
- * Agentless
- * Cross platform – linux, windows, unix, iot, ect
- * Human readable - anyone can do it (no coding skills required) 
- * Perfect description of application - less time on documentation required
- * Version controlled
- * Dynamic inventories
- * Orchestration that plays well with others – hp sa, puppet, jenkins, rhnss, etc.
- * The language of devops
+  * Simple
+  * Powerful - hundreds of use cases 
+  * Agentless
+  * Cross platform – linux, windows, unix, iot, ect
+  * Human readable - anyone can do it (no coding skills required) 
+  * Perfect description of application - less time on documentation required
+  * Version controlled
+  * Dynamic inventories
+  * Orchestration that plays well with others – hp sa, puppet, jenkins, rhnss, etc.
+  * The language of devops
  
 Ansible Tower Features:
 
@@ -97,7 +97,7 @@ Ansible Tower Features:
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC)
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF)
  * [Ansible_PPT](./Ansible_Tower/Ansible_PPT)
- * [Ansible Use Cases](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
+ * [Ansible Use Cases](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
@@ -119,8 +119,9 @@ Ansible Tower Features:
         DISCLAMER: Also these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
  
- * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh)
 
 #### FREE Ansible Tower Workshops (listed below)
 ---------------------------------
@@ -147,14 +148,14 @@ Ansible Tower Features:
 | **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90)  | `workshop_type: rhel_90`  |
 
 #### Lab Provisioner
- - [AWS Lab Provisioner](https://github.com/ansible/workshops/tree/devel/provisioner) - playbook that spins up instances on AWS for students to perform the exercises provided above.
+ - [AWS Lab Provisioner](https://github.com/ansible/workshops/tree/devel/provisioner) - Playbook that spins up instances on AWS for students to perform the exercises provided above.
 
 #### Self Paced Exercises
 
  - [Vagrant Demo](https://github.com/ansible/workshops/tree/devel/vagrant-demo) - Self-paced network automation exercises that can be run on your personal laptop
 
 ---------------------------
-[4. Satellite](./Satellite)
+[2. Satellite](./Satellite)
 ---------------------------
 
         Red Hat Satellite is a system management solution that enables you to deploy, configure,
@@ -168,10 +169,11 @@ Ansible Tower Features:
         CLI, or API access.
 
         Red Hat Satellite Capsule Server mirrors content from Red Hat Satellite Server to facilitate 
-        content federation across various geographical locations. Host systems can pull content and configuration
-        from the Capsule Server in their location and not from the central Satellite Server. The Capsule Server
-        also provides localized services such as Puppet Master, DHCP, DNS, or TFTP. Capsule Servers assist you 
-        in scaling Red Hat Satellite as the number of managed systems increases in your environment.
+        content federation across various geographical locations. Host systems can pull content and
+        configuration from the Capsule Server in their location and not from the central Satellite
+        Server. The Capsule Server also provides localized services such as Puppet Master, DHCP, DNS,
+        or TFTP. Capsule Servers assist you in scaling Red Hat Satellite as the number of managed 
+        systems increases in your environment.
        
        [ACCESS RED HAT SATELLITE](https://access.redhat.com/documentation/en-us/red_hat_satellite/6.7/html/release_notes/pref-red_hat_satellite-release_notes-introduction#red_hat_satellite_and_proxy_server_life_cycle)
         
@@ -180,9 +182,9 @@ Ansible Tower Features:
 
  * [Whats components comprise Satellite?](https://access.redhat.com/articles/1343683)
 
-        NOTE: Satellite has a lot of features so the request will be started with a conversation with 
+        NOTE: Satellite has a lot of features so the request will be started with a conversation with
               your sales person and the technical account team to assist in the archatecturewhen
-              you request a evaluation 
+              you request a evaluation.
 
  * [Satellite_PDF](./Satellite/Satellite_PDF)
  * [Satellite_DOC](./Satellite/Satellite_DOC)
@@ -194,9 +196,12 @@ Ansible Tower Features:
  * sat6_healthCheck.sh
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
 
+        DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
+                   Do not use on a currently running production system. No implied warrenty or other.
+
 ![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
 
- * [REDHATTOOLSINSTALLER-6.7-4.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/4a5891a4674f9d46ea4ed5ebc2df67dbe36b1b84/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
+ * [REDHATTOOLSINSTALLER-6.7-4.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
 [5. Useful Scripts](./Useful_Scripts)
 
