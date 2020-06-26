@@ -37,7 +37,7 @@ Working in tandem, this is what the optimal Management system would look like fr
         your business requires in order to comfortably adopt organization-wide automation, and 
         at any scale you can bring. 
 
-       [Community vs. Enterprise](https://www.ansible.com/products/engine)
+[Community vs. Enterprise](https://www.ansible.com/products/engine)
 
         Both the Ansible project and Ansible Engine are open source technologies. The Ansible project
         is built by the community (ansible.com/community) for the benefit of the community. 
@@ -47,7 +47,7 @@ Working in tandem, this is what the optimal Management system would look like fr
         Automation requires an investment in time, technology, and people. Make the most of your 
         investment with an enterprise automation platform that delivers agility and flexibility.
 
-       [ANSIBLE TOWER](https://www.ansible.com/products/tower)
+[ANSIBLE TOWER](https://www.ansible.com/products/tower)
 
         Solve problems once. Scale automation with control and insight. Collaborate across teams. 
         Manage policy enforcement and governance. Bring the power of automation to your whole 
