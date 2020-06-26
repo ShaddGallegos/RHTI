@@ -29,7 +29,9 @@ Working in tandem, this is what the optimal Management system would look like fr
 ## Table of Contents
 -----------------------
 
+---------------------------
 [1. Ansible Tower](./Ansible_Tower)
+---------------------------
 
 Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your
 your journey into automation
@@ -110,10 +112,30 @@ Ansible can:
 
  - [Vagrant Demo](https://github.com/ansible/workshops/tree/devel/vagrant-demo) - Self-paced network automation exercises that can be run on your personal laptop
 
-
+---------------------------
 [4. Satellite](./Satellite)
+---------------------------
+
+        Red Hat Satellite is a system management solution that enables you to deploy, configure, and maintain your systems 
+        across physical, virtual, and cloud environments. Satellite provides provisioning, remote management and monitoring
+        of multiple Red Hat Enterprise Linux deployments with a single, centralized tool.
+
+        Red Hat Satellite Server synchronizes the content from Red Hat Customer Portal and other sources, and provides 
+        functionality including fine-grained life cycle management, user and group role-based access control, integrated
+        subscription management, as well as advanced GUI, CLI, or API access.
+
+        Red Hat Satellite Capsule Server mirrors content from Red Hat Satellite Server to facilitate content federation across
+        various geographical locations. Host systems can pull content and configuration from the Capsule Server in their
+        location and not from the central Satellite Server. The Capsule Server also provides localized services such as 
+        Puppet Master, DHCP, DNS, or TFTP. Capsule Servers assist you in scaling Red Hat Satellite as the number of managed systems
+        increases in your environment.
+       
+       [ACCESS RED HAT SATELLITE](https://access.redhat.com/documentation/en-us/red_hat_satellite/6.7/html/release_notes/pref-red_hat_satellite-release_notes-introduction#red_hat_satellite_and_proxy_server_life_cycle)
+        
 
  ** [Request Satellite License](https://www.redhat.com/en/technologies/management/smart-management)
+
+ * [Whats components comprise Satellite?](https://access.redhat.com/articles/1343683)
 
         NOTE: Satellite has a lot of features so the request will be started with a conversation with 
               your sales person and the technical account team to assist in the archatecturewhen
