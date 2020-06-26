@@ -30,28 +30,57 @@ Working in tandem, this is what the optimal Management system would look like fr
 -----------------------
 
 ---------------------------
-[1. Ansible Tower](./Ansible_Tower)
+[1. Ansible and Ansible Tower](./Ansible_Tower)
 ---------------------------
+
+        While the upstream Ansible community is known for fast-moving innovations, many enterprises
+        require a more secure, stable and reliable approach. With Ansible Engine, organizations
+        can access the tools and innovations available from the underlying Ansible technology in a
+        hardened, enterprise-grade manner. Ansible Engine relies on the massive, global community 
+        behind the Ansible project, and adds in the capabilities and assurance from Red Hat that 
+        your business requires in order to comfortably adopt organization-wide automation, and 
+        at any scale you can bring. 
+
+       [Community vs. Enterprise](https://www.ansible.com/products/engine)
+        Both the Ansible project and Ansible Engine are open source technologies. The Ansible project
+        is built by the community (ansible.com/community) for the benefit of the community. 
+        Ansible Engine is developed by Red Hat with the explicit intent of being used as an 
+        enterprise IT platform.
+
+        Automation requires an investment in time, technology, and people. Make the most of your 
+        investment with an enterprise automation platform that delivers agility and flexibility.
+
+       [ANSIBLE TOWER](https://www.ansible.com/products/tower)
+        Solve problems once. Scale automation with control and insight. Collaborate across teams. 
+        Manage policy enforcement and governance. Bring the power of automation to your whole 
+        organization.
+
+        With Red Hat Ansible Tower you can centralize and control your IT infrastructure with a visual
+        dashboard, role-based access control, job scheduling, integrated notifications and graphical 
+        inventory management. Easily embed Ansible Tower into existing tools and processes with REST 
+        API and CLI.
+
 
 Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your
 your journey into automation
 
-Ansible can:
+Ansible Tower Features:
 
-  * Get you started on your way to automation of everything.
-  * Has a lower cost of implamentation (easy to learn/master).
-  * Anybody can do it.
-  * Ansible will reduce: development time, operations costs, time to market, suppot costs, 
-    delivery/expense costs and time on site.
-  * Ansible Tower will help build better customer relationships, increase margin, allow you to franchise 
-    your Playbooks, Roles, or Collections bringing in new revinue streams (internal or external) to 
-    your Enterprise or Organization within.
-  * As an individual this is a tool that you can put in your tool bag that can replace just about every
-    management, orchastration, admin tool out there (Windows, Linux, Unix, IoT) just think of the opportunity
-    you create for yourself.
-  * Best part Ansible is free, Ansible Tower comes at a cost however you can request a license for personal use to 
-    manage upto 10 nodes FOREVER for FREE, Or for your Enterprise you can request an eval at the link 
-    below. Check it out I really think it is worth your time.
+  * Easy to understand and clean dashboard
+  * Real-time job status updates
+  * Multi-playbook workflows
+  * Easy to se who ran what job when
+  * Scale capacity with tower clusters
+  * Integrated notifications
+  * Schedule ansible jobs
+  * Manage and track your entire inventory
+  * Self-service it... simplified
+  * Remote command execution
+  * Comprehensive rest api and tower cli tool
+  * Role Based Access Controll
+  * LDAP, AD, and other authentication intergrations
+  * Made easy config for your logging aggragator 
+
 
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
@@ -59,7 +88,7 @@ Ansible can:
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC)
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF)
  * [Ansible_PPT](./Ansible_Tower/Ansible_PPT)
- * [Ansible Use Cases](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
+ * [Ansible Use Cases](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md )
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md )
@@ -80,8 +109,8 @@ Ansible can:
         DISCLAMER: Also these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
  
- * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
 
 [2. Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
   
@@ -93,17 +122,17 @@ Ansible can:
 
 | Workshop   | Presentation Deck  | Exercises  | Workshop Type Var   |
 |---|---|---|---|
-| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_rhel.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel)  | `workshop_type: rhel`  |
-| **Ansible Network Automation Workshop** <br> focused on router and switch platforms like Arista, Cisco, Juniper   | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_network.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_network)  | `workshop_type: network`  |
-| **Ansible F5 Workshop** <br> focused on automation of F5 BIG-IP  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_f5.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_f5)   | `workshop_type: f5` |
-| **Ansible Security Automation** <br> focused on automation of security tools like Check Point Firewall, IBM QRadar and the IDS Snort  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_security.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_security)   | `workshop_type: security` |
-| **Ansible Windows Automation Workshop** <br> focused on automation of Microsoft Windows  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_windows.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_windows)   | `workshop_type: windows` |
+| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_rhel.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel)  | `workshop_type: rhel`  |
+| **Ansible Network Automation Workshop** <br> focused on router and switch platforms like Arista, Cisco, Juniper   | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_network.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_network)  | `workshop_type: network`  |
+| **Ansible F5 Workshop** <br> focused on automation of F5 BIG-IP  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_f5.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_f5)   | `workshop_type: f5` |
+| **Ansible Security Automation** <br> focused on automation of security tools like Check Point Firewall, IBM QRadar and the IDS Snort  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_security.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_security)   | `workshop_type: security` |
+| **Ansible Windows Automation Workshop** <br> focused on automation of Microsoft Windows  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_windows.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_windows)   | `workshop_type: windows` |
 
 90 minute abbreviated versions:
 
 | Workshop   | Presentation Deck  | Exercises  | Workshop Type Var   |
 |---|---|---|---|
-| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/raw/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90)  | `workshop_type: rhel_90`  |
+| **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90)  | `workshop_type: rhel_90`  |
 
 #### Lab Provisioner
  - [AWS Lab Provisioner](https://github.com/ansible/workshops/tree/devel/provisioner) - playbook that spins up instances on AWS for students to perform the exercises provided above.
@@ -116,19 +145,21 @@ Ansible can:
 [4. Satellite](./Satellite)
 ---------------------------
 
-        Red Hat Satellite is a system management solution that enables you to deploy, configure, and maintain your systems 
-        across physical, virtual, and cloud environments. Satellite provides provisioning, remote management and monitoring
-        of multiple Red Hat Enterprise Linux deployments with a single, centralized tool.
+        Red Hat Satellite is a system management solution that enables you to deploy, configure,
+        and maintain your systems across physical, virtual, and cloud environments. Satellite 
+        provides provisioning, remote management and monitoring of multiple Red Hat Enterprise Linux
+        deployments with a single, centralized tool.
 
-        Red Hat Satellite Server synchronizes the content from Red Hat Customer Portal and other sources, and provides 
-        functionality including fine-grained life cycle management, user and group role-based access control, integrated
-        subscription management, as well as advanced GUI, CLI, or API access.
+        Red Hat Satellite Server synchronizes the content from Red Hat Customer Portal and other 
+        sources, and provides functionality including fine-grained life cycle management, user and 
+        group role-based access control, integrated subscription management, as well as advanced GUI, 
+        CLI, or API access.
 
-        Red Hat Satellite Capsule Server mirrors content from Red Hat Satellite Server to facilitate content federation across
-        various geographical locations. Host systems can pull content and configuration from the Capsule Server in their
-        location and not from the central Satellite Server. The Capsule Server also provides localized services such as 
-        Puppet Master, DHCP, DNS, or TFTP. Capsule Servers assist you in scaling Red Hat Satellite as the number of managed systems
-        increases in your environment.
+        Red Hat Satellite Capsule Server mirrors content from Red Hat Satellite Server to facilitate 
+        content federation across various geographical locations. Host systems can pull content and configuration
+        from the Capsule Server in their location and not from the central Satellite Server. The Capsule Server
+        also provides localized services such as Puppet Master, DHCP, DNS, or TFTP. Capsule Servers assist you 
+        in scaling Red Hat Satellite as the number of managed systems increases in your environment.
        
        [ACCESS RED HAT SATELLITE](https://access.redhat.com/documentation/en-us/red_hat_satellite/6.7/html/release_notes/pref-red_hat_satellite-release_notes-introduction#red_hat_satellite_and_proxy_server_life_cycle)
         
@@ -153,7 +184,7 @@ Ansible can:
 
 ![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
 
- * [REDHATTOOLSINSTALLER-6.7-4.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/raw/4a5891a4674f9d46ea4ed5ebc2df67dbe36b1b84/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
+ * [REDHATTOOLSINSTALLER-6.7-4.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/4a5891a4674f9d46ea4ed5ebc2df67dbe36b1b84/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
 [5. Useful Scripts](./Useful_Scripts)
 
