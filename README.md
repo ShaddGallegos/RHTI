@@ -67,20 +67,20 @@ Ansible Features:
   * Simple
   * Powerful - hundreds of use cases 
   * Agentless
-  * Cross platform – linux, windows, unix, iot, ect
+  * Cross platform – linux, windows, UNIX, iot, ect
   * Human readable - anyone can do it (no coding skills required) 
   * Perfect description of application - less time on documentation required
   * Version controlled
   * Dynamic inventories
-  * Orchestration that plays well with others – hp sa, puppet, jenkins, rhnss, etc.
-  * The language of devops
+  * Orchestration that plays well with others – hp sa, puppet, Jenkins, rhnss, etc.
+  * The language of DevOps
  
 Ansible Tower Features:
 
   * Easy to understand and clean dashboard
   * Real-time job status updates
   * Multi-playbook workflows
-  * Easy to se who ran what job when
+  * Easy to see who ran what job when
   * Scale capacity with tower clusters
   * Integrated notifications
   * Schedule ansible jobs
@@ -88,8 +88,8 @@ Ansible Tower Features:
   * Self-service it... simplified
   * Remote command execution
   * Comprehensive rest api and tower cli tool
-  * Role Based Access Controll
-  * LDAP, AD, and other authentication intergrations
+  * Role Based Access Control
+  * LDAP, AD, and other authentication integration
   * Made easy config for your logging aggragator 
 
 
@@ -203,7 +203,7 @@ Ansible Tower Features:
 
 ![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
 
-[Requiremants to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
+[Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
  * [REDHATTOOLSINSTALLER-6.7-4.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
   
