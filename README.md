@@ -25,10 +25,6 @@ Working in tandem, this is what the optimal Management system would look like fr
 
 ![E2E Management Portfolio](./PNG/E2E_RedHat_Management_PortfoliowServiceNow.png)
 
-
-## Table of Contents
------------------------
-
 ---------------------------
 [1. Ansible and Ansible Tower](./Ansible_Tower)
 ---------------------------
@@ -64,6 +60,19 @@ Working in tandem, this is what the optimal Management system would look like fr
 Ansible and Ansible Tower should be the linchpin in your Enterprise and the foundation for your
 your journey into automation
 
+Ansible Features:
+
+ * Simple
+ * Powerful - hundreds of use cases 
+ * Agentless
+ * Cross platform – linux, windows, unix, iot, ect
+ * Human readable - anyone can do it (no coding skills required) 
+ * Perfect description of application - less time on documentation required
+ * Version controlled
+ * Dynamic inventories
+ * Orchestration that plays well with others – hp sa, puppet, jenkins, rhnss, etc.
+ * The language of devops
+ 
 Ansible Tower Features:
 
   * Easy to understand and clean dashboard
@@ -73,7 +82,7 @@ Ansible Tower Features:
   * Scale capacity with tower clusters
   * Integrated notifications
   * Schedule ansible jobs
-  * Manage and track your entire inventory
+  * Manage and track your entire inventory - Static or DYNAMIC INVENTORIES
   * Self-service it... simplified
   * Remote command execution
   * Comprehensive rest api and tower cli tool
@@ -90,8 +99,9 @@ Ansible Tower Features:
  * [Ansible_PPT](./Ansible_Tower/Ansible_PPT)
  * [Ansible Use Cases](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
- * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md )
- * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md )
+ * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
+ * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
+ * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
@@ -112,11 +122,13 @@ Ansible Tower Features:
  * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
  * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://bitbucket.org/ShaddGallegos/redhattoolsinstaller/blob/0c291ee9fd53093599a7f6ed8762cf4b7ad985c4/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
 
-[2. Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
-  
-[3. Red Hat Workshops](https://github.com/ansible/workshops) - Code for building workshops.
+#### FREE Ansible Tower Workshops (listed below)
+---------------------------------
 
-#### Instructor-led Workshops
+ * Instructor-led (In person or remote)  - Contact your Red Hat Technical Account Manager, Account Solutions Architect, or Sales Team.
+ * Or in true Red Hat/Opensource fashion, Red Hat provides you the code to set it up for yourself!
+
+[Red Hat Workshops](https://github.com/ansible/workshops) - Code for building workshops.
 
 6 hour workshops:
 
