@@ -49,7 +49,6 @@
         enabled: "{{ newhost.enabled | default(omit) }}"
         provision_method: "{{ newhost.provision_method | default(omit) }}"
         managed: "{{ newhost.managed | default(omit) }}"
-
     status_code: 
     - 200
     - 201

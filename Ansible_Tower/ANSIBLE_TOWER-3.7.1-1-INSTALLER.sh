@@ -257,6 +257,7 @@ echo "********************************"
 yum-config-manager --enable epel 
 yum clean all 
 rm -rf /var/cache/yum
+yum -q list installed dnf &>/dev/null && echo "dnf is installed" || dnf install -y wget --skip-broken --noplugins 
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y wget --skip-broken --noplugins
 yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || yum install -y python3-pip --skip-broken --noplugins
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install -y yum-util* --skip-broken --noplugins
@@ -318,7 +319,7 @@ then
 echo "*******************"
 echo "Upgrade RHEL7 "
 echo "*******************"
-yum upgrade -y --skip-broken
+dnf upgrade -y --skip-broken --best --allowerasing 
 echo " "
 echo " "
 elif test $status -eq 1
@@ -338,7 +339,7 @@ function CloudRequirements {
 echo '*********************************************'
 echo 'Installing Cloud Requirements (Ignore Errors)'
 echo '*********************************************'
-yum install -y python3-pip ansible ansible-doc
+dnf install -y python3-pip ansible ansible-doc --skip-broken --best --allowerasing 
 source /var/lib/awx/venv/ansible/bin/activate
 umask "0022"
 pip3 install --user --upgrade pip boto3 ansible-tower-cli boto botocore requests requests-credssp cryptography pywinrm PyVmomi azure-mgmt-compute azure-mgmt-resource azure-keyvault-secrets six netaddr passlib
@@ -360,7 +361,7 @@ cd /root/Downloads
 wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.7.1-1.tar.gz
 tar -zxvf /root/Downloads/ansible-tower-setup-bundle-3.7.1-1.tar.gz 
 cd /root/Downloads/ansible-tower-setup-bundle-3.7.1-1
-yum localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.7.1-1/bundle/el7/repos/ansible-tower-dependencies/*.rpm
+dnf localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.7.1-1/bundle/el7/repos/ansible-tower-dependencies/*.rpm  --best --allowerasing
 sleep 2
 echo " "
 echo " " 

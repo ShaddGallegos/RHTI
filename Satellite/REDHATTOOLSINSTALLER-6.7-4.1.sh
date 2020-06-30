@@ -18,16 +18,19 @@ echo "Online: Continuing to Install"
 else
 echo "Offline"
 echo "This script requires access to the network to run please fix your settings and try again"
- sleep 3
+sleep 3
 exit 1
 fi
-sleep 2 
+sleep 1 
 reset
 if [ "$(whoami)" != "root" ]
 then
 echo "This script must be run as root - if you do not have the credentials please contact your administrator"
 exit
 else
+echo ' '
+echo ' '
+
 echo '
 
                                                    REDHAT TOOLS INSTALLER
@@ -36,8 +39,18 @@ echo ''
 read -p "To Continue Press [Enter] or use Ctrl+c to exit the installer"
 fi
 sleep 3 
-mkdir -p /root//Downloads
-mkdir -p /root//Downloads/RHTI
+reset
+}
+CHECKONLINE
+
+#--------------------------required packages for script to run----------------------------
+#-------------------------
+function SETUPHOSTFILE {
+#-------------------------
+HNAME=$(hostname)
+SHNAME=$(hostname -s)
+DOM="$(hostname -d)"
+mkdir -p RHTI
 mkdir /run/user/1000/dconf/ &>/dev/null
 touch /run/user/1000/dconf/user &>/dev/null
 chmod 777 /run/user/1000/dconf/user &>/dev/null
@@ -45,12 +58,38 @@ chmod -R 777 RHTI &>/dev/null
 chown -R nobody:nobody RHTI &>/dev/null
 echo ''
 cp -p /root/.bashrc /root/.bashrc.bak
-reset
+export INTERNAL=$(ip -o link | head -n 2 | tail -n 1 | awk '{print $2}' | sed s/:// )
+export EXTERNAL=$(ip route show | sed -e 's/^default via [0-9.]* dev \(\w\+\).*/\1/' | head -1)
+export INTERNALIP=$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')
+export INTERNALSUBMASK=$(ifconfig "$INTERNAL" |grep netmask |awk -F " " {'print $4'})
+export INTERNALGATEWAY=$(ip route list type unicast dev $(ip -o link | head -n 2 | tail -n 1 | awk '{print $2;}' | sed s/:$//) |awk -F " " '{print $7}')
+echo "INTERNALIP=$INTERNALIP" >> /root/.bashrc
+echo ''$INTERNALIP' '$HNAME' '$SHNAME'' >> /etc/hosts
+echo ' '
+echo ' '
+echo '********************************************************'
+echo 'ENSURE INTERNAL/PROVISIONING (eth0/ens3) GW CONNICTIVITY'
+echo '********************************************************'
+echo ' '
+echo 'what is the IP of your eth0 GATEWAY ?'
+read GWFQDN
+echo 'what is the FQDN of your eth0 GATEWAY ?'
+read GWINIP
+echo ''$GWINIP'  '$GWFQDN'' >> /etc/hosts
+ping -c 5 $GWINIP |exit 1
+sudo touch RHTI/SETUPHOSTFILE
 }
-CHECKONLINE
 
-#--------------------------required packages for script to run----------------------------
-
+ls RHTI/SETUPHOSTFILE &>/dev/null
+if [ $? -eq 0 ]; then
+echo '/etc/host has already been run Skipping'
+sleep 1
+else
+echo "Setting up /etc/hostfile to include this '$(hostname)' and the GW for your internal provisioning (eth0/ens3)  interface"
+SETUPHOSTFILE
+sleep 1
+echo " "
+fi
 
 #-------------------------
 function DISABLESECURITY {
@@ -69,7 +108,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 setenforce 0
 service firewalld stop
 chkconfig firewalld off
-sleep 1
+sleep 5
 echo " "
 echo " "
 }
@@ -92,7 +131,7 @@ echo "System is not registered, Please provide Red Hat CDN username and password
 subscription-manager register --auto-attach
 else
 echo "System is registered with Red Hat or a Red Hat Satellite, Continuing!"
-sleep 2 
+sleep 1 
 fi
 echo " "
 echo " "
@@ -131,20 +170,17 @@ subscription-manager repos --enable=rhel-7-server-extras-rpms || exit 1
 yum-config-manager --save --setopt=*.skip_if_unavailable=true
 yum clean all
 rm -fr /var/cache/yum/*
-mkdir -p /root/Downloads/RHTI
-touch /root/Downloads/RHTI/SYSREPOS
+sudo touch RHTI/SYSREPOS
 echo " "
 echo " "
 }
 
-ls /root/Downloads/RHTI/SYSREPOS &>/dev/null
+ls RHTI/SYSREPOS &>/dev/null
 if [ $? -eq 0 ]; then
-echo 'The repo requirements to run this script have been met, proceeding'
-sleep 2
+echo 'Repos Enabled'
 else
+echo ' Enabling Repos'
 SYSREPOS
-sleep 2
-echo " "
 fi
 
 #-----------------------------
@@ -157,7 +193,7 @@ echo "*********************************************************"
 yum-config-manager --enable epel
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install -y yum-util* --skip-broken
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y wget --skip-broken
-wget https://github.com/ShaddGallegos/RedHatToolsInstaller/raw/master/Satellite/xdialog-2.3.1-13.el7.centos.x86_64.rpm
+wget https://github.com/ShaddGallegos/RedHatToolsInstaller/raw/master/xdialog-2.3.1-13.el7.centos.x86_64.rpm
 chmod 777 /home/admin/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm 
 yum -q list installed xdialog &>/dev/null && echo "xdialog is installed" || yum localinstall -y xdialog-2.3.1-13.el7.centos.x86_64.rpm –skip-broken
 yum -q list installed ansible &>/dev/null && echo "ansible is installed" || yum install -y ansible --skip-broken 
@@ -172,22 +208,71 @@ yum -q list installed hiera &>/dev/null && echo "hiera is installed" || yum inst
 yum -q list installed perl &>/dev/null && echo "perl is installed" || yum install -y perl --skip-broken
 yum -q list installed python-deltarpm &>/dev/null && echo "python-deltarpm is installed" || yum install -y python-deltarpm --skip-broken
 yum -q list installed ruby &>/dev/null && echo "ruby is installed" || yum install -y ruby --skip-broken
+yum -q list installed diskimage-builder &>/dev/null && echo "diskimage-builder is installed" || yum install -y diskimage-builder --skip-broken
+yum -q list installed dracut &>/dev/null && echo "dracut is installed" || yum install -y dracut --skip-broken
+yum -q list installed ntfs-3g &>/dev/null && echo "ntfs-3g is installed" || yum install -y ntfs-3g --skip-broken
+yum -q list installed cifs &>/dev/null && echo "cifs is installed" || yum install -y cifs --skip-broken
+yum -q list installed cifs-utils &>/dev/null && echo "cifs-utils is installed" || yum install -y cifs-utils --skip-broken
 yum-config-manager --disable epel
 subscription-manager repos --disable=rhel-7-server-extras-rpms
-mkdir /root/Downloads/RHTI/
-touch /root/Downloads/RHTI/INSTALLERPACKAGES
+mkdir -p /run/user/1000/dconf
+sudo touch /run/user/1000/dconf/user
+sudo touch RHTI/INSTALLERPACKAGES
 echo " "
 echo " "
 }
 
-
-ls /root/Downloads/RHTI/INSTALLERPACKAGES &>/dev/null
+ls RHTI/INSTALLERPACKAGES &>/dev/null
 if [ $? -eq 0 ]; then
 echo 'The requirements to run this script have been met, proceeding'
-sleep 2
+sleep 1
 else
+echo "Installing requirements to run script please stand by"
 INSTALLERPACKAGES
-sleep 2
+sleep 1
+echo " "
+fi
+
+#-------------------------------
+function SERVICEUSER {
+#-------------------------------
+echo "*********************************************************"
+echo "ADMIN PASSWORD - WRITE DOWN OR REMEMBER THIS YOU WILL BE PROMPTED FOR 
+FORMAN USER CREDINTIALS: admin AND THIS PASSWORD WHEN WE IMPORT THE MANIFEST
+OR WHEN YOU LOGIN TO SATELLITE OR TOWER, YOU CAN CHANGE THIS INFORMATION 
+AFTER YOU LOG IN TO WHICHEVER SYSTEM YOU CREATE"
+echo "*********************************************************"
+echo 'ADMIN=admin'  >> /root/.bashrc
+echo 'What will the password be for your admin user?'
+read  ADMIN_PASSWORD
+echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
+export $ADMIN_PASSWORD
+echo "*********************************************************"
+echo "SETTING UP ADMIN"
+echo "*********************************************************"
+source /root/.bashrc
+useradd admin
+sleep 5
+usermod admin -p "$ADMIN_PASSWORD"
+usermod admin -G wheel
+mkdir -p /home/admin/git
+mkdir -p /home/admin/.ssh
+chown -R admin:admin /home/admin
+sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
+echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
+sleep 10 
+echo " "
+touch RHTI/SERVICEUSER
+}
+
+ls RHTI/SERVICEUSER &>/dev/null
+if [ $? -eq 0 ]; then
+echo 'The requirements to run this script have been met, proceeding'
+sleep 1
+else
+echo "Installing service account please stand by"
+SERVICEUSER
+sleep 1
 echo " "
 fi
 
@@ -223,15 +308,66 @@ fi
 #-----------------------------------------------------SCRIPT BEGINS-----------------------------------------------------
 #------------------------------------------------------ Functions ------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
+#-------------------------------
+function SATELLITEREQUIREMENTS {
+#-------------------------------
+echo "************************************************************************************************************************************"
+echo "
+                                              **************************
+                                              SATELLITE 6.7 REQUIREMENTS
+                                              **************************
+                                    Hardware Requirements
+                                        22GB Ram
+                                        300 GB Storage
+                                        8 CPU
+
+                                    Official Storage Requirements https://url.corp.redhat.com/SAT-6-7-Storage-Requirements
+                                    Filesystems Required for this script to run
+                                        /              Rest of Drive
+                                        /boot          1024 MB
+                                        /swap          18 GB
+
+                                    2 etthernet ports
+                                        eth0 internal for provisioning
+                                        eth1 external for syncing to cdn
+
+                                    The Server
+                                        Basic system or System with GUI
+
+           A user "admin" (I usualy set up an admin user during my initial install)
+                  useradd admin (Script will add this user for you if you dont do it already)
+
+           Your manifest from https://access.redhat.com/management/subscription_allocations
+
+           A /home/admin/Downloads directory (should be there by default if you have already created the user)
+
+           Copy this script, the attached xdialog rpm and your manifest into /home/admin/Downloads/
+
+           To run it
+           change to root user
+           sudo su
+
+           cd into the admin downloads dir
+           cd /home/admin/Downloads
+
+           Run the script
+           sh REDHATTOOLSINSTALLER-6.7.sh"
+echo " "
+echo "************************************************************************************************************************************"
+read -p "Press [Enter] to continue"
+reset
+}
+
 #-------------------------
 function SATELLITEREADME {
 #-------------------------
-reset
 echo " "
 echo " "
 echo " "
 echo " "
 echo "************************************************************************************************************************************"
+echo " "
+echo " "
 echo " "
 echo " "
 echo " "
@@ -263,11 +399,10 @@ echo " "
 echo " "
 echo " "
 echo " "
+echo " "
+echo " "
+echo " "
 echo "************************************************************************************************************************************"
-echo " "
-echo " "
-echo " "
-echo " "
 read -p "Press [Enter] to continue"
 reset
 if [ "$(whoami)" != "root" ]
@@ -302,31 +437,30 @@ echo "*******************************************************************"
 echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
 echo ' '
-subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
+subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`  || exit 1
 sleep 5
 echo ' '
 else
 echo "*******************************************************************"
 echo "System is registered with Red Hat or Red Hat Satellite, Continuing!"
 echo "*******************************************************************"
-sleep 5
 echo ' '
 echo "*******************************************************************"
 echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
-echo ' '
-subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 5 
-echo ' '
+echo 'If you do not have a Satellite sub this step will fail and it will boot you from the installer'
+subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`  || exit 1
+sleep 2
 fi
 echo " "
 echo " "
-touch /root/Downloads/RHTI/SATREGISTER
+sudo touch RHTI/SATREGISTER
 }
 
 #-------------------------------
 function VARIABLES1 {
 #-------------------------------
+reset 
 YMESSAGE="Adding to /root/.bashrc vars"
 NMESSAGE="Skipping"
 FMESSAGE="PLEASE ENTER Y or N"
@@ -335,75 +469,71 @@ DEFAULTVALUE=n
 HNAME=$(hostname)
 SHNAME=$(hostname -s)
 DOM="$(hostname -d)"
+echo "*********************************************************"
+echo "COLLECT VARIABLES FOR SAT 6.X"
+echo "*********************************************************"
+cp -p /root/.bashrc /root/.bashrc.bak
 export INTERNAL=$(ip -o link | head -n 2 | tail -n 1 | awk '{print $2}' | sed s/:// )
 export EXTERNAL=$(ip route show | sed -e 's/^default via [0-9.]* dev \(\w\+\).*/\1/' | head -1)
 export INTERNALIP=$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')
 export INTERNALSUBMASK=$(ifconfig "$INTERNAL" |grep netmask |awk -F " " {'print $4'})
 export INTERNALGATEWAY=$(ip route list type unicast dev $(ip -o link | head -n 2 | tail -n 1 | awk '{print $2;}' | sed s/:$//) |awk -F " " '{print $7}')
-echo "INTERNALIP=$INTERNALIP" >> /root/.bashrc
+echo " "
 echo "*********************************************************"
-echo 'ORGANIZATION'
+echo "ORGANIZATION"
 echo "*********************************************************"
-echo 'What is the Name of your organization or business unit.'
+echo 'What is the name of your Organization?'
 read ORG
 echo 'ORG='$ORG'' >> /root/.bashrc
+echo " "
+echo " "
 echo "*********************************************************"
-echo ''
-echo ''
-echo "*********************************************************"
-echo 'LOCATION'
+echo "LOCATION OF YOUR SATELLITE"
 echo "*********************************************************"
 echo 'What is the location of your Satellite server. Example DENVER'
 read LOC
 echo 'LOC='$LOC'' >> /root/.bashrc
-echo ''
-echo ''
+echo " "
+echo " "
 echo "*********************************************************"
 echo "SETTING DOMAIN"
 echo "*********************************************************"
 echo 'what is your domain name Example:'$(hostname -d)''
 read DOM
 echo 'DOM='$DOM'' >> /root/.bashrc
-echo ''
-echo ''
-echo "*********************************************************"
-echo "ADMIN PASSWORD - WRITE OR REMEMBER YOU WILL BE PROMPTED FOR 
-USER: admin AND THIS PASSWORD WHEN WE IMPORT THE MANIFEST"
-echo "*********************************************************"
-echo 'ADMIN=admin' >> /root/.bashrc
-echo 'What will the password be for your admin user?'
-read ADMIN_PASSWORD
-echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
-echo ''
-echo ''
+echo " "
+echo " "
+
+echo " "
+echo " "
 echo "*********************************************************"
 echo "NAME OF FIRST SUBNET"
 echo "*********************************************************"
 echo 'What would you like to call your first subnet for systems you are regestering to satellite?'
-read SUBNET
+read  SUBNET
 echo 'SUBNET_NAME='$SUBNET'' >> /root/.bashrc
-echo ''
-echo ''
+echo " "
+echo " "
 echo "*********************************************************"
 echo "PROVISIONED NODE PREFIX"
 echo "*********************************************************"
-echo 'The host prefix is used to distinguish the demo hosts created at the end of this script.'
+# The host prefix is used to distinguish the demo hosts created at the end of this script.
 echo 'What would you like the prefix to be for systems you are provisioning with Satellite Example poc- kvm- vm-? enter to skip'
-read PREFIX
+read  PREFIX
 echo 'HOST_PREFIX='$PREFIX'' >> /root/.bashrc
-echo ''
-echo ''
+echo " "
+echo " "
 echo "*********************************************************"
 echo "NODE PASSWORD"
 echo "*********************************************************"
 echo 'PROVISIONED HOST PASSWORD'
 echo 'Please enter the default password you would like to use for root for your newly provisioned nodes'
-read -s PASSWORD
+read PASSWORD
 for i in $(echo "$PASSWORD" | openssl passwd -apr1 -stdin); do echo NODEPASS=$i >> /root/.bashrc ; done
-echo ''
-echo ''
+echo " "
+echo " "
 echo "*********************************************************"
-echo "GRABBING VARIABLES NATIVE TO THE SYSTEM"
+echo "GATHERING VARIABLES SPECIFIC TO THIS SYSTEM, NO INPUT REQUIRED"
 echo "*********************************************************"
 export "DHCPSTART=$(ifconfig $INTERNAL | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."2}')"
 export "DHCPEND=$(ifconfig $INTERNAL | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."254}')"
@@ -432,7 +562,7 @@ echo 'DNS_REV='$(ifconfig $INTERNAL | grep "inet" | awk -F ' ' '{print $2}' |gre
 echo "*********************************************************"
 echo "DNS PTR RECORD"
 echo "*********************************************************"
-'PTR='$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $4}')'' >> /root/.bashrc
+'PTR='$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $4}')''  >> /root/.bashrc
 echo "*********************************************************"
 echo "SETTING SUBNET VARS"
 echo "*********************************************************"
@@ -452,9 +582,8 @@ echo 'DHCP_GW='$(ip route list type unicast dev $(ip -o link | head -n 2 | tail 
 echo 'DHCP_DNS='$(ifconfig $INTERNAL | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')'' >> /root/.bashrc
 sed -i 's/DHCP_GW=100 /DHCP_GW=/g' /root/.bashrc
 sed -i 's/DNS=100 /DNS=/g' /root/.bashrc
-echo ''$INTERNALIP' '$HNAME' '$SHNAME'' >> /etc/hosts
-touch /root/Downloads/RHTI/VARIABLES1
-echo ''
+
+touch RHTI/VARIABLES1
 }
 
 #-------------------------------
@@ -473,13 +602,18 @@ INPUT=${INPUT:-$DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 yum install -y ipa-client ipa-admintools
+echo " "
+echo " "
 echo 'What is the FQDN of the IPA Server?'
 read FQDNIPA
 echo 'IPA_SERVER='$FQDNIPA'' >> /root/.bashrc
-echo 'What is the location of the Capsule?'
+echo " "
+echo " "
 echo 'What is the ip address of your IPA host?'
 read IPAIP
 echo 'IPA_IP='$IPAIP'' >> /root/.bashrc
+echo " "
+echo " "
 source /root/.bashrc
 echo '$IPA_IP $FQDNIPA' >> /etc/hosts
 #COMMANDEXECUTION
@@ -489,7 +623,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/IPA
+sudo touch RHTI/IPA
 }
 
 #-------------------------------
@@ -521,7 +655,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/CAPSULE
+sudo touch RHTI/CAPSULE
 }
 
 #-------------------------------
@@ -559,7 +693,7 @@ echo 'CONFIGURE_LIBVIRT_RESOURCE=false' >> /root/.bashrc
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/SATLIBVIRT
+sudo touch RHTI/SATLIBVIRT
 }
 
 #-------------------------------
@@ -596,7 +730,7 @@ echo 'CONFIGURE_RHEV_RESOURCE=false' >> /root/.bashrc
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/SATRHV
+sudo touch RHTI/SATRHV
 
 }
 
@@ -619,7 +753,8 @@ echo ' '
 echo 'In another terminal please check/correct any variables in /root/.bashrc
 that are nopt needed or are wrong'
 read -p "Press [Enter] to continue"
-touch /root/Downloads/RHTI/RHVORLIBVIRT
+sudo touch RHTI/RHVORLIBVIRT
+reset
 }
 
 #-------------------------------
@@ -642,7 +777,7 @@ else
 echo -e "\n$FMESSAGE\n"
 
 fi
-touch /root/Downloads/RHTI/SYNCREL5
+sudo touch RHTI/SYNCREL5
 }
 
 #-------------------------------
@@ -664,7 +799,7 @@ echo 'RHEL6DEFAULTVALUE=n' >> /root/.bashrc
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/SYNCREL6
+sudo touch RHTI/SYNCREL6
 }
 
 #---END OF VARIABLES 1 SCRIPT---
@@ -687,15 +822,15 @@ echo "**************************"
 subscription-manager repos --enable=rhel-7-server-rpms
 subscription-manager repos --enable=rhel-server-rhscl-7-rpms
 subscription-manager repos --enable=rhel-7-server-optional-rpms
-subscription-manager repos --enable=rhel-7-server-satellite-6.7-rpms
-subscription-manager repos --enable=rhel-7-server-satellite-maintenance-6-rpms
+subscription-manager repos --enable=rhel-7-server-satellite-6.7-rpms || exit 1
+subscription-manager repos --enable=rhel-7-server-satellite-maintenance-6-rpms || exit 1
 subscription-manager repos --enable=rhel-7-server-ansible-2.9-rpms
 yum clean all 
 rm -rf /var/cache/yum
 echo " "
 echo " "
 echo " "
-touch /root/Downloads/RHTI/INSTALLREPOS
+sudo touch RHTI/INSTALLREPOS
 }
 
 #------------------------------
@@ -708,9 +843,9 @@ echo -ne "\e[8;40;170t"
 yum-config-manager --enable epel
 subscription-manager repos --enable=rhel-7-server-extras-rpms
 yum clean all ; rm -rf /var/cache/yum
-sleep 2
-yum install -y qemu-kvm libvirt virt-install virt-install virt-viewer bridge-utils screen syslinux python-pip python3-pip rubygems lorax yum-utils vim gcc gcc-c++ git make automake kernel-devel libvirt-client bind dhcp tftp libvirt augeas ruby git --skip-broken
-sleep 2
+sleep 1
+yum install -y qemu-kvm libvirt virt-install bridge-utils screen syslinux python-pip python3-pip rubygems lorax yum-utils vim gcc gcc-c++ git make automake kernel-devel libvirt-client bind dhcp tftp libvirt augeas ruby git --skip-broken
+sleep 1
 echo " "
 echo " "
 echo " "
@@ -731,7 +866,7 @@ echo "*********************************************************"
  subscription-manager repos --disable=rhel-7-server-extras-rpms
  yum clean all ; rm -rf /var/cache/yum
  yum upgrade -y; yum update -y
- touch /root/Downloads/RHTI/INSTALLDEPS
+ sudo touch RHTI/INSTALLDEPS
 }
 
 #----------------------------------
@@ -747,24 +882,14 @@ echo " "
 echo "*********************************************************"
 echo "GENERATE USERS AND SYSTEM KEYS FOR REQUIRED USERS"
 echo "*********************************************************"
-echo "*********************************************************"
-echo "SETTING UP ADMIN"
-echo "*********************************************************"
-groupadd admin
-useradd admin --group admin wheel -p $ADMIN
-mkdir -p /home/admin/.ssh
-mkdir -p /home/admin/git
-chown -R admin:admin /home/admin
-sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
-echo " "
 
 echo "*********************************************************"
 echo "SETTING UP FOREMAN-PROXY"
 echo "*********************************************************"
 useradd foreman-proxy -U -d /usr/share/foreman-proxy/ 
-sleep 2
+sleep 1
 mkdir -p /usr/share/foreman-proxy/.ssh
-sleep 2
+sleep 1
 sudo -u foreman-proxy ssh-keygen -f /usr/share/foreman-proxy/.ssh/id_rsa_foreman_proxy -N ''
 chown -R foreman-proxy:foreman-proxy /usr/share/foreman-proxy
 echo " "
@@ -795,17 +920,17 @@ echo "ADDING KATELLO-CVMANAGER TO /HOME/ADMIN/GIT "
 echo "*********************************************************"
 cd /home/admin/git
 git clone https://github.com/RedHatSatellite/katello-cvmanager.git
-cd 
+cd /home/admin/Downloads/
 mkdir -p /root/.hammer
 echo " "
 
 echo "*********************************************************"
-echo "SETTING ADMIN USER TO NO PASSWORD FOR SUDO"
+echo "SETTING ADMIN/FOREMAN USERS TO NO PASSWORD FOR SUDO"
 echo "*********************************************************"
 cp /etc/sudoers /etc/sudoers.bak
-echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
+echo 'foreman ALL = NOPASSWD: ALL' >> /etc/sudoers
 echo " "
-touch /root/Downloads/RHTI/GENERALSETUP
+sudo touch RHTI/GENERALSETUP
 }
 
 # --------------------------------------
@@ -829,7 +954,7 @@ mv /etc/hosts.bak /etc/hosts
 mv /etc/sysctl.conf.bak /etc/sysctl.conf
 sleep 10
 exit
-sleep 2
+sleep 1
 echo " "
 fi
 echo "*********************************************************"
@@ -842,10 +967,10 @@ else
 echo "No, the admin user does not exist
 please create a admin user and try again."
 exit
-sleep 2
+sleep 1
 echo " "
 fi
-touch /root/Downloads/RHTI/SYSCHECK
+sudo touch RHTI/SYSCHECK
 }
 
 # --------------------------------------
@@ -871,7 +996,7 @@ subscription-manager repos --enable=rhel-7-server-satellite-maintenance-6-rpms
 subscription-manager repos --enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
-sleep 2
+sleep 1
 echo " "
 echo " "
 echo " "
@@ -880,20 +1005,14 @@ echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
 yum-config-manager --disable epel
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || time yum install satellite -y --skip-broken 
-echo " "
-echo " "
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || time yum install -y 'satellite' --skip-broken 
 echo " "
 echo "INSTALLING PUPPET"
-yum -q list installed puppetserver &>/dev/null && echo "puppetserver is installed" || yum install puppetserver -y --skip-broken
-yum -q list installed puppet-agent-oauth &>/dev/null && echo "puppet-agent-oauth is installed" || yum install puppet-agent-oauth -y --skip-broken
-yum -q list installed puppet-agent &>/dev/null && echo "puppet-agent is installed" || yum install puppet-agent -y --skip-broken
-yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install rh-mongodb34-syspaths -y --skip-broken
-yum -q list installed fio &>/dev/null && echo "fio is installed" || yum install fio -y --skip-broken
-yum -q list installed tfm-rubygem-foreman_ansible_core &>/dev/null && echo "tfm-rubygem-foreman_ansible_core is installed" || yum install -y tfm-rubygem-foreman_ansible_core --skip-broken
-
-
-echo " "
+yum -q list installed puppetserver &>/dev/null && echo "puppetserver is installed" || time yum install puppetserver -y --skip-broken
+yum -q list installed puppet-agent-oauth &>/dev/null && echo "puppet-agent-oauth is installed" || time yum install puppet-agent-oauth -y --skip-broken
+yum -q list installed puppet-agent &>/dev/null && echo "puppet-agent is installed" || time yum install puppet-agent -y --skip-broken
+yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || time yum install rh-mongodb34-syspaths -y --skip-broken
+yum -q list installed fio &>/dev/null && echo "fio is installed" || time yum install fio -y --skip-broken
 echo " "
 echo " "
 echo "INSTALLING ANSIBLE ROLES"
@@ -902,10 +1021,10 @@ yum-config-manager --enable epel
 yum clean all
 rm -rf /var/cache/yum
 yum -q list installed rhel-system-roles &>/dev/null && echo "rhel-system-roles is installed" || time yum install rhel-system-roles -y --skip-broken
-sleep 2
+sleep 1
 subscription-manager repos --disable=rhel-7-server-extras-rpms
 yum-config-manager --disable epel
-touch /root/Downloads/RHTI/INSTALLNSAT
+sudo touch RHTI/INSTALLNSAT
 }
 
 #
@@ -932,7 +1051,7 @@ echo " "
 echo " "
 yum clean all
 rm -rf /var/cache/yum
-sleep 2
+sleep 1
 foreman-maintain packages unlock
 
 satellite-installer --scenario satellite -v \
@@ -968,7 +1087,7 @@ Now, Press [Enter] to continue"
 
 #--foreman-proxy-dns-tsig-principal="foreman-proxy $(hostname)@$DOM" \
 #--foreman-proxy-dns-tsig-keytab=/etc/foreman-proxy/dns.key \
-touch /root/Downloads/RHTI/CONFSAT
+sudo touch RHTI/CONFSAT
 }
 
 
@@ -985,6 +1104,7 @@ echo "CONFIGURING SATELLITE DHCP"
 echo "*********************************************************"
 yum clean all
 rm -rf /var/cache/yum
+katello-service stop
 foreman-maintain packages unlock
 foreman-installer -v \
 --no-lock-package-versions \
@@ -999,7 +1119,7 @@ foreman-installer -v \
 systemctl enable dhcpd.service
 systemctl start dhcpd.service
 sleep 5
-touch /root/Downloads/RHTI/CONFSATDHCP
+sudo touch RHTI/CONFSATDHCP
 }
 
 #--------------------------------------
@@ -1015,12 +1135,11 @@ echo "CONFIGURING SATELLITE TFTP"
 echo "*********************************************************"
 yum clean all
 rm -rf /var/cache/yum
-sleep 2
+sleep 1
+katello-service stop
 foreman-maintain packages unlock
-yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || yum install -y tfm-rubygem-foreman_discovery* --skip-broken 
-#yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y foreman-discovery-image* --skip-broken
-#yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken 
-
+yum -q list installed foreman-discovery* &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y foreman-discovery-image* --skip-broken
+yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken 
 foreman-installer -v \
 --no-lock-package-versions \
 --foreman-proxy-tftp true \
@@ -1029,17 +1148,21 @@ foreman-installer -v \
 
 systemctl start tftp.service
 systemctl enable tftp.service
-touch /root/Downloads/RHTI/CONFSATTFTP
+sudo touch RHTI/CONFSATTFTP
 }
 
 #--------------------------------------
 function FOREMANPROXY {
 #--------------------------------------
+yum clean all
+rm -rf /var/cache/yum
+sleep 1
+katello-service stop
 foreman-maintain packages unlock
-#yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image_client is installed" || yum install -y foreman-discovery* --skip-broken
-#yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken
-#yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image y is installed" || yum install -y rubygem-smart_proxy_discovery_image --skip-broken
-
+yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || yum install -y tfm-rubygem-foreman_discovery* --skip-broken
+yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image_client is installed" || yum install -y foreman-discovery* --skip-broken
+yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken
+yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image y is installed" || yum install -y rubygem-smart_proxy_discovery_image --skip-broken
 foreman-installer -v
 --enable-foreman-proxy \
 --enable-foreman-proxy-content \
@@ -1049,8 +1172,7 @@ foreman-installer -v
 --enable-foreman-proxy-plugin-openscap \
 --enable-foreman-proxy-plugin-pulp \
 --enable-foreman-proxy-plugin-remote-execution-ssh
-
-touch /root/Downloads/RHTI/FOREMANPROXY
+sudo touch RHTI/FOREMANPROXY
 }
 
 #--------------------------------------
@@ -1064,6 +1186,7 @@ echo " "
 echo "*********************************************************"
 echo "CONFIGURING ALL SATELLITE PLUGINS"
 echo "*********************************************************"
+katello-service stop
 foreman-maintain packages unlock
 subscription-manager repos --enable=rhel-7-server-rpms
 subscription-manager repos --enable=rhel-server-rhscl-7-rpms
@@ -1072,20 +1195,15 @@ subscription-manager repos --enable=rhel-7-server-satellite-6.7-rpms
 subscription-manager repos --enable=rhel-7-server-satellite-maintenance-6-rpm
 subscription-manager repos --enable rhel-7-server-ansible-2.9-rpms
 subscription-manager repos --enable=rhel-7-server-extras-rpms
-
 yum clean all 
 rm -rf /var/cache/yum
-sleep 2
-foreman-maintain packages unlock
 yum -q list installed puppet-foreman_scap_client &>/dev/null && echo "puppet-foreman_scap_client is installed" || yum install -y puppet-foreman_scap_client* --skip-broken
 yum -q list installed tfm-rubygem-hammer_cli_foreman_discovery &>/dev/null && echo "tfm-rubygem-hammer_cli_foreman_discovery is installed" || yum install -y tfm-rubygem-hammer_cli_foreman_discovery --skip-broken
-yum -q list installed OpenScap_client &>/dev/null && echo "OpenScap is installed" || yum install -y openscap-* scap-* --skip-broken
 
 source /root/.bashrc
 foreman-maintain packages unlock
 
 foreman-installer -v \
---no-lock-package-versions \
 --enable-foreman-cli-kubevirt \
 --enable-foreman-compute-ec2 \
 --enable-foreman-compute-gce \
@@ -1106,7 +1224,7 @@ foreman-installer -v \
 --enable-katello \
 --enable-puppet 
 
-touch /root/Downloads/RHTI/CONFSATPLUGINS
+sudo touch RHTI/CONFSATPLUGINS
 }
 
 #--------------------------------------
@@ -1131,7 +1249,7 @@ foreman-maintain packages unlock
 #yum install https://yum.theforeman.org/releases/latest/el7/x86_64/foreman-release.rpm
 #satellite-installer -v --katello-enable-deb true
 #foreman-installer -v --foreman-proxy-content-enable-deb --katello-enable-deb
-touch /root/Downloads/RHTI/CONFSATDEB
+sudo touch RHTI/CONFSATDEB
 }
 
 #--------------------------------------
@@ -1140,7 +1258,7 @@ function CONFSATCACHE {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
-sleep 2
+sleep 1
 echo "*********************************************************"
 echo "CONFIGURING SATELLITE CACHE"
 echo "*********************************************************"
@@ -1148,7 +1266,7 @@ foreman-rake apipie:cache:index --trace
 echo " "
 echo " "
 echo " "
-touch /root/Downloads/RHTI/CONFSATCACHE
+sudo touch RHTI/CONFSATCACHE
 }
 
 #--------------------------------------
@@ -1157,7 +1275,7 @@ function CHECKDHCP {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
-sleep 2
+sleep 1
 echo "*********************************************************"
 echo "VERIFYING DHCP IS WANTED FOR NEW SYSTEMS "
 echo "*********************************************************"
@@ -1179,7 +1297,7 @@ service dhcpd stop
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/CHECKDHCP
+sudo touch RHTI/CHECKDHCP
 }
 
 #--------------------------------------
@@ -1194,7 +1312,7 @@ echo " "
 subscription-manager repos --disable=rhel-7-server-extras-rpms
 yum clean all 
 rm -rf /var/cache/yum
-touch /root/Downloads/RHTI/DISABLEEXTRAS
+sudo touch RHTI/DISABLEEXTRAS
 }
 
 #------------------------------
@@ -1226,7 +1344,7 @@ cat > /root/.hammer/cli_config.yml<< EOF
 EOF
 sed -i 's/example/redhat/g' /etc/hammer/cli.modules.d/foreman.yml
 sed -i 's/#:password/:password/g' /etc/hammer/cli.modules.d/foreman.yml
-touch /root/Downloads/RHTI/HAMMERCONF
+sudo touch RHTI/HAMMERCONF
 }
 
 # --------------------------------------
@@ -1254,7 +1372,7 @@ echo "*********************************************************"
 echo 'If you have put your manafest into /home/admin/Downloads/'
 echo "*********************************************************"
 read -p "Press [Enter] to continue"
-sleep 2
+sleep 1
 echo " "
 echo " "
 echo " "
@@ -1263,7 +1381,7 @@ echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN USERNAME AND PASSWORD'
 echo "*********************************************************"
 hammer organization update --name $ORG
 hammer location update --name $LOC
-sleep 2
+sleep 1
 chown -R admin:admin /home/admin
 source /root/.bashrc
 for i in $(find /home/admin/Downloads/ |grep manifest* ); do sudo -u admin hammer subscription upload --file $i --organization $ORG ; done || exit 1
@@ -1275,7 +1393,7 @@ echo "*********************************************************"
 echo 'REFRESHING THE CAPSULE CONTENT'
 echo "*********************************************************"
 for i in $(hammer capsule list |awk -F '|' '{print $1}' |grep -v ID|grep -v -) ; do hammer capsule refresh-features --id=$i ; done 
-sleep 2
+sleep 1
 echo " "
 echo " "
 echo " "
@@ -1288,8 +1406,7 @@ hammer settings set --name default_location --value "$LOC"
 hammer settings set --name discovery_organization --value "$ORG"
 hammer settings set --name root_pass --value "$NODEPASS"
 hammer settings set --name query_local_nameservers --value true
-hammer settings set --name lab_features --value true
-hammer settings set --name default_puppet_environment --value development
+#hammer settings set --name lab_features --value true
 hammer settings set --name discovery_location --value "$LOC"
 hammer settings set --name content_view_solve_dependencies --value true
 hammer settings set --name remote_execution_by_default --value true
@@ -1303,7 +1420,7 @@ mkdir -p /etc/puppet/environments/production/modules
 echo " "
 echo " "
 echo " "
-touch /root/Downloads/RHTI/CONFIG2
+sudo touch RHTI/CONFIG2
 }
 
 #-------------------------------
@@ -1316,11 +1433,11 @@ echo "STOP THE LOG SPAMMING OF /VAR/LOG/MESSAGES WITH SLICE"
 echo "*********************************************************"
 echo 'if $programname == "systemd" and ($msg contains "Starting Session" or $msg contains "Started Session" or $msg contains "Created slice" or $msg contains "Starting user-" or $msg contains "Starting User Slice of" or $msg contains "Removed session" or $msg contains "Removed slice User Slice of" or $msg contains "Stopping User Slice of") then stop' > /etc/rsyslog.d/ignore-systemd-session-slice.conf
 systemctl restart rsyslog 
-touch /root/Downloads/RHTI/STOPSPAMMINGVARLOG
+sudo touch RHTI/STOPSPAMMINGVARLOG
 }
 
 
-#NOTE: Jenkins, CentOS Linux 7.8 Puppet Forge, Icinga, and Maven are examples of setting up a custom repository
+#NOTE: Jenkins, CentOS Linux 7.6 Puppet Forge, Icinga, and Maven are examples of setting up a custom repository
 #---START OF REPO CONFIGURE AND SYNC SCRIPT---
 source /root/.bashrc
 QMESSAGE5="Would you like to enable and sync RHEL 5 Content
@@ -1387,8 +1504,8 @@ QMESSAGEPUPPET="Would you like to download Puppet Forge custom content"
 QMESSAGEJENKINS="Would you like to download JENKINS custom content"
 QMESSAGEMAVEN="Would you like to download Maven custom content"
 QMESSAGEICINGA="Would you like to download Icinga custom content"
-QMESSAGEICENTOS7="Would you like to download CentOS Linux 7.8 custom content"
-QMESSAGEISCIENTIFICLINUX7="Would you like to download Scientific Linux 7.8 custom content"
+QMESSAGEICENTOS7="Would you like to download CentOS Linux 7.6 custom content"
+QMESSAGEISCIENTIFICLINUX7="Would you like to download SCIENTIFIC LINUX 7.6 custom content"
 
 YMESSAGE="Adding avalable content. This step will take the longest,
 (Depending on your network)"
@@ -1399,7 +1516,43 @@ OTHER7REPOSDEFAULTVALUE=n
 RHEL7DEFAULTVALUE=y
 RHEL8DEFAULTVALUE=y
 PUPPETDEFAULTVALUE=y
-tion "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 5 Server Kickstart x86_64 5.11' 2>/dev/null
+
+#-------------------------------
+function REQUESTSYNCMGT {
+#-------------------------------
+echo "*********************************************************"
+echo "Configuring Repositories"
+echo "*********************************************************"
+echo "*********************************************************"
+echo "BY DEFAULT IF YOU JUST LET THIS SCRIPT RUN YOU WILL 
+ONLY SYNC THE CORE RHEL 7 (KICKSTART, 7SERVER, OPTIONAL, EXTRAS,
+ SAT 6.7 TOOLS, SUPPLAMENTRY, AND RH COMMON ) THE PROGRESS 
+ TO THIS STEP CAN BE TRACKED AT $(hostname)/katello/sync_management :"
+echo "*********************************************************"
+if ! xset q &>/dev/null; then
+echo "No X server at \$DISPLAY [$DISPLAY]" >&2
+echo 'In a system browser please goto the URL to view progress https://$(hostname)/katello/sync_management'
+sleep 10
+else 
+firefox https://$(hostname)/katello/sync_management &
+fi
+sudo touch RHTI/REQUESTSYNCMGT
+}
+
+#-------------------------------
+function REQUEST5 {
+#-------------------------------
+source /root/.bashrc
+echo -ne "\e[8;40;170t"
+echo "*********************************************************"
+echo "RHEL 5 STANDARD REPOS:"
+echo "*********************************************************"
+read -n1 -t "$COUNTDOWN" -p "$QMESSAGE5 ? Y/N " INPUT
+INPUT=${INPUT:-$RHEL5DEFAULTVALUE}
+if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
+echo -e "\n$YMESSAGE\n"
+hammer repository-set enable --organization $ORG --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='5.11' --name 'Red Hat Enterprise Linux 5 Server (Kickstart)'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 5 Server Kickstart x86_64 5.11' 2>/dev/null
 
 hammer repository-set enable --organization $ORG --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='5Server' --name 'Red Hat Enterprise Linux 5 Server (RPMs)'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 5 Server (RPMs)' 2>/dev/null
@@ -1438,7 +1591,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUEST5
+sudo touch RHTI/REQUEST5
 }
 
 #-------------------------------
@@ -1496,7 +1649,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUEST6
+sudo touch RHTI/REQUEST6
 }
 
 #-------------------------------
@@ -1511,8 +1664,8 @@ read -n1 -t "$COUNTDOWN" -p "$QMESSAGE7 ? Y/N " INPUT
 INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.8' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8' 2>/dev/null
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.7' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.7' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server (RPMs)'
 #time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)'
@@ -1528,18 +1681,18 @@ hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
 #time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 -O /root/RPM-GPG-KEY-EPEL-7
-wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
+#wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
 sleep 10
-#hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7 --name 'GPG-EPEL-7' --organization $ORG
-hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7Server --name 'GPG-EPEL-7Sever' --organization $ORG
+hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7 --name 'GPG-EPEL-7' --organization $ORG
+#hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7Server --name 'GPG-EPEL-7Sever' --organization $ORG
 sleep 10
-#hammer product create --name='Extra Packages for Enterprise Linux 7' --organization $ORG
-hammer product create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG
+hammer product create --name='Extra Packages for Enterprise Linux 7' --organization $ORG
+#hammer product create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG
 sleep 10
-#hammer repository create --name='Extra Packages for Enterprise Linux 7' --organization $ORG --product='Extra Packages for Enterprise Linux 7' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7/x86_64/
+hammer repository create --name='Extra Packages for Enterprise Linux 7' --organization $ORG --product='Extra Packages for Enterprise Linux 7' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7/x86_64/
 #time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 7' --name 'Extra Packages for Enterprise Linux 7' 2>/dev/null
-hammer repository create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG --product='Extra Packages for Enterprise Linux 7Server' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7Server/x86_64/
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Extra Packages for Enterprise Linux 7Server' 2>/dev/null
+#hammer repository create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG --product='Extra Packages for Enterprise Linux 7Server' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7Server/x86_64/
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Extra Packages for Enterprise Linux 7Server' 2>/dev/null
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
 echo -e "\n$NMESSAGE\n"
@@ -1547,7 +1700,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUEST7
+sudo touch RHTI/REQUEST7
 }
 
 #-------------------------------
@@ -1562,13 +1715,13 @@ read -n1 -t "$COUNTDOWN" -p "$QMESSAGE8 ? Y/N " INPUT
 INPUT=${INPUT:-$RHEL8DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)' 
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)' 
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)' 
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Storage Native Client for RHEL 8 (RPMs)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
 sleep 10
@@ -1584,7 +1737,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUEST8
+sudo touch RHTI/REQUEST8
 }
 
 #-------------------------------
@@ -1608,7 +1761,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTJBOSS
+sudo touch RHTI/REQUESTJBOSS
 }
 
 #-------------------------------
@@ -1632,7 +1785,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTVIRTAGENT
+sudo touch RHTI/REQUESTVIRTAGENT
 }
 
 #-------------------------------
@@ -1656,7 +1809,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTSAT64
+sudo touch RHTI/REQUESTSAT64
 }
 
 #-------------------------------
@@ -1680,7 +1833,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTOSC
+sudo touch RHTI/REQUESTOSC
 }
 
 #-------------------------------
@@ -1717,7 +1870,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTCEPH
+sudo touch RHTI/REQUESTCEPH
 }
 
 #-------------------------------
@@ -1742,7 +1895,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTSNC
+sudo touch RHTI/REQUESTSNC
 }
 
 #-------------------------------
@@ -1767,7 +1920,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTCSI
+sudo touch RHTI/REQUESTCSI
 }
 
 #-------------------------------
@@ -1792,7 +1945,7 @@ echo -e "\n$NMESSAGE\n"
 elsehttps://www.linuxtechi.com/proxy-settings-yum-command-on-rhel-centos-servers/
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTRHVH
+sudo touch RHTI/REQUESTRHVH
 }
 
 #-------------------------------
@@ -1817,7 +1970,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTRHVM
+sudo touch RHTI/REQUESTRHVM
 }
 
 #-------------------------------
@@ -1842,7 +1995,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTATOMIC
+sudo touch RHTI/REQUESTATOMIC
 }
 
 #-------------------------------
@@ -1868,7 +2021,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTTOWER
+sudo touch RHTI/REQUESTTOWER
 }
 
 #-------------------------------
@@ -1894,7 +2047,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTPUPPET
+sudo touch RHTI/REQUESTPUPPET
 }
 
 #-------------------------------
@@ -1913,7 +2066,7 @@ wget http://pkg.jenkins.io/redhat-stable/jenkins.io.key
 hammer gpg create --organization $ORG --name GPG-JENKINS --key jenkins.io.key
 hammer product create --name='JENKINS' --organization $ORG
 hammer repository create --organization $ORG --name='JENKINS' --product=$ORG --gpg-key='GPG-JENKINS' --content-type='yum' --publish-via-http=true --url=https://pkg.jenkins.io/redhat/ --download-policy immediate
-time hammer repository synchronize --organization "$ORG" --product 'JENKINS' --name 'JENKINS' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'JENKINS' --name 'JENKINS' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -1922,7 +2075,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTJENKINS
+sudo touch RHTI/REQUESTJENKINS
 }
 
 #-------------------------------
@@ -1939,7 +2092,7 @@ if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 hammer product create --name='Maven' --organization $ORG
 hammer repository create --organization $ORG --name='Maven 7Server' --product='Maven' --content-type='yum' --publish-via-http=true --url=https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-7Server/x86_64/ --download-policy immediate
-time hammer repository synchronize --organization "$ORG" --product 'Maven 7Server' --name 'Maven 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Maven 7Server' --name 'Maven 7Server' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -1948,7 +2101,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTMAVEN
+sudo touch RHTI/REQUESTMAVEN
 }
 
 #-------------------------------
@@ -1967,7 +2120,7 @@ wget http://packages.icinga.org/icinga.key
 hammer gpg create --organization $ORG --name GPG-ICINGA --key icinga.key
 hammer product create --name='Icinga' --organization $ORG
 hammer repository create --organization $ORG --name='Icinga 7Server' --product='Icinga' --content-type='yum' --gpg-key='GPG-ICINGA' --publish-via-http=true --url=http://packages.icinga.org/epel/7Server/release --download-policy immediate
-time hammer repository synchronize --organization "$ORG" --product 'Icinga 7Server' --name 'Icinga 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Icinga 7Server' --name 'Icinga 7Server' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -1976,7 +2129,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTICINGA
+sudo touch RHTI/REQUESTICINGA
 }
 
 #-------------------------------
@@ -1985,7 +2138,7 @@ function REQUESTCENTOS7 {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo "*********************************************************"
-echo "CentOS Linux 7.8:"
+echo "CentOS Linux 7.6:"
 echo "*********************************************************"
 read -n1 -t "$COUNTDOWN" -p "$QMESSAGEICENTOS7 ? Y/N " INPUT
 INPUT=${INPUT:-$OTHER7REPOSDEFAULTVALUE}
@@ -1994,37 +2147,37 @@ echo -e "\n$YMESSAGE\n"
 cd /root/Downloads
 wget http://mirror.centos.org/centos/7.6.1810/os/x86_64/RPM-GPG-KEY-CentOS-7
 hammer gpg create --organization $ORG --name RPM-GPG-KEY-CentOS-Linux-7.6 --key RPM-GPG-KEY-CentOS-7
-hammer product create --name='CentOS Linux 7.8' --organization $ORG
+hammer product create --name='CentOS Linux 7.6' --organization $ORG
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 (Kickstart)' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/os/x86_64/ 
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 (Kickstart)' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 (Kickstart)' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/os/x86_64/ 
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 (Kickstart)' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 CentOS Plus' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/centosplus/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 CentOSplus' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 CentOS Plus' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/centosplus/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 CentOSplus' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 DotNET' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/dotnet/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 DotNET' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 DotNET' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/dotnet/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 DotNET' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Extras' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/extras/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Extras' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Extras' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/extras/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Extras' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Fasttrack' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/fasttrack/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Fasttrack' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Fasttrack' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/fasttrack/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Fasttrack' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Openshift-Origin' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/paas/x86_64/openshift-origin/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Openshift-Origin' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Openshift-Origin' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/paas/x86_64/openshift-origin/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Openshift-Origin' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 OpsTools' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/opstools/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 OpsTools' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 OpsTools' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/opstools/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 OpsTools' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Gluster 5' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/storage/x86_64/gluster-5/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Gluster 5' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Gluster 5' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/storage/x86_64/gluster-5/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Gluster 5' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Ceph-Luminous' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/storage/x86_64/ceph-luminous/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Ceph-Luminous' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Ceph-Luminous' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/storage/x86_64/ceph-luminous/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Ceph-Luminous' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Updates' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/updates/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Updates' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.6 Updates' --product='CentOS Linux 7.6' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.6 --publish-via-http=true --url=http://mirror.centos.org/centos/7.6.1810/updates/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.6' --name 'CentOS Linux 7.6 Updates' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -2033,7 +2186,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTCENTOS7
+sudo touch RHTI/REQUESTCENTOS7
 }
 
 #-------------------------------
@@ -2042,7 +2195,7 @@ function REQUESTSCIENTIFICLINUX {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo "*********************************************************"
-echo "CentOS Linux 7.8:"
+echo "CentOS Linux 7.6:"
 echo "*********************************************************"
 read -n1 -t "$COUNTDOWN" -p "$QMESSAGEISCIENTIFICLINUX7 ? Y/N " INPUT
 INPUT=${INPUT:-$OTHER7REPOSDEFAULTVALUE}
@@ -2052,28 +2205,28 @@ cd /root/Downloads
 wget http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/x86_64/os/RPM-GPG-KEY-sl7
 
 hammer gpg create --organization $ORG --name RPM-GPG-KEY-sl7 --key RPM-GPG-KEY-sl7
-hammer product create --name='Scientific Linux 7.8' --organization $ORG
+hammer product create --name='Scientific Linux 7.6' --organization $ORG
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 (Kickstart)' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/os/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 (Kickstart)' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 (Kickstart)' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/os/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 (Kickstart)' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 Updates Fastbugs' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/updates/fastbugs/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 Updates Fastbugs' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 Updates Fastbugs' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/updates/fastbugs/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 Updates Fastbugs' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 Updates Security' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/updates/security/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8'--name 'Scientific Linux 7.8 Updates Security' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 Updates Security' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7.6/x86_64/updates/security/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6'--name 'Scientific Linux 7.6 Updates Security' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 External Products Extras' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/extras/x86_64/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 External Products Extras' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 External Products Extras' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/extras/x86_64/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 External Products Extras' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 External Products HC' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/hc/x86_64/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 External Products HC' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 External Products HC' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/hc/x86_64/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 External Products HC' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 Software Collections' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/softwarecollections/x86_64/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 Software Collections' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 Software Collections' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/external_products/softwarecollections/x86_64/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 Software Collections' 2>/dev/null
 
-hammer repository create --organization $ORG --name='Scientific Linux 7.8 3rd Party Repos' --product='Scientific Linux 7.8' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/repos/x86_64/
-time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.8' --name='Scientific Linux 7.8 3rd Party Repos' 2>/dev/null
+hammer repository create --organization $ORG --name='Scientific Linux 7.6 3rd Party Repos' --product='Scientific Linux 7.6' --content-type='yum' --gpg-key='RPM-GPG-KEY-sl7' --publish-via-http=true --url=http://mirror.cpsc.ucalgary.ca/mirror/scientificlinux.org/7x/repos/x86_64/
+time hammer repository synchronize --organization "$ORG" --product='Scientific Linux 7.6' --name='Scientific Linux 7.6 3rd Party Repos' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -2082,7 +2235,7 @@ echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
 fi
-touch /root/Downloads/RHTI/REQUESTSCIENTIFICLINUX
+sudo touch RHTI/REQUESTSCIENTIFICLINUX
 }
 
 #-------------------------------
@@ -2094,12 +2247,12 @@ echo "*********************************************************"
 echo "SYNC ALL REPOSITORIES (WAIT FOR THIS TO COMPLETE BEFORE CONTINUING):"
 echo "*********************************************************"
 for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}') ; do hammer repository update --id $i --download-policy immediate ; done
-for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID'); do hammer repository synchronize --id ${i} --organization $ORG --async; done
+for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID' |grep -v -i puppet); do hammer repository synchronize --id ${i} --organization $ORG --async; done
 
-
-sleep 2
+sleep 1
 echo " "
-touch /root/Downloads/RHTI/SYNC
+sudo touch RHTI/SYNC
+pkill firfox
 }
 
 #-------------------------------
@@ -2113,14 +2266,14 @@ else
 firefox https://$(hostname)/katello/sync_management &
 fi
 echo " "
-touch /root/Downloads/RHTI/SYNCMSG
+sudo touch RHTI/SYNCMSG
 }
 
 #-------------------------------
 function PRIDOMAIN {
 #------------------------------
 for i in $(hammer --csv domain list |grep -v Id | awk -F ',' '{print $1}') ; do hammer domain update --id $i ; done
-touch /root/Downloads/RHTI/PRIDOMAIN
+sudo touch RHTI/PRIDOMAIN
 }
 
 #-------------------------------
@@ -2133,7 +2286,7 @@ echo "CREATE THE FIRST OR PRIMARY SUBNET TO CONNECT THE NODES TO THE SATELLITE:"
 echo "*********************************************************"
 echo " "
 hammer subnet create --name $SUBNET_NAME --network $INTERNALNETWORK --mask $SUBNET_MASK --gateway $DHCP_GW --dns-primary $DNS --ipam 'Internal DB' --from $SUBNET_IPAM_BEGIN --to $SUBNET_IPAM_END --tftp-id 1 --dhcp-id 1 --domain-ids 1 --organizations $ORG --locations "$LOC"
-touch /root/Downloads/RHTI/CREATESUBNET
+sudo touch RHTI/CREATESUBNET
 }
 
 #-------------------------------
@@ -2178,7 +2331,7 @@ hammer lifecycle-environment create --name='PROD_RHEL_8' --prior='TEST_RHEL_8' -
 #echo " "
 #hammer lifecycle-environment list --organization $ORG
 #echo " "
-touch /root/Downloads/RHTI/ENVIRONMENTS
+sudo touch RHTI/ENVIRONMENTS
 }
 
 #-------------------------------
@@ -2192,10 +2345,10 @@ echo "Create a daily sync plan:"
 echo "*********************************************************"
 hammer sync-plan create --name 'Daily_Sync' --description 'Daily Synchronization Plan' --organization $ORG --interval daily --sync-date $(date +"%Y-%m-%d")" 00:00:00" --enabled no
 hammer sync-plan create --name 'Weekly_Sync' --description 'Weekly Synchronization Plan' --organization $ORG --interval weekly --sync-date $(date +"%Y-%m-%d")" 00:00:00" --enabled yes
-#hammer sync-plan create --name 'Scientific Linux 7.8 Weekly Sync' --description 'Weekly Sync sl_76 Plan' --organization $ORG --interval weekly --sync-date $(date +"%Y-%m-%d")" 00:00:00" --enabled yes
+#hammer sync-plan create --name 'Scientific Linux 7.6 Weekly Sync' --description 'Weekly Sync sl_76 Plan' --organization $ORG --interval weekly --sync-date $(date +"%Y-%m-%d")" 00:00:00" --enabled yes
 hammer sync-plan list --organization $ORG
 echo " "
-touch /root/Downloads/RHTI/SYNCPLANS
+sudo touch RHTI/SYNCPLANS
 }
 
 #-------------------------------
@@ -2204,15 +2357,8 @@ function SYNCPLANCOMPONENTS {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
-hammer product set-sync-plan --name 'Red Hat Enterprise Linux Server' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Extra Packages for Enterprise Linux 7' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Red Hat Enterprise Linux for x86_64' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Extra Packages for Enterprise Linux 6' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Extra Packages for Enterprise Linux 5' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Puppet Forge' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'CentOS Linux 7.8' --organization $ORG --sync-plan 'Weekly_Sync'
-hammer product set-sync-plan --name 'Scientific Linux 7.8' --organization $ORG --sync-plan 'Scientific Linux 7.8 Weekly Sync'
-touch /root/Downloads/RHTI/SYNCPLANCOMPONENTS
+for i in $(hammer --csv product list --enabled yes --organization $ORG |grep -v "-" |grep -v ID| awk -F ',' '{print $1}') ; do hammer product set-sync-plan --id $i --organization $ORG --sync-plan 'Weekly_Sync' ; done
+sudo touch RHTI/SYNCPLANCOMPONENTS
 }
 
 #-------------------------------
@@ -2224,16 +2370,9 @@ echo " "
 echo "*********************************************************"
 echo "Associate plan to products:"
 echo "*********************************************************"
-hammer product set-sync-plan --sync-plan-id=1 --organization $ORG --name='Oracle Java for RHEL Server'
-hammer product set-sync-plan --sync-plan-id=1 --organization $ORG --name='Red Hat Enterprise Linux Server'
-hammer product set-sync-plan --sync-plan-id=1 --organization $ORG --name='Red Hat Enterprise Linux for x86_64'
-hammer product set-sync-plan --sync-plan-id=1 --organization $ORG --name='Puppet Forge'
-hammer product set-sync-plan --sync-plan-id=2 --organization $ORG --name='Extra Packages for Enterprise Linux 5'
-hammer product set-sync-plan --sync-plan-id=2 --organization $ORG --name='Extra Packages for Enterprise Linux 6'
-hammer product set-sync-plan --sync-plan-id=1 --organization $ORG --name='Extra Packages for Enterprise Linux 7'
-hammer product set-sync-plan --sync-plan-id=2 --organization $ORG --name='CentOS Linux 7.8'
-hammer product set-sync-plan --sync-plan-id=$(hammer --csv sync-plan list --organization $ORG |grep 'Scientific Linux 7.8 Weekly Sync'|awk -F ',' '{print $1}') --organization $ORG --name='Scientific Linux 7.8'
-touch /root/Downloads/RHTI/ASSOCPLANTOPRODUCTS
+for i in $(hammer --csv product list --enabled yes --organization $ORG |grep -v "-" |grep -v ID| awk -F ',' '{print $1}') ; do hammer product set-sync-plan --sync-plan-id=2 --organization $ORG --id=$i; done
+#hammer product set-sync-plan --sync-plan-id=$(hammer --csv sync-plan list --organization $ORG |grep 'Scientific Linux 7.6 Weekly Sync'|awk -F ',' '{print $1}') --organization $ORG --name='Scientific Linux 7.6'
+sudo touch RHTI/ASSOCPLANTOPRODUCTS
 }
 
 #-------------------------------
@@ -2243,23 +2382,23 @@ source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
 echo "***********************************************"
-echo "Create a content view for CentOS Linux 7.8:"
+echo "Create a content view for CentOS Linux 7.6:"
 echo "***********************************************"
 #hammer content-view create --name='RHEL7-server-x86_64' --organization $ORG
-#sleep 20
+#sleep 10
 #for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID'); do hammer content-view add-repository --name RHEL7-Base --organization $ORG --repository-id=${i}; done 
 hammer content-view create --organization $ORG --name 'CentOS 7' --label 'CentOS7' --description 'CentOS 7'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 (Kickstart)'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Gluster 5'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Extras'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 ISO'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Openshift-Origin'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 DotNET'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 CentOSplus'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Ceph-Luminous'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Fasttrack'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 OpsTools'
-hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.8' --repository 'CentOS Linux 7.8 Updates'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 (Kickstart)'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Gluster 5'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Extras'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 ISO'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Openshift-Origin'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 DotNET'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 CentOSplus'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Ceph-Luminous'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Fasttrack'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 OpsTools'
+hammer content-view add-repository --organization $ORG --name 'CentOS 7' --product 'CentOS Linux 7.6' --repository 'CentOS Linux 7.6 Updates'
 time hammer content-view publish --organization $ORG --name 'CentOS 7' --description 'Initial Publishing' 2>/dev/null
 time hammer content-view version promote --organization $ORG --content-view 'CentOS 7' --to-lifecycle-environment DEV_CentOS_7 2>/dev/null
 echo "***********************************************"
@@ -2402,7 +2541,71 @@ hammer content-view puppet-module add --organization $ORG --content-view 'RHEL5_
 hammer content-view puppet-module add --organization $ORG --content-view 'RHEL5_Base' --author saz --name ssh
 time hammer content-view publish --organization $ORG --name 'RHEL5_Base' --description 'Initial Publishing' 2>/dev/null
 time hammer content-view version promote --organization $ORG --content-view 'RHEL5_Base' --to-lifecycle-environment DEV_RHEL_5 2>/dev/null
-touch /root/Downloads/RHTI/CONTENTVIEWS
+sudo touch RHTI/CONTENTVIEWS
+}
+
+#-------------------------------
+function PUBLISHRHEL7CONTENT {
+#-------------------------------
+source /root/.bashrc
+echo -ne "\e[8;40;170t"
+echo "***********************************************"
+echo "CREATE A CONTENT VIEW FOR RHEL 7"
+echo "***********************************************"
+read -n1 -t "$COUNTDOWN" -p "$QMESSAGE7 ? Y/N " INPUT
+INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
+if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
+echo -e "\n$YMESSAGE\n"
+hammer content-view create --organization $ORG --name 'RHEL_7_x86_64' --label RHEL_7_x86_64 --description 'RHEL 7'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.7'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Extra Packages for Enterprise Linux 7' --repository 'Extra Packages for Enterprise Linux 7'
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_7_x86_64' --author puppetlabs --name stdlib
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_7_x86_64' --author puppetlabs --name concat
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_7_x86_64' --author puppetlabs --name ntp
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_7_x86_64' --author saz --name ssh
+time hammer content-view publish --organization $ORG --name 'RHEL_7_x86_64' --description 'Initial Publishing' 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7--to-lifecycle-environment PROD_RHEL_7 2>/dev/null
+sudo touch RHTI/PUBLISHRHEL8CONTENT
+fi
+}
+
+#-------------------------------
+function PUBLISHRHEL8CONTENT {
+#-------------------------------
+read -n1 -t "$COUNTDOWN" -p "$QMESSAGE8 ? Y/N " INPUT
+INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
+if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
+echo -e "\n$YMESSAGE\n"
+echo "***********************************************"
+echo "CREATE A CONTENT VIEW FOR RHEL 8"
+echo "***********************************************"
+hammer content-view create --organization $ORG --name 'RHEL_8_x86_64' --label RHEL_8_x86_64 --description 'RHEL 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream Kickstart x86_64 8.1'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs x86_64 8.1'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.1'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs x86_64 8.1'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs x86_64 8.1'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Extra Packages for Enterprise Linux 8' --repository 'Extra Packages for Enterprise Linux 8'
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_8_x86_64' --author puppetlabs --name stdlib
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_8_x86_64' --author puppetlabs --name concat
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_8_x86_64' --author puppetlabs --name ntp
+hammer content-view puppet-module add --organization $ORG --content-view 'RHEL_8_x86_64' --author saz --name ssh
+time hammer content-view publish --organization $ORG --name 'RHEL_8_x86_64' --description 'Initial Publishing' 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_6' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
+sudo touch RHTI/PUBLISHRHEL8CONTENT
+fi
 }
 
 #-------------------------------
@@ -2422,7 +2625,7 @@ touch /root/Downloads/RHTI/CONTENTVIEWS
 # echo "********************************"
 # echo " "
 # hammer content-view publish --name 'rhel-7-server-x86_64' --organization $ORG --async
-# sleep 2000
+# sleep 1000
 # echo " "
 # echo "*********************************************************"
 # echo "Promote content views to DEV_RHEL,TEST_RHEL,PROD_RHEL:"
@@ -2433,7 +2636,7 @@ touch /root/Downloads/RHTI/CONTENTVIEWS
 # sleep 700
 # hammer content-view version promote --organization $ORG --from-lifecycle-environment ='TEST_RHEL' --to-lifecycle-environment 'PROD_RHEL' --id 2 --async
 # sleep 700
-#touch /root/Downloads/RHTI/PUBLISHCONTENT
+#sudo touch RHTI/PUBLISHCONTENT
 #}
 
 #-------------------------------
@@ -2445,13 +2648,10 @@ echo " "
 echo "***********************************"
 echo "Create a host collection for RHEL:"
 echo "***********************************"
-hammer host-collection create --name='RHEL 7 x86_64' --organization $ORG
-hammer host-collection create --name='CentOS 7 x86_64' --organization $ORG
-hammer host-collection create --name='RHEL 5 x86_64' --organization $ORG
-hammer host-collection create --name='RHEL 6 x86_64' --organization $ORG
+hammer host-collection create --name='RHEL_7_x86_64' --organization $ORG
+hammer host-collection create --name='RHEL_8_x86_64' --organization $ORG
 sleep 10
-hammer host-collection list --organization $ORG
-touch /root/Downloads/RHTI/HOSTCOLLECTION
+sudo touch RHTI/HOSTCOLLECTION
 }
 
 #-------------------------------
@@ -2463,15 +2663,13 @@ echo " "
 echo "*********************************************************"
 echo "Create an activation keys for environments:"
 echo "*********************************************************"
-hammer activation-key create --name 'RHEL7-x86_64' --organization $ORG --content-view='RHEL 7' --lifecycle-environment 'DEV_RHEL_7'
-hammer activation-key create --name 'CentOS7-x86_64' --organization $ORG --content-view='CentOS 7' --lifecycle-environment 'DEV_CentOS_7'
-#hammer activation-key create --name 'rhel-7-server-x86_64'-DEV_RHEL_7 --organization $ORG --content-view='RHEL7-server-x86_64' --lifecycle-environment 'DEV_RHEL_7'
-#sleep 2
-#hammer activation-key create --name 'rhel-7-server-x86_64'-TEST_RHEL_7 --organization $ORG --content-view='RHEL7-server-x86_64' --lifecycle-environment 'TEST_RHEL_7'
-#sleep 2
-#hammer activation-key create --name 'rhel-7-server-x86_64'-PROD_RHEL_7 --organization $ORG --content-view='RHEL7-server-x86_64' --lifecycle-environment 'PROD_RHEL_7'
-#sleep 2
-touch /root/Downloads/RHTI/KEYSFORENV
+hammer activation-key create --name 'DEV_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'DEV_RHEL_7'
+hammer activation-key create --name 'TEST_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'TEST_RHEL_7'
+hammer activation-key create --name 'PROD_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'PROD_RHEL_7'
+
+hammer activation-key create --name 'DEV_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'DEV_RHEL_8'
+hammer activation-key create --name 'TEST_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'TEST_RHEL_8'
+hammer activation-key create --name 'PROD_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'PROD_RHEL_8'sudo touch RHTI/KEYSFORENV
 }
 
 #-------------------------------
@@ -2483,13 +2681,11 @@ echo " "
 echo "*********************************************************"
 echo "Associate each activation key to host collection:"
 echo "*********************************************************"
-hammer activation-key add-host-collection --name 'RHEL7-x86_64' --host-collection='RHEL 7 x86_64' --organization $ORG
-sleep 2
-hammer activation-key add-host-collection --name 'CentOS7-x86_64' --host-collection='CentOS 7 x86_64' --organization $ORG
-sleep 2
-hammer activation-key add-host-collection --name 'rhel-7-server-x86_64'-PROD_RHEL_7 --host-collection='RHEL 7 x86_64' --organization $ORG
-sleep 2
-touch /root/Downloads/RHTI/KEYSTOHOST
+for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_7); do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' --organization $ORG; done
+sleep 1
+for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_8); do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' --organization $ORG; done
+sleep 1
+sudo touch RHTI/KEYSTOHOST
 }
 
 #-------------------------------
@@ -2498,19 +2694,17 @@ function SUBTOKEYS {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
-echo "********************************"
-echo "
- There may be errors in the next step (Could not add subscription to activation key) Please ignore these as
- long as your primary keys for your enabled subscriptions have been added"
- 
-echo " "
-echo "********************************"
 echo " "
 echo "*********************************************************"
 echo "Add all subscriptions available to keys:"
 echo "*********************************************************"
 for i in $(hammer --csv activation-key list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); do for j in $(hammer --csv subscription list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); do hammer activation-key add-subscription --id ${i} --subscription-id ${j}; done; done
-touch /root/Downloads/RHTI/SUBTOKEYS
+echo " "
+echo "*********************************************************"
+echo "Enable all the base content for each OS by default:"
+echo "*********************************************************"
+for i in $(hammer activation-key list --organization $ORG | grep -v ID | grep -v '-' | awk -F '|' '{print $1}') ; do hammer activation-key product-content --content-access-mode-all true --organization $ORG  --id $i ;done
+sudo touch RHTI/SUBTOKEYS
 }
 
 #-------------------------------
@@ -2529,7 +2723,7 @@ hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server
 #RHEL 8
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.0/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.0 Kickstart" --operatingsystems="RedHat 8.0"
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.1/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.1 Kickstart" --operatingsystems="RedHat 8.1"
-touch /root/Downloads/RHTI/MEDIUM
+sudo touch RHTI/MEDIUM
 }
 
 #----------------------------------
@@ -2565,9 +2759,9 @@ echo "VERIFY VARIABLES IN /root/.bashrc"
 echo "*********************************************************"
 cat /root/.bashrc
 echo " "
-sleep 2
+sleep 1
 read -p "Press [Enter] to continue"
-touch /root/Downloads/RHTI/VARSETUP2
+sudo touch RHTI/VARSETUP2
 }
 
 #-----------------------------------
@@ -2586,7 +2780,7 @@ hammer os set-default-template --id="${i}" --config-template-id="${PXEID}"
 hammer os add-config-template --id="${i}" --config-template-id="${SATID}"
 hammer os set-default-template --id="${i}" --config-template-id="${SATID}"
 done
-touch /root/Downloads/RHTI/PARTITION_OS_PXE_TEMPLATE
+sudo touch RHTI/PARTITION_OS_PXE_TEMPLATE
 }
 
 #-------------------------------
@@ -2602,8 +2796,8 @@ echo "*********************************************************"
 ENVIROMENT=$(hammer --csv lifecycle-environment list |awk -F "," {'print $2'}|grep -v Name |grep -v production)
 LEL=$(hammer --csv environment list |awk -F "," {'print $2'}|grep -v Name)
 for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name RHEL-7.7-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID1 --operatingsystem-id $OSID1 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=rreeddhhaatt ; done; done
-#for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name CentOS Linux 7.8-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID2 --operatingsystem-id $OSID2 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=redhat ; done; done
-touch /root/Downloads/RHTI/HOSTGROUPS
+#for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name CentOS Linux 7.6-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID2 --operatingsystem-id $OSID2 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=redhat ; done; done
+sudo touch RHTI/HOSTGROUPS
 }
 
 #-------------------------------
@@ -2617,7 +2811,7 @@ echo "Setting up and Modifying default template for auto discovery"
 echo "*********************************************************"
 #sed -i 's/SATELLITE_CAPSULE_URL/'$(hostname)'/g' /usr/share/foreman/app/views/unattended/pxe/PXELinux_default.erb
 #hammer template update --id 1
-touch /root/Downloads/RHTI/MODPXELINUXDEF
+sudo touch RHTI/MODPXELINUXDEF
 }
 
 #-------------------------------
@@ -2630,7 +2824,7 @@ echo "*********************************************************"
 echo "ASSOCIATE OS TO TEMPLATE"
 echo "*********************************************************"
 hammer template add-operatingsystem --operatingsystem-id 1 --id 1
-touch /root/Downloads/RHTI/ADD_OS_TO_TEMPLATE
+sudo touch RHTI/ADD_OS_TO_TEMPLATE
 }
 
 #------------------------------
@@ -2651,7 +2845,7 @@ firewall-cmd --permanent \
 --add-port="22/tcp" --add-port="16514/tcp" \
 --add-port="389/tcp" --add-port="636/tcp" \
 --add-port=5900-5930/tcp
-touch /root/Downloads/RHTI/SATREENABLEFOIREWALL
+sudo touch RHTI/SATREENABLEFOIREWALL
 }
 
 #-------------------------------
@@ -2659,7 +2853,7 @@ function SATDONE {
 #-------------------------------
 echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE!'
 clear}
-touch /root/Downloads/RHTI/
+sudo touch RHTI/
 }
 
 #NOTE You can remove or dissasociate templates Remove is perm (Destricutve) dissasociate you can re associate if you need 
@@ -2698,7 +2892,7 @@ for i in $(hammer medium list |grep -i Fedora |awk -F "|" {'print $1'}) ; do ham
 for i in $(hammer medium list |grep -i FreeBSD |awk -F "|" {'print $1'}) ; do hammer medium delete --id $i ;done
 for i in $(hammer medium list |grep -i OpenSUSE |awk -F "|" {'print $1'}) ; do hammer medium delete --id $i ;done
 for i in $(hammer medium list |grep -i Ubuntu |awk -F "|" {'print $1'}) ; do hammer medium delete --id $i ;done
-touch /root/Downloads/RHTI/REMOVEUNSUPPORTED
+sudo touch RHTI/REMOVEUNSUPPORTED
 }
 
 #-------------------------------
@@ -2754,7 +2948,7 @@ echo disassoction of ${INDEX} from ${ORG}@${LOC}
 hammer organization remove-config-template --config-template "${INDEX}" --name "${ORG}"
 hammer location remove-config-template --config-template "${INDEX}" --name "${LOC}"
 done
-touch /root/Downloads/RHTI/DISASSOCIATE_TEMPLATES
+sudo touch RHTI/DISASSOCIATE_TEMPLATES
 }
 
 #-------------------------------
@@ -2794,7 +2988,7 @@ foreman-rake katello:reimport
 foreman-rake apipie:cache:index
 hammer template build-pxe-default
 for i in $(hammer capsule list |awk -F '|' '{print $1}' |grep -v ID|grep -v -) ; do hammer capsule refresh-features --id=$i ; done 
-touch /root/Downloads/RHTI/SATUPDATE
+sudo touch RHTI/SATUPDATE
 }
 
 #-------------------------------
@@ -2803,7 +2997,8 @@ function INSIGHTS {
 yum update python-requests -y
 yum install redhat-access-insights -y
 redhat-access-insights --register
-touch /root/Downloads/RHTI/INSIGHTS
+sudo touch RHTI/INSIGHTS
+satellite-maintain packages lock
 }
 
 
@@ -2814,26 +3009,13 @@ rm -rf /home/admin/FILES
 rm -rf /root/FILES
 rm -rf /tmp/*
 mv -f /root/.bashrc.bak /root/.bashrc
-touch /root/Downloads/RHTI/CLEANUP
+sudo touch RHTI/CLEANUP
 }
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------Ansible Tower---------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
-
-# This installer will work on RHEL 7 or RHEL 8 and:
-#1.verify you are root 
-#2.Check you are connected to the internet.
-#3.Provide a breif overview of what the tool is.
-#4.Help the end user register with Red Hat if not already done.
-#5.Take of some prep stuff install shut off firewall and selinux and install pip prior to install.
-#6.Enable required repos for OS and Ansible Tower.
-#7.Upgrades the OS.
-#8.Installs the dependencies from the bundle forces them to requirement levels listed in bundle.
-#9.Installs Tower. (Queries user for tower password) 
-#10. Gives the end user the option to enable firewall and selinux.
-
 
 #-------------------------
 function ANSIBLETOWERTXT {
@@ -2844,97 +3026,79 @@ echo " "
 echo " "
 echo " "
 echo "
-                                            ANSIBLE-TOWER BASE HARDWARE REQUIREMENTS
+ANSIBLE-TOWER BASE HARDWARE REQUIREMENTS
 
-                        1. Ansible-Tower will require a RHEL subscription and an Ansible Tower License.
-                           Please register and download your lincense at http://www.ansible.com/tower-trial
+1. Ansible-Tower will require a RHEL subscription and an Ansible Tower License.
+Please register and download your lincense at http://www.ansible.com/tower-trial
 
-                        2. Hardware requirement depends, however whether 
-                           it is a KVM or physical-Tower will require atleast 1 node with:
+2. Hardware requirement depends, however whether 
+ it is a KVM or physical-Tower will require atleast 1 node with:
 
-                                  Min Storage 35GB
-                                  Directorys Recommended
-                                     /boot 1024MB
-                                      /swap 8192MB
-                                      / Rest of drive
+Min Storage 35GB
+Directorys Recommended
+/boot 1024MB
+/swap 8192MB
+/ Rest of drive
 
-                                      Min RAM 4096
-                                      Min CPU 2 (4 Reccomended)
 
-                                      3. Network
-                                      Connection to the internet so the installer can download the required packages
-                                      eth0 internal Provisioning network
-                                      eth1 external"
+Min RAM 4096
+Min CPU 2 (4 Reccomended)
+
+3. Network
+Connection to the internet so the installer can download the required packages"
 echo " "
 echo " "
 echo " "
 read -p "Press [Enter] to continue"
 reset
 echo " "
-echo " "
-
 echo "
 
-                                                      REQUIREMENTS CONTINUED
+REQUIREMENTS CONTINUED
 
-                        4. For this POC you must have a RHN User ID and password with entitlements
-                           to channels below. (item 6)
+4. For this POC you must have a RHN User ID and password with entitlements
+ to channels below. (item 6)
 
-                        5. Install ansible tgz will be downloaded and placed into the FILES directory 
-                           created by the sript on the host machine:
+5. Install ansible tgz will be downloaded and placed into the FILES directory created by the sript on the host machine:
 
-                        6. This install was tested with:
-                           * RHEL_7.x in a KVM environment.
-                           * Ansible Tower 3.7.0-4
-                             https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el7.tar.gz
-                           * Red Hat subscriber channels:
-                                rhel-7-server-ansible-2.9-rpms
-                                rhel-7-server-extras-rpms
-                                rhel-7-server-optional-rpms
-                                rhel-7-server-rpms
-                                https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+6. This install was tested with:
+* RHEL_7.x in a KVM environment.
+* Ansible Tower 3.6.4 https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.6.4-1.tar.gz
+* Red Hat subscriber channels:
+rhel-7-server-ansible-2.8-rpms
+rhel-7-server-extras-rpms
+rhel-7-server-optional-rpms
+rhel-7-server-rpms
+https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
-                          * RHEL_8.x in a KVM environment.
-                          * Ansible Tower 3.7.0-4 https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el8.tar.gz
-                          * Red Hat subscriber channels:
-                                ansible-2.9-for-rhel-8-x86_64-rpms
-                                rhel-8-for-x86_64-appstream-rpms
-                                rhel-8-for-x86_64-baseos-rpms
-                                rhel-8-for-x86_64-supplementary-rpms
-                                rhel-8-for-x86_64-optional-rpms
-                                https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-
-        URL Resources 
-            http://www.ansible.com
-            https://www.ansible.com/tower-trial
-            http://docs.ansible.com/ansible-tower/latest/html/quickinstall/index.html"
+URL Resources 
+http://www.ansible.com
+https://www.ansible.com/tower-trial
+http://docs.ansible.com/ansible-tower/latest/html/quickinstall/index.html"
 echo " "
 echo " "
-read -p "        If you have met all of the minimum requirements from above please Press [Enter] to continue"
+read -p "If you have met all of the minimum requirements from above please Press [Enter] to continue"
 echo " "
 reset
 }
 
 #-----------------------------
-function ANSIBLECHECKCONNECT {
+function CHECKCONNECT {
 #-----------------------------
-echo " "
-echo " "
 echo "********************************************"
 echo "Verifying the server can get to the internet"
 echo "********************************************"
-wget -q --tries=10 --timeout=20 --spider http://redhat.com
+wget -q --tries=10 --timeout=20 --spider http://google.com
 if [[ $? -eq 0 ]]; then
-echo "Online: Continuing to Install"
-sleep 2
+echo "Online: 
+ Continuing to Install"
+sleep 3
 else
 echo "Offline"
 echo "This script requires access to 
  the network to run please fix your settings and try again"
-sleep 2
+sleep 3
 exit 1
-echo " "
-echo " "
 fi
 }
 
@@ -2953,85 +3117,30 @@ subscription-manager register --auto-attach
 
 else
 echo "System is registered with Red Hat or Red Hat Satellite, Continuing!"
-sleep 2 
+sleep 1 
 fi
 echo " "
 echo " "
 }
 
 #-------------------------------
-function ANSIBLESECURITY {
+function ANSIBLEPREPFORINSTALL {
 #-------------------------------
-mkdir /root/Downloads
-cd /root/Downloads
+mkdir ~/Downloads
+cd ~/Downloads
 echo "***************************************************************************"
-echo "SET SELINUX TO PERMISSIVE FOR THE INSTALL AND CONFIG OF Ansible Tower 3.7.0-4"
+echo "SET SELINUX TO PERMISSIVE FOR THE INSTALL AND CONFIG OF Ansible Tower 3.6.4"
 echo "***************************************************************************"
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 setenforce 0
 service firewalld stop
 echo " "
 echo " "
-}
-
-#-------------------------------
-function YOURUSER {
-#-------------------------------
-echo "*********************************************************"
-echo "Setting up your user on the system if needed"
-echo "*********************************************************"
-echo " "
-YMESSAGE="Adding your user"
-NMESSAGE="Skipping"
-FMESSAGE="PLEASE ENTER Y or N"
-COUNTDOWN=15
-DEFAULTVALUE=n
-echo " "
-read -n1 -p "Do you need to ad your user to the system Y/N " 
-INPUT=${INPUT:-$DEFAULTVALUE}
-if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
-echo -e "\n$YMESSAGE\n"
-echo " "
-echo "Enter your username: "
-read USERNAME
-echo " "
-echo "Enter the password: "
-read PASSWORD
-echo " "
-adduser "$USERNAME" --group wheel
-echo "$PASSWORD" | passwd "$USERNAME" --stdin
-echo " "
-sudo -u "$USERNAME" ssh-keygen -f /home/"$USERNAME"/.ssh/id_rsa -t rsa -N ''
-chown -R "$USERNAME":"$USERNAME" /usr/share/"$USERNAME"
-mkdir -p /home/"$USERNAME"/git
-chown -R "$USERNAME":"$USERNAME" /home/admin
-echo " "
-echo " "
-fi
-}
-
-#-------------------------------
-function ADMINUSERS {
-#-------------------------------
-echo " "
-echo "*********************************************************"
-echo "SETTING UP ADMIN"
-echo "*********************************************************"
-echo " "
-echo 'What would you like your default Ansible Tower user "admin" password to be?'
-read ADMINPASSWORD
-export $ADMINPASSWORD
-groupadd admin
-useradd admin --group admin wheel -p $ADMINPASSWORD
-mkdir -p ~/.ssh
-mkdir -p ~/git
-chown -R admin:admin /home/admin
-sudo -u admin ssh-keygen -f ~/.ssh/id_rsa -N ''
-echo " "
-echo "***********************************************************************"
-echo "SETTING UP ROOT KEYS (Please select NO if it prompts you to overwrite "
-echo "***********************************************************************"
-ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
+echo "*******************"
+echo "FIRST DISABLE REPOS"
+echo "*******************"
+subscription-manager repos --disable "*"
+yum-config-manager --disable "*"
 echo " "
 echo " "
 }
@@ -3043,80 +3152,31 @@ grep -q -i "release 7." /etc/redhat-release
 status=$?
 if test $status -eq 0
 then
-echo " "
-echo "*******************"
-echo "DISABLE REPOS"
-echo "*******************"
-subscription-manager repos --disable "*"
-sleep 2
-echo " "
-echo " "
 echo "*******************"
 echo "ENABLE REPOS RHEL7 "
 echo "*******************"
-subscription-manager repos --enable rhel-7-server-extras-rpms --enable rhel-7-server-optional-rpms --enable rhel-7-server-supplementary-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-rpms --enable rhel-7-server-ansible-2.9-rpms
 yum -q list installed epel &>/dev/null && echo "epel is installed" || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm --skip-broken
-yum-config-manager --add-repo https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-el7.repo
+subscription-manager repos --enable rhel-7-server-rh-common-rpms --enable rhel-7-server-extras-rpms --enable rhel-7-server-optional-rpms --enable rhel-7-server-supplementary-rpms --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-rpms --enable rhel-7-server-ansible-2.9-rpms
 yum clean all
 rm -rf /var/cache/yum
 yum-config-manager --setopt=\*.skip_if_unavailable=1 --save \*
 echo " "
 echo " "
-sleep 2
+sleep 1
 echo "********************************"
 echo "CHECKING AND INSTALLING PACKAGES"
 echo "********************************"
-yum-config-manager --enable epel 
-yum clean all 
-rm -rf /var/cache/yum
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y wget --skip-broken --noplugins
+yum -q list installed python3-pip-wheel &>/dev/null && echo "wgpython3-pip-wheel is installed" || yum install -y python3-pip-wheel --skip-broken --noplugins
 yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || yum install -y python3-pip --skip-broken --noplugins
+yum -q list installed platform-python-pip &>/dev/null && echo "platform-python-pip is installed" || yum install -y platform-python-pip --skip-broken --noplugins
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install -y yum-util* --skip-broken --noplugins
-yum -q list installed bash-completion-extras &>/dev/null && echo "bash-completion-extras is installed" || yum install -y bash-completion-extras --skip-broken --noplugins
-yum -q list installed dconf &>/dev/null && echo "dconf is installed" || yum install -y dconf* --skip-broken --noplugins
-yum -q list installed git &>/dev/null && echo "git is installed" || yum install -y git --skip-broken --noplugins
-mkdir -p /root/Downloads/git 
-cd /root/Downloads/git
-git clone https://github.com/ansible/product-demos.git
-cd /root/Downloads
+yum -q list installed dialog &>/dev/null && echo "dialog is installed" || yum localinstall -y dialog --skip-broken --noplugins
+yum -q list installed bash-completion-extras &>/dev/null && echo "bash-completion-extras" || yum install -y bash-completion-extras --skip-broken --noplugins
+yum -q list installed dconf &>/dev/null && echo "dconf" || yum install -y dconf* --skip-broken --noplugins
 yum-config-manager --disable epel
 echo " "
 echo " "
-elif test $status -eq 1
-then
-echo '*******************'
-echo 'ENABLE REPOS RHEL 8' 
-echo '*******************'
-subscription-manager repos --disable '*'
-subscription-manager repos --enable ansible-2.9-for-rhel-8-x86_64-rpms --enable rhel-8-for-x86_64-appstream-rpms --enable rhel-8-for-x86_64-baseos-rpms --enable rhel-8-for-x86_64-supplementary-rpms 
-yum -q list installed epel &>/dev/null && echo "epel is installed" || dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm --skip-broken
-dnf config-manager --add-repo https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-el8.repo
-yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || dnf install -y yum-utils --skip-broken
-yum-config-manager --setopt=\*.skip_if_unavailable=1 --save \*
-dnf clean all
-rm -rf /var/cache/dnf
-echo " "
-echo " "
-sleep 2
-echo "********************************"
-echo "CHECKING AND INSTALLING PACKAGES"
-echo "********************************"
-yum-config-manager --enable epel 
-yum clean all 
-rm -rf /var/cache/yum
-yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || dnf install -y yum-util* --skip-broken --noplugins --best --allowerasing
-yum -q list installed wget &>/dev/null && echo "wget is installed" || dnf install -y wget --skip-broken --noplugins --best --allowerasing
-yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || dnf install -y python3-pip --skip-broken --noplugins --best --allowerasing
-yum -q list installed platform-python-pip &>/dev/null && echo "platform-python-pip is installed" || dnf install -y platform-python-pip --skip-broken --noplugins --best --allowerasing
-yum -q list installed dconf &>/dev/null && echo "dconf" || dnf install -y dconf* --skip-broken --noplugins --best --allowerasing
-yum -q list installed dnf-utils &>/dev/null && echo "dnf-utils is installed" || dnf install -y dnf-utils --skip-broken --noplugins --best --allowerasing
-yum -q list installed git &>/dev/null && echo "git is installed" || dnf install -y git --skip-broken --noplugins --best --allowerasing
-mkdir -p /root/Downloads/git 
-cd /root/Downloads
-yum-config-manager --disable epel
-echo " "
-echo " "
-sleep 2
 fi
 }
 
@@ -3130,31 +3190,10 @@ then
 echo "*******************"
 echo "Upgrade RHEL7 "
 echo "*******************"
-yum upgrade -y --skip-broken
-echo " "
-echo " "
-elif test $status -eq 1
-then 
-echo "*******************"
-echo "Upgrade RHEL8 "
-echo "*******************"
-dnf upgrade -y --skip-broken --best --allowerasing 
+yum upgrade -y
 echo " "
 echo " "
 fi
-}
-
-#---------------------------
-function CloudRequirements {
-#---------------------------
-echo '*********************************************'
-echo 'Installing Cloud Requirements (Ignore Errors)'
-echo '*********************************************'
-yum install -y python3-pip ansible ansible-doc
-source /var/lib/awx/venv/ansible/bin/activate
-umask "0022"
-pip3 install --user --upgrade pip boto3 ansible-tower-cli boto botocore requests requests-credssp cryptography pywinrm PyVmomi azure-mgmt-compute azure-mgmt-resource azure-keyvault-secrets six netaddr passlib
-deactivate
 }
 
 #-----------------------------
@@ -3163,81 +3202,49 @@ function ANSIBLEINSTALLTOWER {
 grep -q -i "release 7." /etc/redhat-release
 status=$?
 if test $status -eq 0
-then 
-echo '****************************************************************'
-echo 'Getting, Expanding, and installing Ansible Tower 3.7.0-4 for RHEL7'
-echo '****************************************************************'
-mkdir /root/Downloads
-cd /root/Downloads
-wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.7.0-4.tar.gz
-tar -zxvf /root/Downloads/ansible-tower-setup-bundle-3.7.0-4.tar.gz 
-cd /root/Downloads/ansible-tower-setup-bundle-3.7.0-4
-yum localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/bundle/el7/repos/ansible-tower-dependencies/*.rpm
-sleep 2
-echo " "
-echo " " 
-cd 
-echo 'What would you like your default Ansible Tower user "admin" password to be?'
-read ADMINPASSWORD
-export $ADMINPASSWORD
-sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory
-sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory
-sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory
-echo " "
-echo " "
-cd /root/Downloads/ansible-tower-setup-bundle-3.7.0-4
-sh setup.sh
-sleep 5
-echo " "
-echo " "
-elif test $status -eq 1
 then
 echo '****************************************************************'
-echo 'Getting, Expanding, and installing Ansible Tower 3.7.0-4 for RHEL8'
+echo 'Getting, Expanding, and installing Ansible Tower 3.6.4 for RHEL7'
 echo '****************************************************************'
-mkdir /root/Downloads
-cd /root/Downloads
-wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.7.0-4.tar.gz
-
-tar -zxvf /root/Downloads/ansible-tower-setup-bundle-3.7.0-4.tar.gz 
-cd /root/Downloads/ansible-tower-setup-bundle-3.7.0-4
-dnf localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/bundle/el8/repos/ansible-tower-dependencies/*.rpm --best --allowerasing
-sleep 2
+mkdir ~/Downloads
+cd ~/Downloads
+wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.6.4-1.tar.gz
+tar -zxvf ansible-tower-setup-bundle-3.6.4-1.tar.gz
+yum localinstall -y ansible-tower-setup-bundle-3.6.4-1.el7/bundle/ansible-tower-dependencies/repos/*.rpm
+cd ~/Downloads/ansible-tower-setup-bundle-3.6.4-1/
+sleep 1
+reset
 echo " "
-echo " "
+echo " " 
 echo 'What would you like your default Ansible Tower user "admin" password to be?'
 read ADMINPASSWORD
 export $ADMINPASSWORD
-sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory 
-sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory
-sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/inventory
-echo " "
-echo " "
-cd /root/Downloads/ansible-tower-setup-bundle-3.7.0-4/
+sed -i 's/admin_password='"''"'/admin_password='"'"'$ADMINPASSWORD'"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.6.4-1/inventory
+sed -i 's/pg_password='"''"'/pg_password='"'"'$ADMINPASSWORD'"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.6.4-1/inventory
+sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"'$ADMINPASSWORD'"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.6.4-1/inventory
 sh setup.sh
-sleep 5
+sleep 1
 echo " "
 echo " "
 fi
 }
 
-
-#-------------------------
-function ANSIBLESELINUX {
-#-------------------------
 DEFAULTVALUE=y
 NMESSAGE="Disabled"
 FMESSAGE="PLEASE ENTER Y or N"
 COUNTDOWN=10
+#-------------------------
+function ANSIBLESELINUX {
+#-------------------------
+clear
 echo '*******'
 echo 'SELinux'
 echo '*******'
-echo '
-         If you do not know what selinux is please visit
-         https://www.redhat.com/en/topics/linux/what-is-selinux.
-         It is Red Hats position that SELinux should be enabled unless 
-         your enterprise dictates you disable SELinux on your systems.
-         The default answer is yes'
+echo 'If you do not know what selinux is please visit
+https://www.redhat.com/en/topics/linux/what-is-selinux.
+It is Red Hats position that SELinux should be enabled unless 
+your enterprise dictates you disable SELinux on your systems.
+The default answer is yes'
 echo " "
 read -n1 -p "Would you like to ENABLE SELinux? Y/n " INPUT
 INPUT=${INPUT:-$DEFAULTVALUE}
@@ -3250,25 +3257,24 @@ elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
 echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
-REQUEST
 fi
 }
 
 #-------------------------
 function ANSIBLEFIREWALL {
 #-------------------------
+clear
 echo " "
 echo '********'
 echo 'Firewall'
 echo '********'
 echo ''
-echo '
-         The ports used by Ansible Tower and its services are:
+echo 'The ports used by Ansible Tower and its services are:
  
-             80, 443 (normal Tower ports)
-             22 (ssh)
-             5432 (database instance - if the database is installed on 
-             an external instance, needs to be opened to the tower instances)'
+ 80, 443 (normal Tower ports)
+ 22 (ssh)
+ 5432 (database instance - if the database is installed on 
+ an external instance, needs to be opened to the tower instances)'
 echo " "
 read -n1 -p "Would you like to ENABLE Firewall? Y/n " INPUT
 INPUT=${INPUT:-$DEFAULTVALUE}
@@ -3284,7 +3290,6 @@ chkconfig firewalld off
 echo -e "\n$NMESSAGE\n"
 else
 echo -e "\n$FMESSAGE\n"
-ANSIBLEFIREWALL
 fi
 } 
 
@@ -3335,11 +3340,11 @@ $DIALOG --infobox "
 **** Red Hat - Config Tools****
 **************************
 `hostname`" 20 80 $TV
-[[ -z $DISPLAY ]] && sleep 2 
+[[ -z $DISPLAY ]] && sleep 1 
 
 #---------------------------------Menu----------------------------------------
 HNAME=$(hostname)
-TMPd=/root/Downloads/RHTI/
+TMPd=RHTI/
 while true
 do
 [[ -e "$TMPd" ]] || mkdir -p $TMPd
@@ -3352,430 +3357,489 @@ case $Flag in
 1) dMsgBx "Satellite 6.7 INSTALL" \
 sleep 10
 #SCRIPT
+CHECKONLINE
 echo " "
 SATELLITEREADME
+SATELLITEREQUIREMENTS
 echo " "
+
 SATREGISTER
 echo " "
 
-ls /root/Downloads/RHTI/VARIABLES1 &>/dev/null
+ls RHTI/VARIABLES1 &>/dev/null
 if [ $? -eq 0 ]; then
 echo 'The Variables complete, proceeding'
-sleep 2
+sleep 1
 else
 echo "Setting up Variables for Satellite stand by"
 echo " "
 VARIABLES1
-sleep 2
+sleep 1
 echo " "
 fi
 echo " "
 
-ls /root/Downloads/RHTI/IPA &>/dev/null
+ls RHTI/IPA &>/dev/null
 if [ $? -eq 0 ]; then
 echo 'IPA Complete , proceeding'
-sleep 2
+sleep 1
 else
 echo "IPA"
 IPA
-sleep 2
+sleep 1
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CAPSULE &>/dev/null
+ls RHTI/CAPSULE &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CAPSULE Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CAPSULE"
 CAPSULE
-sleep 2
+sleep 1
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SATLIBVIRT &>/dev/null
+ls RHTI/SATLIBVIRT &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SATLIBVIRT Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SATLIBVIRT"
 SATLIBVIRT
-sleep 2
+sleep 1
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SATRHV &>/dev/null
+ls RHTI/SATRHV &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SATRHV Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SATRHV"
 SATRHV
-sleep 2
+sleep 1
 fi
 echo " "
 
-ls /root/Downloads/RHTI/RHVORLIBVIRT &>/dev/null
+ls RHTI/RHVORLIBVIRT &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' RHVORLIBVIRT Complete skipping'
-sleep 2
+sleep 1
 else
 echo "RHVORLIBVIRT"
 RHVORLIBVIRT
 fi
 echo " "
 
-ls /root/Downloads/RHTI/INSTALLREPOS &>/dev/null
+ls RHTI/INSTALLREPOS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' INSTALLREPOS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "INSTALLREPOS"
 INSTALLREPOS
-sleep 2
+sleep 1
 fi
 echo " "
 
-ls /root/Downloads/RHTI/INSTALLDEPS &>/dev/null
+ls RHTI/INSTALLDEPS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' INSTALLDEPS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "INSTALLDEPS"
 INSTALLDEPS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/GENERALSETUP &>/dev/null
+ls RHTI/GENERALSETUP &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' GENERALSETUP Complete skipping'
-sleep 2
+sleep 1
 else
 echo "GENERALSETUP"
 GENERALSETUP
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SYSCHECK &>/dev/null
+ls RHTI/SYSCHECK &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SYSCHECK Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SYSCHECK"
 SYSCHECK
 fi
 echo " "
 
-ls /root/Downloads/RHTI/INSTALLNSAT &>/dev/null
+ls RHTI/INSTALLNSAT &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' INSTALLNSAT Complete skipping'
-sleep 2
+sleep 1
 else
 echo "INSTALLNSAT"
 INSTALLNSAT
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFSAT &>/dev/null
+ls RHTI/CONFSAT &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFSAT Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFSAT"
 CONFSAT
 fi
 echo " "
 
-ls /root/Downloads/RHTI/FOREMANPROXY &>/dev/null
+ls RHTI/FOREMANPROXY &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' FOREMANPROXY Complete skipping'
-sleep 2
+sleep 1
 else
 echo "FOREMANPROXY"
 FOREMANPROXY
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFSATDHCP &>/dev/null
+ls RHTI/CONFSATDHCP &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFSATDHCP Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFSATDHCP"
 CONFSATDHCP
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFSATTFTP &>/dev/null
+ls RHTI/CONFSATTFTP &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFSATTFTP Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFSATTFTP"
 CONFSATTFTP
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFSATPLUGINS &>/dev/null
+ls RHTI/CONFSATPLUGINS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFSATPLUGINS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFSATPLUGINS"
-#CONFSATPLUGINS
+CONFSATPLUGINS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFSATCACHE &>/dev/null
+ls RHTI/CONFSATCACHE &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFSATCACHE Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFSATCACHE"
 CONFSATCACHE
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CHECKDHCP &>/dev/null
+ls RHTI/CHECKDHCP &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CHECKDHCP Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CHECKDHCP"
 CHECKDHCP
 fi
 echo " "
 
-ls /root/Downloads/RHTI/DISABLEEXTRAS &>/dev/null
+ls RHTI/DISABLEEXTRAS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' DISABLEEXTRAS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "DISABLEEXTRAS"
 DISABLEEXTRAS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/HAMMERCONF &>/dev/null
+ls RHTI/HAMMERCONF &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' HAMMERCONF Complete skipping'
-sleep 2
+sleep 1
 else
 echo "HAMMERCONF"
 HAMMERCONF
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CONFIG2 &>/dev/null
+ls RHTI/CONFIG2 &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CONFIG2 Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CONFIG2"
 CONFIG2
 fi
 echo " "
 
-ls /root/Downloads/RHTI/STOPSPAMMINGVARLOG &>/dev/null
+ls RHTI/STOPSPAMMINGVARLOG &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' STOPSPAMMINGVARLOG Complete skipping'
-sleep 2
+sleep 1
 else
 echo "STOPSPAMMINGVARLOG"
 STOPSPAMMINGVARLOG
 fi
 echo " "
 
-ls /root/Downloads/RHTI/REQUESTSYNCMGT &>/dev/null
+ls RHTI/REQUESTSYNCMGT &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' REQUESTSYNCMGT Complete skipping'
-sleep 2
+sleep 1
 else
 echo "REQUESTSYNCMGT"
 REQUESTSYNCMGT
 fi
 echo " "
 
-ls /root/Downloads/RHTI/REQUEST7 &>/dev/null
+ls RHTI/REQUEST7 &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' REQUEST7 Complete skipping'
-sleep 2
+sleep 1
 else
 echo "REQUEST7"
 REQUEST7
 fi
 echo " "
 
-ls /root/Downloads/RHTI/REQUEST8 &>/dev/null
+ls RHTI/REQUEST8 &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' REQUEST8 Complete skipping'
-sleep 2
+sleep 1
 else
 echo "REQUEST8"
 REQUEST8
-for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}') ; do hammer repository update --id $i --download-policy immediate ; done
 fi
 echo " "
 
-
-ls /root/Downloads/RHTI/REQUESTPUPPET &>/dev/null
-if [ $? -eq 0 ]; then
-echo ' REQUESTPUPPET Complete skipping'
-sleep 2
-else
-echo "REQUESTPUPPET"
-REQUESTPUPPET
-fi
-echo " "
-
-ls /root/Downloads/RHTI/SYNC &>/dev/null
+ls RHTI/SYNC &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SYNC Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SYNC"
 SYNC
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SYNCMSG &>/dev/null
+ls RHTI/SYNCMSG &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SYNCMSG Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SYNCMSG"
 SYNCMSG
 fi
 echo " "
 
-ls /root/Downloads/RHTI/PRIDOMAIN &>/dev/null
+ls RHTI/REQUESTPUPPET &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' REQUESTPUPPET Complete skipping'
+sleep 1
+else
+echo "REQUESTPUPPET"
+REQUESTPUPPET
+fi
+echo " "
+
+ls RHTI/PRIDOMAIN &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' PRIDOMAIN Complete skipping'
-sleep 2
+sleep 1
 else
 echo "PRIDOMAIN"
 PRIDOMAIN
 fi
 echo " "
 
-ls /root/Downloads/RHTI/CREATESUBNET &>/dev/null
+ls RHTI/CREATESUBNET &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' CREATESUBNET Complete skipping'
-sleep 2
+sleep 1
 else
 echo "CREATESUBNET"
 CREATESUBNET
 fi
 echo " "
 
-ls /root/Downloads/RHTI/ENVIRONMENTS &>/dev/null
+ls RHTI/ENVIRONMENTS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' ENVIRONMENTS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "ENVIRONMENTS"
 ENVIRONMENTS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SYNCPLANS &>/dev/null
+ls RHTI/SYNCPLANS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SYNCPLANS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SYNCPLANS"
 SYNCPLANS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/SYNCPLANCOMPONENTS &>/dev/null
+ls RHTI/SYNCPLANCOMPONENTS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' SYNCPLANCOMPONENTS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SYNCPLANCOMPONENTS"
 SYNCPLANCOMPONENTS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/ASSOCPLANTOPRODUCTS &>/dev/null
+ls RHTI/ASSOCPLANTOPRODUCTS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' ASSOCPLANTOPRODUCTS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "ASSOCPLANTOPRODUCTS"
 ASSOCPLANTOPRODUCTS
 fi
 echo " "
 
-ls /root/Downloads/RHTI/MEDIUM &>/dev/null
+PUBLISHRHEL7CONTENT
+ls RHTI/PUBLISHRHEL7CONTENT &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' PUBLISHRHEL7CONTENT Complete skipping'
+sleep 1
+else
+echo "PUBLISHRHEL7CONTENT"
+PUBLISHRHEL7CONTENT
+fi
+echo " "
+
+ls RHTI/PUBLISHRHEL8CONTENT &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' PUBLISHRHEL8CONTENT Complete skipping'
+sleep 1
+else
+echo "PUBLISHRHEL8CONTENT"
+PUBLISHRHEL8CONTENT
+fi
+echo " "
+
+ls RHTI/HOSTCOLLECTION &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' HOSTCOLLECTION Complete skipping'
+sleep 1
+else
+echo "HOSTCOLLECTION"
+HOSTCOLLECTION
+fi
+echo " "
+
+ls RHTI/KEYSFORENV &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' KEYSFORENV Complete skipping'
+sleep 1
+else
+echo "KEYSFORENV"
+KEYSFORENV
+fi
+echo " "
+
+ls RHTI/KEYSTOHOST &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' KEYSTOHOST Complete skipping'
+sleep 1
+else
+echo "KEYSTOHOST"
+KEYSTOHOST
+fi
+echo " "
+
+ls RHTI/SUBTOKEYS &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' SUBTOKEYS Complete skipping'
+sleep 1
+else
+echo "SUBTOKEYS"
+SUBTOKEYS
+fi
+echo " "
+
+ls RHTI/MEDIUM &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' MEDIUM Complete skipping'
-sleep 2
+sleep 1
 else
 echo "MEDIUM"
 MEDIUM
 fi
 echo " "
 
-ls /root/Downloads/RHTI/DISASSOCIATE_TEMPLATES &>/dev/null
+ls RHTI/DISASSOCIATE_TEMPLATES &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' DISASSOCIATE_TEMPLATES Complete skipping'
-sleep 2
+sleep 1
 else
 echo "DISASSOCIATE_TEMPLATES"
 DISASSOCIATE_TEMPLATES
 fi
 echo " " 
 
-ls /root/Downloads/RHTI/INSIGHTS &>/dev/null
+ls RHTI/INSIGHTS &>/dev/null
 if [ $? -eq 0 ]; then
 echo ' INSIGHTS Complete skipping'
-sleep 2
+sleep 1
 else
 echo "INSIGHTS"
 INSIGHTS
-foreman-maintain packages lock
 fi
 echo " "
 
-#ls /root/Downloads/RHTI/CLEANUP
+#ls RHTI/CLEANUP
 #if [ $? -eq 0 ]; then
 #echo ' CLEANUP Complete skipping'
-#sleep 2
+#sleep 1
 #else
 #echo "CLEANUP"
 #CLEANUP
 #fi
 #echo " "
 
-ls /root/Downloads/RHTI/SATREENABLEFOIREWALL &>/dev/null
+ls RHTI/SATREENABLEFOIREWALL &>/dev/null
 echo 'This Script has set up Satellite to the point where it should be basicly 
 operational the syntax for some of the items that have been pounded out and require some updating if you plan to use.'
 if [ $? -eq 0 ]; then
 echo ' SATREENABLEFOIREWALL Complete skipping'
-sleep 2
+sleep 1
 else
 echo "SATREENABLEFOIREWALL"
 SATREENABLEFOIREWALL
 fi
 echo " "
 
-sleep 2
+sleep 1
 ;;
 2) dMsgBx "ANSIBLE TOWER 3.6.4 INSTALL" \
+CHECKCONNECT
 ANSIBLETOWERTXT
-ANSIBLECHECKCONNECT
 ANSIBLEREGISTER
-ANSIBLESECURITY
-#YOURUSER
-#ADMINUSERS
+ANSIBLEPREPFORINSTALL
 ANSIBLESYSTEMREPOS
 ANSIBLELINUXUPGRADE
-#CloudRequirements
 ANSIBLEINSTALLTOWER
-ANSIBLESELINUX
+INSIGHTS
 ANSIBLEFIREWALL
+ANSIBLESELINUX
 ;;
 3) dMsgBx "SATELLITE POST INSTALL CLEANUP" \
 #REMOVEUNSUPPORTED

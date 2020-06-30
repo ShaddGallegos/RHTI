@@ -1,6 +1,6 @@
 - name: Create New Hosts on Satellite
   hosts: localhost
-  become: false
+  become: true
   gather_facts: false
   vars_files:
   - sat_vars.yml
@@ -11,4 +11,10 @@
     loop: "{{ servers }}"
     loop_control:
       loop_var: 'newhost'
+
+
+
+
+
+
   
