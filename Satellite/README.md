@@ -49,9 +49,9 @@ I can set up a full satellite for a P.O.C in 3 to 4 hours with:
 
 ![REDHATTOOLSINSTALLER-6.7](./PNG/REDHATTOOLSINSTALLER-6.7.png)
 
-* git clone https://github.com/ShaddGallegos/RedHatToolsInstaller.git
-* cd RedHatToolsInstaller
-* sh REDHATTOOLSINSTALLER-XXX.sh
+* git clone https://github.com/ShaddGallegos/RHTI.git
+* cd Satellite
+* sh REDHATTOOLSINSTALLER-6.7-4.1.sh
 * Follow prompts to completion 
 
 ## Why this installer
