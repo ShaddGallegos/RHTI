@@ -1715,13 +1715,13 @@ read -n1 -t "$COUNTDOWN" -p "$QMESSAGE8 ? Y/N " INPUT
 INPUT=${INPUT:-$RHEL8DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)' 
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)' 
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)' 
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Storage Native Client for RHEL 8 (RPMs)'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.1' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
 sleep 10
