@@ -95,19 +95,19 @@ Ansible Tower Features:
 
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
- * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
- * [Ansible_DOC](./Ansible_Tower/Ansible_DOC)
- * [Ansible_PDF](./Ansible_Tower/Ansible_PDF)
- * [Ansible_PPT](./Ansible_Tower/Ansible_PPT)
+## What Comes with the Premium vs Standard versions of Ansible Tower?
+ * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions)
+
+ * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets/) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
+ * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/)
+ * [Ansible_PDF](./Ansible_Tower/Ansible_PDF/)
+ * [Ansible_PPT](./Ansible_Tower/Ansible_PPT/)
  * [Ansible Use Cases](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
- * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos)
+ * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos/)
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
-
-## What Comes with the Premium vs Standard versions of Ansible Tower?
- * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
         
