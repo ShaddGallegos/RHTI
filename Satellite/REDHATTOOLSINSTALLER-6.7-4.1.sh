@@ -193,7 +193,7 @@ echo "*********************************************************"
 yum-config-manager --enable epel
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install -y yum-util* --skip-broken
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y wget --skip-broken
-wget https://github.com/ShaddGallegos/RedHatToolsInstaller/raw/master/xdialog-2.3.1-13.el7.centos.x86_64.rpm
+wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/xdialog-2.3.1-13.el7.centos.x86_64.rpm
 chmod 777 /home/admin/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm 
 yum -q list installed xdialog &>/dev/null && echo "xdialog is installed" || yum localinstall -y xdialog-2.3.1-13.el7.centos.x86_64.rpm –skip-broken
 yum -q list installed ansible &>/dev/null && echo "ansible is installed" || yum install -y ansible --skip-broken 
@@ -1379,11 +1379,11 @@ echo " "
 echo "*********************************************************"
 echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN USERNAME AND PASSWORD'
 echo "*********************************************************"
+source /root/.bashrc
 hammer organization update --name $ORG
 hammer location update --name $LOC
 sleep 1
 chown -R admin:admin /home/admin
-source /root/.bashrc
 for i in $(find /home/admin/Downloads/ |grep manifest* ); do sudo -u admin hammer subscription upload --file $i --organization $ORG ; done || exit 1
 hammer subscription refresh-manifest --organization $ORG
 echo " "
@@ -1406,7 +1406,6 @@ hammer settings set --name default_location --value "$LOC"
 hammer settings set --name discovery_organization --value "$ORG"
 hammer settings set --name root_pass --value "$NODEPASS"
 hammer settings set --name query_local_nameservers --value true
-#hammer settings set --name lab_features --value true
 hammer settings set --name discovery_location --value "$LOC"
 hammer settings set --name content_view_solve_dependencies --value true
 hammer settings set --name remote_execution_by_default --value true
@@ -1669,32 +1668,7 @@ time hammer repository synchronize --organization "$ORG" --product 'Red Hat Ente
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server (RPMs)'
 #time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server' 2>/dev/null
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server' 2>/dev/null
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64' 2>/dev/null
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server' 2>/dev/null
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
-wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 -O /root/RPM-GPG-KEY-EPEL-7
-#wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
-sleep 10
-hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7 --name 'GPG-EPEL-7' --organization $ORG
-#hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7Server --name 'GPG-EPEL-7Sever' --organization $ORG
-sleep 10
-hammer product create --name='Extra Packages for Enterprise Linux 7' --organization $ORG
-#hammer product create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG
-sleep 10
-hammer repository create --name='Extra Packages for Enterprise Linux 7' --organization $ORG --product='Extra Packages for Enterprise Linux 7' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7/x86_64/
-#time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 7' --name 'Extra Packages for Enterprise Linux 7' 2>/dev/null
-#hammer repository create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG --product='Extra Packages for Enterprise Linux 7Server' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7Server/x86_64/
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Extra Packages for Enterprise Linux 7Server' 2>/dev/null
-#COMMANDEXECUTION
-elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprihttps://cloud.redhat.com/
 echo -e "\n$NMESSAGE\n"
 #COMMANDEXECUTION
 else

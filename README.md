@@ -106,6 +106,9 @@ Ansible Tower Features:
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
 
+## What Comes with the Priemium vs Standard versions of Ansible Tower?
+ * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions)
+
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
         
         NOTE: Ansible Tower is one of the easiest things to install at Red Hat the 

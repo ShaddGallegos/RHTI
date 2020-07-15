@@ -42,15 +42,7 @@ echo "
 
                                   Min Storage 35GB
                                   Directorys Recommended
-                                     /boot 1024MB
-                                      /swap 8192MB
-                                      / Rest of drive
-
-                                      Min RAM 4096
-                                      Min CPU 2 (4 Reccomended)
-
-                                      3. Network
-                                      Connection to the internet so the installer can download the required packages
+                                    di Connection to the internet so the installer can download the required packages
                                       eth0 internal Provisioning network
                                       eth1 external"
 echo " "
