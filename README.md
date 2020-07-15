@@ -196,9 +196,9 @@ Ansible Tower Features:
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 #### RPM for an X enabled server (not required) 
- * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
+ * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/)
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
- * [sat6_healthCheck.sh](./Satellite/sat6_healthCheck.sh)
+ * [sat6_healthCheck.sh](./Satellite/)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
 
         DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
@@ -208,7 +208,7 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-4.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.sh)
+ * [REDHATTOOLSINSTALLER-6.7-4.1.sh](https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.1.sh)
   
 [3. Useful Scripts](./Useful_Scripts)
 
