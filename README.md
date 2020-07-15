@@ -11,7 +11,7 @@ My work is focused on:
 
 ![Red Hat Management](./PNG/Red_Hat_Management.png)
 
-The key to success is always in the planning! The venn diagram below depicts the primary functions between tools and the overlap between to help you decide where you would like to situate the functions, and assist in integrating the tools within your IT environment(s) 
+The key to success is always in the planning! The Venn diagram below depicts the primary functions between tools and the overlap between to help you decide where you would like to situate the functions, and assist in integrating the tools within your IT environment(s) 
 ## Satellite: 
 The easiest way to manage your Red Hat infrastructure for efficient and compliant IT operations. Establish trusted content repos and processes that help you build a standards-based, secure Red Hat environment. 
 ## Ansible Tower: 
@@ -67,7 +67,7 @@ Ansible Features:
   * Simple
   * Powerful - hundreds of use cases 
   * Agentless
-  * Cross platform – linux, windows, UNIX, iot, ect
+  * Cross platform – Linux, Windows, UNIX, IoT, etc...
   * Human readable - anyone can do it (no coding skills required) 
   * Perfect description of application - less time on documentation required
   * Version controlled
@@ -87,7 +87,7 @@ Ansible Tower Features:
   * Manage and track your entire inventory - Static or DYNAMIC INVENTORIES
   * Self-service it... simplified
   * Remote command execution
-  * Comprehensive rest api and tower cli tool
+  * Comprehensive rest API and tower CLI tool
   * Role Based Access Control
   * LDAP, AD, and other authentication integration
   * Made easy config for your logging aggragator 
@@ -106,7 +106,7 @@ Ansible Tower Features:
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
 
-## What Comes with the Priemium vs Standard versions of Ansible Tower?
+## What Comes with the Premium vs Standard versions of Ansible Tower?
  * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
@@ -210,9 +210,9 @@ Ansible Tower Features:
 
  * [REDHATTOOLSINSTALLER-6.7-4.1.sh](https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.1.sh)
   
-[3. Useful Scripts](./Useful_Scripts)
+[3. Useful Scripts](./Useful_Scripts/)
 
-[4. intergrations](./Intergrations)
+[4. Integration](./Intergrations/)
 
  * [Satellite/Ansible Tower](./Intergrations/Satellite-Ansible_Tower) - in Progress
  * [Ansible Tower/ServiceNow](./Intergrations/Ansible_Tower-ServiceNow) - in progress

@@ -441,3 +441,14 @@ Example from below
      * https://github.com/BubbatheVTOG/molecule_cicd
      * https://github.com/maccioni/forward-cicd-ansible
 
+## Azure DevOPS
+-----
+
+     * https://docs.ansible.com/ansible-tower/
+     * https://medium.com/gsoft-tech/easily-configuring-an-azure-devops-agent-with-ansible-fb9cb0f98b73
+     * https://www.azuredevopslabs.com/labs/vstsextend/ansible/
+     * https://www.mediaglasses.blog/2020/05/10/azure-devops-ansible-pipeline/
+     * https://azure.microsoft.com/en-us/resources/videos/ignite-2018-azure-devops-using-jenkins-terraform-and-ansible/
+     * https://keithtenzer.com/2019/06/24/ci-cd-with-ansible-tower-and-github/
+
+
