@@ -77,6 +77,7 @@ Ansible Features:
  
 Ansible Tower Features:
 
+  * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions) Standard vs Premium
   * Easy to understand and clean dashboard
   * Real-time job status updates
   * Multi-playbook workflows
@@ -95,9 +96,7 @@ Ansible Tower Features:
 
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
-## What Comes with the Premium vs Standard versions of Ansible Tower?
- * [Ansible Tower Editions](https://www.ansible.com/products/tower/editions)
-
+## Resources
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets/) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/)
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF/)
