@@ -88,11 +88,11 @@ For convenience sake I have provided a script that will automatically install a 
         After you set the password you can walk away and 
         Takes 15-20 min to install Ansible Tower
 
-## Configuring
+## CONFIGURING YOUR TOWER (Post install) 
 -----
 
 ### Credentials
-![1. Credentials](./PNG/1.1_satellite_credential.png)
+![1._Credentials](./PNG/1.1_satellite_credential.png)
 
         Credentials are utilized by Tower for authentication when launching Jobs against machines, synchronizing 
         with inventory sources, and importing project content from a version control system.
@@ -100,8 +100,10 @@ For convenience sake I have provided a script that will automatically install a 
         You can grant users and teams the ability to use these credentials, without actually exposing the credential to 
         the user. If you have a user move to a different team or leave the organization, you don’t have to re-key all of 
         your systems just because that credential was available in Tower.
+
+        For this API machine provisioning you will need both a Machine and a Satellite credential to provision machines 
       
-        Required Fields for Machine Credentials 
+        Required Fields for Machine Credential
         1. NAME
         2. CREDENTIAL TYPE          #This will be a Machine credential for building machines
         3. USERNAME                 #This must be "root"
@@ -117,7 +119,7 @@ For convenience sake I have provided a script that will automatically install a 
 -----
 
 ### Project
-![2. Project](./PNG/1_projects.png)
+![2._Project](./PNG/1_projects.png)
 
         A Project is a logical collection of Ansible playbooks, represented in Tower.
 
@@ -135,7 +137,7 @@ For convenience sake I have provided a script that will automatically install a 
 -----
 
 ### Inventory
-![3. Inventory](./PNG/2_inventory.png)
+![3._Inventory](./PNG/2_inventory.png)
 
         An Inventory is a collection of hosts against which jobs may be launched, the same as an Ansible inventory file. 
         Inventories are divided into groups and these groups contain the actual hosts. Groups may be sourced manually, by 
@@ -147,7 +149,7 @@ For convenience sake I have provided a script that will automatically install a 
         Adding a source to an inventory only applies to standard inventories. Smart inventories inherit their source 
         from the standard inventories they are associated with. 
         
-        To configure the source for the inventory:
+        To configure Satellite as the source for the inventory:
                 
         1. From the menu on the left choose "INVENTORIES" 
         2. Click the green + add button.
@@ -158,7 +160,7 @@ For convenience sake I have provided a script that will automatically install a 
 
 ### Inventory source
 
-![4. Inventory source](./PNG/4_inventory_source.png)
+![4._Inventory source](./PNG/4_inventory_source.png)
         
         Select the green + to add a source on the right
         
@@ -175,7 +177,7 @@ For convenience sake I have provided a script that will automatically install a 
 
 ### Inventory Sync
 
-![5. Inventory Sync](./PNG/4_inventory_sync.png) 
+![5._ Inventory Sync](./PNG/4_inventory_sync.png) 
 
         Now, select the sercular arrows (circular arrows icon) below "ACTIONS" on the right side
 
@@ -183,7 +185,7 @@ For convenience sake I have provided a script that will automatically install a 
 
 ### Job Templates
 
-![6. Job Templates](./PNG/5_Template.png)
+![6._Job Templates](./PNG/5_Template.png)
 
         A job template is a definition and set of parameters for running an Ansible job. Job templates are useful to execute 
         the same job many times. Job templates also encourage the reuse of Ansible playbook content and collaboration between 
@@ -212,7 +214,7 @@ For convenience sake I have provided a script that will automatically install a 
 
 ### SURVEY
 
-![7. SURVEY](./PNG/6_SURVEY.png)
+![7._SURVEY](./PNG/6_SURVEY.png)
         Required "SURVEY" Fields
         1. PROMPT
         2. ANSWER VARIABLE NAME <-- THIS IS EQUAL TO THE VARIABLE IN CURLEY BRACKETS {{ newnodez }} IN YOUR PLAYBOOK 
