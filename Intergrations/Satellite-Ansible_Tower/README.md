@@ -56,8 +56,7 @@ For convieniance sake I have provided a script that will automaticly install a s
         Red Hat Enterprise Linux 8.2 or later 64-bit (x86)
         Red Hat Enterprise Linux 7.7 or later 64-bit (x86)
 
-
-####Requirements to setup Ansible Tower
+#### Requirements to setup Ansible Tower
 
         1. Download the script
              
@@ -88,6 +87,19 @@ For convieniance sake I have provided a script that will automaticly install a s
 
         After you set the password you can walk away and 
         Takes 15-20 min to install Ansible Tower
+
+## Configuring
+
+  * ![Credentials](./PNG/1.1_satellite_credential.png)
+  * ![Project](./PNG/1_projects.png)
+  * ![Inventory](./PNG/2_inventory.png) 
+  * ![Inventory Source](./PNG/2_inventory.png)
+  * ![Inventory Sync](./PNG/4_inventory_sync.png)
+  * ![Template](./PNG/5_Template.png)
+
+
+[Setting Up Libvirt Host](./libvirt)
+[Setting Up Satellite Host](./Satellite)
 
 
 
