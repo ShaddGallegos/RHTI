@@ -90,8 +90,8 @@ For convenience sake I have provided a script that will automatically install a 
 
 ## Configuring
 
+-----
 ![1. Credentials](./PNG/1.1_satellite_credential.png)
-
 
         Credentials are utilized by Tower for authentication when launching Jobs against machines, synchronizing 
         with inventory sources, and importing project content from a version control system.
@@ -100,6 +100,7 @@ For convenience sake I have provided a script that will automatically install a 
         the user. If you have a user move to a different team or leave the organization, you don’t have to re-key all of 
         your systems just because that credential was available in Tower.
 
+-----
 ![2. Project](./PNG/1_projects.png)
 
         A Project is a logical collection of Ansible playbooks, represented in Tower.
@@ -109,8 +110,7 @@ For convenience sake I have provided a script that will automatically install a 
         including Git, Subversion, Mercurial, and Red Hat Insights. To create a Red Hat Insights project, refer to Setting 
         up an Insights Project.
 
-
-
+-----
 ![3. Inventory](./PNG/2_inventory.png)
 
         An Inventory is a collection of hosts against which jobs may be launched, the same as an Ansible inventory file. 
@@ -122,7 +122,8 @@ For convenience sake I have provided a script that will automatically install a 
                 In the inventory you want to add a source, click the Sources tab.
 
                 Click the green + add button.
- 
+
+----- 
 ![4. Inventory Source](./PNG/2_inventory.png)
 
         Inventory sources are no longer associated with groups. Prior to Ansible Tower 3.2, spawned groups and hosts would 
@@ -132,12 +133,19 @@ For convenience sake I have provided a script that will automatically install a 
         Adding a source to an inventory only applies to standard inventories. Smart inventories inherit their source 
         from the standard inventories they are associated with. 
 
-
+-----
 ![5. Inventory Sync](./PNG/4_inventory_sync.png)
 
-        You should be back at the previous menu now, select the 2 sercular arrows below "ACTIONS" on the right side
+        You should be back at the previous menu now, select the sercular arrows (icon) below "ACTIONS" on the right side
 
-![6. Template](./PNG/5_Template.png)
+-----
+![6. Job Templates](./PNG/5_Template.png)
+
+        A job template is a definition and set of parameters for running an Ansible job. Job templates are useful to execute 
+        the same job many times. Job templates also encourage the reuse of Ansible playbook content and collaboration between 
+        teams. While the REST API allows for the execution of jobs directly, Tower requires that you first create a job template.
+
+
 
 
 [Setting Up Libvirt Host](./libvirt)
