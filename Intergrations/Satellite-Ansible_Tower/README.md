@@ -18,9 +18,12 @@ Satellite then provisions the node
  * Satellite 6 Credential
  * Machine Credential to manage nodes
  * Template calling 
+
         main.yml
         Work flow templates (optional)  
+
  * Survey for:
+
         sat_server_url: "{{ SATFQDN }}"   <-- should be FQDN or ip (https://sat.example.com or https://10.168.0.1)
         sat_password: "{{ SATPASSWORD }}" <-- Uses the service user "admin" account that you sign into satellite with 
         name: "{{ newnodez }}"            <-- shortname node to create
@@ -32,6 +35,7 @@ Satellite then provisions the node
  * DHCP
  * DNS
  * tftp
+ * Discovery
 
 ### LIBVIRT
 
