@@ -35,6 +35,7 @@ Satellite then provisions the node
 
 ### LIBVIRT
 
+
 ## Setup Ansible Tower
 -----
 For convieniance sake I have provided a script that will automaticly install a single node Proof of Concept type system 
@@ -64,15 +65,15 @@ For convieniance sake I have provided a script that will automaticly install a s
              
                  What this script does 
                     This installer will work on RHEL 7 or RHEL 8 and:
-                    1.verify you are root 
-                    2.Check you are connected to the internet.
-                    3.Provide a breif overview of what the tool is.
-                    4.Help the end user register with Red Hat if not already done.
-                    5.Take of some prep stuff install shut off firewall and selinux and install pip prior to install.
-                    6.Enable required repos for OS and Ansible Tower.
-                    7.Upgrades the OS.
-                    8.Installs the dependencies from the bundle forces them to requirement levels listed in bundle.
-                    9.Installs Tower. (Queries user for tower password) 
+                    1. Verify you are root 
+                    2. Check you are connected to the internet.
+                    3. Provide a breif overview of what the tool is.
+                    4. Help the end user register with Red Hat if not already done.
+                    5. Take of some prep stuff install shut off firewall and selinux and install pip prior to install.
+                    6. Enable required repos for OS and Ansible Tower.
+                    7. Upgrades the OS.
+                    8. Installs the dependencies from the bundle forces them to requirement levels listed in bundle.
+                    9. Installs Tower. (Queries user for tower password) 
                     10. Gives the end user the option to enable firewall and selinux.
          
         2. Change to root user
