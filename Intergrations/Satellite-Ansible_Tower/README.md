@@ -90,8 +90,8 @@ For convenience sake I have provided a script that will automatically install a 
 
 ## Configuring
 
-    ![1. Credentials](./PNG/1.1_satellite_credential.png)
------
+![1. Credentials](./PNG/1.1_satellite_credential.png)
+
 
         Credentials are utilized by Tower for authentication when launching Jobs against machines, synchronizing 
         with inventory sources, and importing project content from a version control system.
@@ -100,10 +100,7 @@ For convenience sake I have provided a script that will automatically install a 
         the user. If you have a user move to a different team or leave the organization, you don’t have to re-key all of 
         your systems just because that credential was available in Tower.
 
-
-
-    ![2. Project](./PNG/1_projects.png)
------
+![2. Project](./PNG/1_projects.png)
 
         A Project is a logical collection of Ansible playbooks, represented in Tower.
 
@@ -114,8 +111,7 @@ For convenience sake I have provided a script that will automatically install a 
 
 
 
-    ![3. Inventory](./PNG/2_inventory.png)
------
+![3. Inventory](./PNG/2_inventory.png)
 
         An Inventory is a collection of hosts against which jobs may be launched, the same as an Ansible inventory file. 
         Inventories are divided into groups and these groups contain the actual hosts. Groups may be sourced manually, by 
@@ -126,10 +122,8 @@ For convenience sake I have provided a script that will automatically install a 
                 In the inventory you want to add a source, click the Sources tab.
 
                 Click the green + add button.
-
  
-    ![4. Inventory Source](./PNG/2_inventory.png)
------
+![4. Inventory Source](./PNG/2_inventory.png)
 
         Inventory sources are no longer associated with groups. Prior to Ansible Tower 3.2, spawned groups and hosts would 
         be children of our inventory source group. Now, spawned groups are top-level. These groups may still have child 
@@ -139,14 +133,12 @@ For convenience sake I have provided a script that will automatically install a 
         from the standard inventories they are associated with. 
 
 
-    ![5. Inventory Sync](./PNG/4_inventory_sync.png)
------
+![5. Inventory Sync](./PNG/4_inventory_sync.png)
 
         You should be back at the previous menu now, select the 2 sercular arrows below "ACTIONS" on the right side
 
+![6. Template](./PNG/5_Template.png)
 
-    ![6. Template](./PNG/5_Template.png)
------
 
 [Setting Up Libvirt Host](./libvirt)
 [Setting Up Satellite Host](./Satellite)
