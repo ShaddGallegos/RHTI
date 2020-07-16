@@ -1,4 +1,4 @@
-# Simple Ansible and Satellite Intergration ASI - Proof of Concept
+# Simple Ansible and Satellite Integration ASI - Proof of Concept
 
 These playbooks use Satellite API to create a node in libvirt 
 
@@ -16,7 +16,7 @@ Satellite then provisions the node
  * These playbooks [ASI](./ASI) 
  * Project
  * Satellite 6 Credential
- * Machine Cerdential to manage nodes
+ * Machine Credential to manage nodes
  * Template calling 
         main.yml
         Work flow templates (optional)  
@@ -28,7 +28,7 @@ Satellite then provisions the node
 ### SATELLITE
 
  * A Satellite 6.7 server (or later)
- * Compute Resourses (libvirt) 
+ * Compute Resources (libvirt) 
  * DHCP
  * DNS
  * tftp
@@ -38,7 +38,7 @@ Satellite then provisions the node
 
 ## Setup Ansible Tower
 -----
-For convieniance sake I have provided a script that will automaticly install a single node Proof of Concept type system 
+For convenience sake I have provided a script that will automatically install a single node Proof of Concept type system 
 
 [Requirements](https://docs.ansible.com/ansible-tower/latest/html/installandreference/requirements_refguide.html) for Ansible Tower 
         
@@ -90,12 +90,53 @@ For convieniance sake I have provided a script that will automaticly install a s
 
 ## Configuring
 
-  * ![Credentials](./PNG/1.1_satellite_credential.png)
-  * ![Project](./PNG/1_projects.png)
-  * ![Inventory](./PNG/2_inventory.png) 
-  * ![Inventory Source](./PNG/2_inventory.png)
-  * ![Inventory Sync](./PNG/4_inventory_sync.png)
-  * ![Template](./PNG/5_Template.png)
+    ![1. Credentials](./PNG/1.1_satellite_credential.png)
+
+        Credentials are utilized by Tower for authentication when launching Jobs against machines, synchronizing 
+        with inventory sources, and importing project content from a version control system.
+
+        You can grant users and teams the ability to use these credentials, without actually exposing the credential to 
+        the user. If you have a user move to a different team or leave the organization, you don’t have to re-key all of 
+        your systems just because that credential was available in Tower.
+
+----
+    ![2. Project](./PNG/1_projects.png)
+
+        A Project is a logical collection of Ansible playbooks, represented in Tower.
+
+        You can manage playbooks and playbook directories by either placing them manually under the Project Base Path 
+        on your Tower server, or by placing your playbooks into a source code management (SCM) system supported by Tower, 
+        including Git, Subversion, Mercurial, and Red Hat Insights. To create a Red Hat Insights project, refer to Setting 
+        up an Insights Project.
+
+----
+    ![3. Inventory](./PNG/2_inventory.png)
+
+        An Inventory is a collection of hosts against which jobs may be launched, the same as an Ansible inventory file. 
+        Inventories are divided into groups and these groups contain the actual hosts. Groups may be sourced manually, by 
+        entering host names into Tower, or from one of Ansible Tower’s supported cloud providers.
+        
+        To configure the source for the inventory:
+
+                In the inventory you want to add a source, click the Sources tab.
+
+                Click the green + add button.
+
+---- 
+    ![4. Inventory Source](./PNG/2_inventory.png)
+
+        Inventory sources are no longer associated with groups. Prior to Ansible Tower 3.2, spawned groups and hosts would 
+        be children of our inventory source group. Now, spawned groups are top-level. These groups may still have child 
+        groups, and all of these spawned groups may have hosts.
+
+        Adding a source to an inventory only applies to standard inventories. Smart inventories inherit their source 
+        from the standard inventories they are associated with. 
+
+    ![5. Inventory Sync](./PNG/4_inventory_sync.png)
+
+        You should be back at the previous menu now, select the 2 sercular arrows below "ACTIONS" on the right side
+
+    ![6. Template](./PNG/5_Template.png)
 
 
 [Setting Up Libvirt Host](./libvirt)
