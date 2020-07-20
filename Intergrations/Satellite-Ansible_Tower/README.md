@@ -11,9 +11,8 @@ Satellite then provisions the node
 
  * Ansible Tower
  * Ansible 2.9 or later
- * Dynamic inventory 
- * Libvirt host
- * These playbooks [ASI](./ASI) 
+ * Dynamic Inventory for Satellite 
+ * Playbooks [ASI](./ASI) 
  * Project
  * Satellite 6 Credential
  * Machine Credential to manage nodes
@@ -28,16 +27,19 @@ Satellite then provisions the node
         sat_password: "{{ SATPASSWORD }}" <-- Uses the service user "admin" account that you sign into satellite with 
         name: "{{ newnodez }}"            <-- shortname node to create
 
-### SATELLITE
+### SATELLITE WILL PROVIDE
 
  * A Satellite 6.7 server (or later)
  * Compute Resources (libvirt) 
  * DHCP
  * DNS
- * tftp
+ * TFTP
  * Discovery
+ * Rpm repos
 
-### LIBVIRT
+### LIBVIRT WILL PROVIDE
+
+ * A host for our VM's to live on 
 
 
 ## Setup Ansible Tower

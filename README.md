@@ -207,7 +207,7 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-4.1.sh](https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/REDHATTOOLSINSTALLER-6.7-4.1.sh)
+ * [REDHATTOOLSINSTALLER-6.7-4.1.sh](https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/files/REDHATTOOLSINSTALLER-6.7-4.1.sh)
   
 [3. Useful Scripts](./Useful_Scripts/)
 
