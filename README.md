@@ -123,9 +123,9 @@ Ansible Tower Features:
         DISCLAMER: Also these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
  
- * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh)
 
 #### FREE Ansible Tower Workshops (listed below)
 ---------------------------------
@@ -152,6 +152,7 @@ Ansible Tower Features:
 | **Ansible Red Hat Enterprise Linux Workshop** <br> focused on automating Linux platforms like Red Hat Enterprise Linux  | [Deck](https://github.com/ansible/workshops/blob/devel/decks/ansible_rhel_90.pdf) | [Exercises](https://github.com/ansible/workshops/tree/devel/exercises/ansible_rhel_90)  | `workshop_type: rhel_90`  |
 
 #### Lab Provisioner
+
  - [AWS Lab Provisioner](https://github.com/ansible/workshops/tree/devel/provisioner) - Playbook that spins up instances on AWS for students to perform the exercises provided above.
 
 #### Self Paced Exercises
@@ -194,10 +195,15 @@ Ansible Tower Features:
  * [Satellite_DOC](./Satellite/Satellite_DOC)
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
+
+  * [Ansible_Modules-Foreman-Katell](./files/Ansible_Modules-Foreman-Katello.tar.gz)
+  * [REDHATTOOLSINSTALLER-6.7-4.1.sh](./files/REDHATTOOLSINSTALLER-6.7-4.1.sh)
+  * [sat6_healthCheck.sh](./files/sat6_healthCheck.sh)
+
 #### RPM for an X enabled server (not required) 
- * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/)
+ * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files)
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
- * [sat6_healthCheck.sh](./Satellite/)
+ * [sat6_healthCheck.sh](./Satellite/files)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
 
         DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
