@@ -809,7 +809,8 @@ sudo touch RHTI/SYNCREL6
 function INSTALLREPOS {
 #------------------------------
 echo "****************************************************"
-echo "SET REPOS FOR INSTALLING AND UPDATING SATELLITE 7"
+echo "SET REPOS FOR INSTALLING AND UPDATING RHEL 7.8 
+      and Satellite 6.7"
 echo "***************************************************"
 echo -ne "\e[8;40;170t"
 subscription-manager repos --disable '*'
