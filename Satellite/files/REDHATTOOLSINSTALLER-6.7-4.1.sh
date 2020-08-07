@@ -193,7 +193,7 @@ echo "*********************************************************"
 yum-config-manager --enable epel
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install -y yum-util* --skip-broken
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y wget --skip-broken
-wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/xdialog-2.3.1-13.el7.centos.x86_64.rpm
+wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm
 chmod 777 /home/admin/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm 
 yum -q list installed xdialog &>/dev/null && echo "xdialog is installed" || yum localinstall -y xdialog-2.3.1-13.el7.centos.x86_64.rpm –skip-broken
 yum -q list installed ansible &>/dev/null && echo "ansible is installed" || yum install -y ansible --skip-broken 
@@ -2583,37 +2583,6 @@ fi
 }
 
 #-------------------------------
-#function PUBLISHCONTENT {
-#-------------------------------
-#source /root/.bashrc
-#echo -ne "\e[8;40;170t"
-#echo " "
-#echo "********************************"
-#echo "Publish content view to Library:"
-#echo "********************************"
-#echo " "
-#echo "********************************"
-#echo "
-# There may be an error that the (content-view publish) task has failed however the process takes longer to complete than the command timeout.
-#Please see https://$(hostname)/content_views/2/versions to watch the task complete.“
-# echo "********************************"
-# echo " "
-# hammer content-view publish --name 'rhel-7-server-x86_64' --organization $ORG --async
-# sleep 1000
-# echo " "
-# echo "*********************************************************"
-# echo "Promote content views to DEV_RHEL,TEST_RHEL,PROD_RHEL:"
-# echo "*********************************************************"
-# hammer content-view version promote --organization $ORG --from-lifecycle-environment ='Library' --to-lifecycle-environment 'DEV_RHEL' --id 2 --async
-# sleep 700
-# hammer content-view version promote --organization $ORG --from-lifecycle-environment ='DEV_RHEL' --to-lifecycle-environment 'TEST_RHEL' --id 2 --async
-# sleep 700
-# hammer content-view version promote --organization $ORG --from-lifecycle-environment ='TEST_RHEL' --to-lifecycle-environment 'PROD_RHEL' --id 2 --async
-# sleep 700
-#sudo touch RHTI/PUBLISHCONTENT
-#}
-
-#-------------------------------
 function HOSTCOLLECTION {
 #-------------------------------
 source /root/.bashrc
@@ -2643,7 +2612,8 @@ hammer activation-key create --name 'PROD_RHEL_7' --organization $ORG --content-
 
 hammer activation-key create --name 'DEV_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'DEV_RHEL_8'
 hammer activation-key create --name 'TEST_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'TEST_RHEL_8'
-hammer activation-key create --name 'PROD_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'PROD_RHEL_8'sudo touch RHTI/KEYSFORENV
+hammer activation-key create --name 'PROD_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'PROD_RHEL_8'
+sudo touch RHTI/KEYSFORENV
 }
 
 #-------------------------------
@@ -2692,11 +2662,11 @@ echo "Create Media:"
 echo "*********************************************************"
 #RHEL 7
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.6/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.6 Kickstart" --operatingsystems="RedHat 7.6"
-hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.7/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.7 Kickstart" --operatingsystems="RedHat 7.7"
+hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.7/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.8 Kickstart" --operatingsystems="RedHat 7.8"
 
 #RHEL 8
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.0/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.0 Kickstart" --operatingsystems="RedHat 8.0"
-hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.1/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.1 Kickstart" --operatingsystems="RedHat 8.1"
+hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.1/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.2 Kickstart" --operatingsystems="RedHat 8.2"
 sudo touch RHTI/MEDIUM
 }
 
@@ -2712,10 +2682,10 @@ echo -ne "\e[8;40;170t"
 ENVIROMENT=$(hammer --csv environment list |awk -F "," {'print $2'}|grep -v Name |grep -v production)
 LEL=$(hammer --csv lifecycle-environment list |awk -F "," {'print $2'} |grep -v NAME)
 echo "CAID=1" >> /root/.bashrc
-echo "MEDID1=$(hammer --csv medium list |grep 'RHEL 7.7' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
+echo "MEDID1=$(hammer --csv medium list |grep 'RHEL 7.8' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 #echo "MEDID2=$(hammer --csv medium list |grep 'CentOS 7' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 echo "SUBNETID=$(hammer --csv subnet list |awk -F "," {'print $1'}| grep -v Id)" >> /root/.bashrc
-echo "OSID1=$(hammer os list |grep -i "RedHat 7.7" |awk -F "|" {'print $1'})" >> /root/.bashrc
+echo "OSID1=$(hammer os list |grep -i "RedHat 7.8" |awk -F "|" {'print $1'})" >> /root/.bashrc
 #echo "OSID2=$(hammer os list |grep -i "CentOS 7.7" |awk -F "|" {'print $1'})" >> /root/.bashrc
 echo "PROXYID=$(hammer --csv proxy list |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 echo "PARTID=$(hammer --csv partition-table list | grep "Kickstart default" | grep -i -v thin |cut -d, -f1)" >> /root/.bashrc

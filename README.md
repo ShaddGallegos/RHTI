@@ -221,6 +221,8 @@ Ansible Tower Features:
 
  * [Satellite/Ansible Tower](./Intergrations/Satellite-Ansible_Tower) - in Progress
  * [Ansible Tower/ServiceNow](./Intergrations/Ansible_Tower-ServiceNow) - in progress
- * [Red Hat Tiger Team member Michael Fords Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85/cloud-deploy)
-
+ 
+### Red Hat Tiger Team members
+   * Michael Ford [Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85/cloud-deploy)
+   * Orcun Aatakan [Many examples: Windows, VMWare, and Other](https://github.com/oatakan?tab=repositories)
 more to come 
