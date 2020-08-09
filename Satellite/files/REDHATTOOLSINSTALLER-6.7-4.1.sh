@@ -58,6 +58,7 @@ chmod -R 777 RHTI &>/dev/null
 chown -R nobody:nobody RHTI &>/dev/null
 echo ''
 cp -p /root/.bashrc /root/.bashrc.bak
+cp /etc/hosts /etc/hosts.bak
 export INTERNAL=$(ip -o link | head -n 2 | tail -n 1 | awk '{print $2}' | sed s/:// )
 export EXTERNAL=$(ip route show | sed -e 's/^default via [0-9.]* dev \(\w\+\).*/\1/' | head -1)
 export INTERNALIP=$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')
@@ -77,7 +78,7 @@ echo 'what is the IP of your eth0 GATEWAY ?'
 read GWINIP
 echo 'what is the FQDN of your eth0 GATEWAY ?'
 read GWFQDN
-echo ''$GWINIP '  ' $GWFQDN' '$(hostname -s)'' >> /etc/hosts
+echo ''$GWINIP '  ' $GWFQDN' ' >> /etc/hosts
 ping -c 5 $GWINIP |exit 1
 sudo touch RHTI/SETUPHOSTFILE
 }
@@ -213,6 +214,7 @@ yum -q list installed ruby &>/dev/null && echo "ruby is installed" || yum instal
 yum -q list installed diskimage-builder &>/dev/null && echo "diskimage-builder is installed" || yum install -y diskimage-builder --skip-broken
 yum -q list installed dracut &>/dev/null && echo "dracut is installed" || yum install -y dracut --skip-broken
 yum -q list installed ntfs-3g &>/dev/null && echo "ntfs-3g is installed" || yum install -y ntfs-3g --skip-broken
+yum-builddep -y --skip-broken ntfs-3g cifs-utils
 yum -q list installed cifs-utils &>/dev/null && echo "cifs-utils is installed" || yum install -y cifs-utils --skip-broken
 yum-config-manager --disable epel
 subscription-manager repos --disable=rhel-7-server-extras-rpms
@@ -252,6 +254,30 @@ echo "*********************************************************"
 echo "SETTING UP ADMIN"
 echo "*********************************************************"
 source /root/.bashrc
+cut -d: -f1 /etc/passwd |grep admin > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+echo "admin user exists"
+usermod admin -G wheel
+mkdir -p /home/admin/git
+mkdir -p /home/admin/.ssh
+chown -R admin:admin /home/admin
+sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
+echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
+echo " "
+else
+echo "admin user does NOT exist, adding and configuring"
+useradd admin
+sleep 1
+usermod admin -p "$ADMIN_PASSWORD"
+usermod admin -G wheel
+mkdir -p /home/admin/git
+mkdir -p /home/admin/.ssh
+chown -R admin:admin /home/admin
+sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
+echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
+echo " "
+fi
+
 useradd admin
 sleep 5
 usermod admin -p "$ADMIN_PASSWORD"
@@ -513,15 +539,6 @@ echo "*********************************************************"
 echo 'What would you like to call your first subnet for systems you are regestering to satellite?'
 read  SUBNET
 echo 'SUBNET_NAME='$SUBNET'' >> /root/.bashrc
-echo " "
-echo " "
-echo "*********************************************************"
-echo "PROVISIONED NODE PREFIX"
-echo "*********************************************************"
-# The host prefix is used to distinguish the demo hosts created at the end of this script.
-echo 'What would you like the prefix to be for systems you are provisioning with Satellite Example poc- kvm- vm-? enter to skip'
-read  PREFIX
-echo 'HOST_PREFIX='$PREFIX'' >> /root/.bashrc
 echo " "
 echo " "
 echo "*********************************************************"
@@ -909,12 +926,7 @@ echo 'inet.ipv4.ip_forward=1' >> /etc/sysctl.conf
 echo "kernel.domainname=$DOM" >> /etc/sysctl.conf
 echo " "
 
-echo "*********************************************************"
-echo "GENERATE /ETC/HOSTS"
-echo "*********************************************************"
-cp /etc/hosts /etc/hosts.bak
-echo "${SAT_IP} $(hostname)" >>/etc/hosts
-echo " "
+
 
 echo "*********************************************************"
 echo "ADDING KATELLO-CVMANAGER TO /HOME/ADMIN/GIT "
