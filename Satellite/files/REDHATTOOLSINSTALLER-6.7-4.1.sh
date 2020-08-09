@@ -71,11 +71,13 @@ echo '********************************************************'
 echo 'ENSURE INTERNAL/PROVISIONING (eth0/ens3) GW CONNICTIVITY'
 echo '********************************************************'
 echo ' '
+echo ' ' >> /etc/hosts
+echo ' ' >> /etc/hosts
 echo 'what is the IP of your eth0 GATEWAY ?'
-read GWFQDN
-echo 'what is the FQDN of your eth0 GATEWAY ?'
 read GWINIP
-echo ''$GWINIP'  '$GWFQDN'' >> /etc/hosts
+echo 'what is the FQDN of your eth0 GATEWAY ?'
+read GWFQDN
+echo ''$GWINIP '  ' $GWFQDN' '$(hostname -s)'' >> /etc/hosts
 ping -c 5 $GWINIP |exit 1
 sudo touch RHTI/SETUPHOSTFILE
 }
@@ -146,7 +148,7 @@ echo "*********************************************************"
 echo "SET REPOS ENABLING SCRIPT TO RUN"
 echo "*********************************************************"
 echo "*********************************************************"
-echo "FIRST DISABLE REPOS"
+echo "FIRST DISABLE REPOS NOT NEEDED"
 echo "*********************************************************"
 subscription-manager repos --disable '*'
 echo " "
@@ -211,7 +213,6 @@ yum -q list installed ruby &>/dev/null && echo "ruby is installed" || yum instal
 yum -q list installed diskimage-builder &>/dev/null && echo "diskimage-builder is installed" || yum install -y diskimage-builder --skip-broken
 yum -q list installed dracut &>/dev/null && echo "dracut is installed" || yum install -y dracut --skip-broken
 yum -q list installed ntfs-3g &>/dev/null && echo "ntfs-3g is installed" || yum install -y ntfs-3g --skip-broken
-yum -q list installed cifs &>/dev/null && echo "cifs is installed" || yum install -y cifs --skip-broken
 yum -q list installed cifs-utils &>/dev/null && echo "cifs-utils is installed" || yum install -y cifs-utils --skip-broken
 yum-config-manager --disable epel
 subscription-manager repos --disable=rhel-7-server-extras-rpms
@@ -844,7 +845,6 @@ echo -ne "\e[8;40;170t"
 yum-config-manager --enable epel
 subscription-manager repos --enable=rhel-7-server-extras-rpms
 yum clean all ; rm -rf /var/cache/yum
-sleep 1
 yum install -y qemu-kvm libvirt virt-install bridge-utils screen syslinux python-pip python3-pip rubygems lorax yum-utils vim gcc gcc-c++ git make automake kernel-devel libvirt-client bind dhcp tftp libvirt augeas ruby git --skip-broken
 sleep 1
 echo " "
@@ -919,6 +919,7 @@ echo " "
 echo "*********************************************************"
 echo "ADDING KATELLO-CVMANAGER TO /HOME/ADMIN/GIT "
 echo "*********************************************************"
+mkdir -p /home/admin/git
 cd /home/admin/git
 git clone https://github.com/RedHatSatellite/katello-cvmanager.git
 cd /home/admin/Downloads/
@@ -953,7 +954,6 @@ mv /root/.bashrc.bak /root/.bashrc
 mv /etc/sudoers.bak /etc/sudoers
 mv /etc/hosts.bak /etc/hosts
 mv /etc/sysctl.conf.bak /etc/sysctl.conf
-sleep 10
 exit
 sleep 1
 echo " "
@@ -961,7 +961,7 @@ fi
 echo "*********************************************************"
 echo "CHECKING FOR ADMIN USER"
 echo "*********************************************************"
-getent passwd admin > /dev/null 2&>1
+cut -d: -f1 /etc/passwd |grep admin > /dev/null 2>&1
 if [ $? -eq 0 ]; then
 echo "yes the admin user exists"
 else
@@ -986,9 +986,10 @@ echo "*********************************************************"
 echo "VERIFING REPOS FOR Satellite 6.7"
 echo "*********************************************************"
 yum-config-manager --disable epel
+subscription-manager repos --disable '*'
+yum-config-manager --disable s --disable '*'
+clear
 subscription-manager repos --disable=rhel-7-server-extras-rpms
-yum clean all
-rm -rf /var/cache/yum
 subscription-manager repos --enable=rhel-7-server-rpms
 subscription-manager repos --enable=rhel-server-rhscl-7-rpms
 subscription-manager repos --enable=rhel-7-server-optional-rpms
@@ -1009,9 +1010,9 @@ yum-config-manager --disable epel
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || time yum install -y 'satellite' --skip-broken 
 echo " "
 echo "INSTALLING PUPPET"
-yum -q list installed puppetserver &>/dev/null && echo "puppetserver is installed" || time yum install puppetserver -y --skip-broken
+#yum -q list installed puppetserver &>/dev/null && echo "puppetserver is installed" || time yum install puppetserver -y --skip-broken
 yum -q list installed puppet-agent-oauth &>/dev/null && echo "puppet-agent-oauth is installed" || time yum install puppet-agent-oauth -y --skip-broken
-yum -q list installed puppet-agent &>/dev/null && echo "puppet-agent is installed" || time yum install puppet-agent -y --skip-broken
+#yum -q list installed puppet-agent &>/dev/null && echo "puppet-agent is installed" || time yum install puppet-agent -y --skip-broken
 yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || time yum install rh-mongodb34-syspaths -y --skip-broken
 yum -q list installed fio &>/dev/null && echo "fio is installed" || time yum install fio -y --skip-broken
 echo " "
@@ -1033,9 +1034,6 @@ sudo touch RHTI/INSTALLNSAT
 #--------------------------------------
 function CONFSAT {
 #--------------------------------------
-source /root/.bashrc
-echo -ne "\e[8;40;170t"
-echo " "
 echo " "
 echo " "
 echo "*********************************************************"
@@ -1047,7 +1045,6 @@ echo "CONFIGURING SATELLITE BASE"
 echo "*********************************************************"
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
-echo " "
 echo " "
 echo " "
 yum clean all
@@ -1097,7 +1094,6 @@ function CONFSATDHCP {
 #--------------------------------------
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
-echo " "
 echo " "
 echo " "
 echo "*********************************************************"
@@ -1281,7 +1277,7 @@ echo "*********************************************************"
 echo "VERIFYING DHCP IS WANTED FOR NEW SYSTEMS "
 echo "*********************************************************"
 echo " "
-DEFAULTDHCP=y
+DEFAULTDHCP=n
 COUNTDOWN=15
 read -n1 -t "$COUNTDOWN" -p "Would like to use the DHCP server provided by Satellite? y/n " INPUT
 INPUT=${INPUT:-$DEFAULTDHCP}
@@ -1385,6 +1381,7 @@ hammer organization update --name $ORG
 hammer location update --name $LOC
 sleep 1
 chown -R admin:admin /home/admin
+chmod 777 /home/admin/Downloads/manifest*
 for i in $(find /home/admin/Downloads/ |grep manifest* ); do sudo -u admin hammer subscription upload --file $i --organization $ORG ; done || exit 1
 hammer subscription refresh-manifest --organization $ORG
 echo " "
