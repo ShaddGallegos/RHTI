@@ -256,7 +256,7 @@ echo "*********************************************************"
 source /root/.bashrc
 cut -d: -f1 /etc/passwd |grep admin > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-echo "admin user exists"
+echo "admin user exists - configuring"
 usermod admin -G wheel
 mkdir -p /home/admin/git
 mkdir -p /home/admin/.ssh
@@ -265,7 +265,7 @@ sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
 echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
 echo " "
 else
-echo "admin user does NOT exist, adding and configuring"
+echo "admin user does NOT exist - adding and configuring"
 useradd admin
 sleep 1
 usermod admin -p "$ADMIN_PASSWORD"
@@ -277,29 +277,17 @@ sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
 echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
 echo " "
 fi
-
-useradd admin
-sleep 5
-usermod admin -p "$ADMIN_PASSWORD"
-usermod admin -G wheel
-mkdir -p /home/admin/git
-mkdir -p /home/admin/.ssh
-chown -R admin:admin /home/admin
-sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
-echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
-sleep 10 
-echo " "
 touch RHTI/SERVICEUSER
 }
 
 ls RHTI/SERVICEUSER &>/dev/null
 if [ $? -eq 0 ]; then
 echo 'The requirements to run this script have been met, proceeding'
-sleep 1
+sleep 5
 else
 echo "Installing service account please stand by"
 SERVICEUSER
-sleep 1
+sleep 5
 echo " "
 fi
 
@@ -499,7 +487,6 @@ DOM="$(hostname -d)"
 echo "*********************************************************"
 echo "COLLECT VARIABLES FOR SAT 6.X"
 echo "*********************************************************"
-cp -p /root/.bashrc /root/.bashrc.bak
 export INTERNAL=$(ip -o link | head -n 2 | tail -n 1 | awk '{print $2}' | sed s/:// )
 export EXTERNAL=$(ip route show | sed -e 's/^default via [0-9.]* dev \(\w\+\).*/\1/' | head -1)
 export INTERNALIP=$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')
@@ -1025,6 +1012,7 @@ echo "INSTALLING PUPPET"
 #yum -q list installed puppetserver &>/dev/null && echo "puppetserver is installed" || time yum install puppetserver -y --skip-broken
 yum -q list installed puppet-agent-oauth &>/dev/null && echo "puppet-agent-oauth is installed" || time yum install puppet-agent-oauth -y --skip-broken
 #yum -q list installed puppet-agent &>/dev/null && echo "puppet-agent is installed" || time yum install puppet-agent -y --skip-broken
+yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken 
 yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || time yum install rh-mongodb34-syspaths -y --skip-broken
 yum -q list installed fio &>/dev/null && echo "fio is installed" || time yum install fio -y --skip-broken
 echo " "
@@ -1065,7 +1053,6 @@ sleep 1
 foreman-maintain packages unlock
 
 satellite-installer --scenario satellite -v \
---no-lock-package-versions \
 --foreman-cli-username=$ADMIN \
 --foreman-cli-password=$ADMIN_PASSWORD \
 --foreman-initial-admin-username=$ADMIN \
@@ -1076,7 +1063,7 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dns true \
 --foreman-proxy-dns-managed=true \
 --foreman-proxy-dns-provider=nsupdate \
---foreman-proxy-dns-server="127.0.0.1" \
+--foreman-proxy-dns-server=$INTERNALIP \
 --foreman-proxy-dns-interface $SAT_INTERFACE \
 --foreman-proxy-dns-zone=$DOM \
 --foreman-proxy-dns-forwarders $DNS \
@@ -1116,7 +1103,6 @@ rm -rf /var/cache/yum
 katello-service stop
 foreman-maintain packages unlock
 foreman-installer -v \
---no-lock-package-versions \
 --foreman-proxy-dhcp true \
 --foreman-proxy-dhcp-server=$INTERNALIP \
 --foreman-proxy-dhcp-interface=$SAT_INTERFACE \
@@ -1148,8 +1134,6 @@ sleep 1
 katello-service stop
 foreman-maintain packages unlock
 yum -q list installed foreman-discovery* &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y foreman-discovery-image* --skip-broken
-yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y rubygem-smart_proxy_discovery* --skip-broken 
-foreman-installer -v \
 --no-lock-package-versions \
 --foreman-proxy-tftp true \
 --foreman-proxy-tftp-listen-on both \
