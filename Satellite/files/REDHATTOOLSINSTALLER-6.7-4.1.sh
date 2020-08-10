@@ -240,23 +240,17 @@ fi
 function SERVICEUSER {
 #-------------------------------
 echo "*********************************************************"
-echo "ADMIN PASSWORD - WRITE DOWN OR REMEMBER THIS YOU WILL BE PROMPTED FOR 
-FORMAN USER CREDINTIALS: admin AND THIS PASSWORD WHEN WE IMPORT THE MANIFEST
-OR WHEN YOU LOGIN TO SATELLITE OR TOWER, YOU CAN CHANGE THIS INFORMATION 
-AFTER YOU LOG IN TO WHICHEVER SYSTEM YOU CREATE"
+echo "Service accoung ADMIN Setup and configure"
 echo "*********************************************************"
-echo 'ADMIN=admin'  >> /root/.bashrc
-echo 'What will the password be for your admin user?'
-read  ADMIN_PASSWORD
-echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
-export $ADMIN_PASSWORD
+
 echo "*********************************************************"
 echo "SETTING UP ADMIN"
 echo "*********************************************************"
 source /root/.bashrc
 cut -d: -f1 /etc/passwd |grep admin > /dev/null 2>&1
-if [ $? -eq 0 ]; then
+if [ $? -eq 1 ]; then
 echo "admin user exists - configuring"
+echo 'ADMIN=admin'  >> /root/.bashrc
 usermod admin -G wheel
 mkdir -p /home/admin/git
 mkdir -p /home/admin/.ssh
@@ -265,6 +259,11 @@ sudo -u admin ssh-keygen -f /home/admin/.ssh/id_rsa -N ''
 echo 'admin ALL = NOPASSWD: ALL' >> /etc/sudoers
 echo " "
 else
+echo 'ADMIN=admin'  >> /root/.bashrc
+echo 'What will the password be for your initial Satelliteadmin user?'
+read  ADMIN_PASSWORD
+echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
+export $ADMIN_PASSWORD
 echo "admin user does NOT exist - adding and configuring"
 useradd admin
 sleep 1
