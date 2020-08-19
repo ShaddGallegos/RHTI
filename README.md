@@ -213,7 +213,11 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-4.1.sh](https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/files/REDHATTOOLSINSTALLER-6.7-4.1.sh)
+ * [REDHATTOOLSINSTALLER-6.7-4.1.sh] NOTE:
+        Dont us this right now Red Hat made changes to 6.7.4-2 that 
+        broke my script (much easier to install now). I will have a 
+        new one for you in a couple days just incase you want it 
+        (today is Aug 13) 
   
 [3. Useful Scripts](./Useful_Scripts/)
 
