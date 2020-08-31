@@ -196,14 +196,14 @@ Ansible Tower Features:
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 
-  * [Ansible_Modules-Foreman-Katell](./files/Ansible_Modules-Foreman-Katello.tar.gz)
-  * [REDHATTOOLSINSTALLER-6.7-4.1.sh](./files/REDHATTOOLSINSTALLER-6.7-4.1.sh)
-  * [sat6_healthCheck.sh](./files/sat6_healthCheck.sh)
+  * [Ansible_Modules-Foreman-Katell](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
+  * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
+  * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
 
 #### RPM for an X enabled server (not required) 
- * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files)
+ * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
- * [sat6_healthCheck.sh](./Satellite/files)
+ * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
 
         DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
@@ -213,11 +213,7 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-4.1.sh] NOTE:
-        Dont us this right now Red Hat made changes to 6.7.4-2 that 
-        broke my script (much easier to install now). I will have a 
-        new one for you in a couple days just incase you want it 
-        (today is Aug 13) 
+ * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
   
 [3. Useful Scripts](./Useful_Scripts/)
 
