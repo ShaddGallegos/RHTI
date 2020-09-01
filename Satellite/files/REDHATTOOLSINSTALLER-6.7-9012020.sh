@@ -837,8 +837,11 @@ echo " "
 foreman-maintain packages unlock --assumeyes
 satellite-installer --scenario satellite -v \
 --foreman-proxy-logs-listen-on "both" \
---foreman-proxy-plugin-remote-execution-ssh-install-key \
---foreman-proxy-realm-listen-on "both" \
+--foreman-proxy-realm-listen-on "both"
+
+foreman-maintain packages unlock --assumeyes
+satellite-installer --scenario satellite -v \
+--foreman-proxy-plugin-remote-execution-ssh-install-key "true"
 echo " " 
 echo " " 
 echo '*******************************************'
