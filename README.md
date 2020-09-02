@@ -197,7 +197,7 @@ Ansible Tower Features:
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 
   * [Ansible_Modules-Foreman-Katell](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
-  * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
+  * [REDHATTOOLSINSTALLER-6.7-9012020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-9012020.sh)
   * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
 
 #### RPM for an X enabled server (not required) 
@@ -213,7 +213,7 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
+ * [REDHATTOOLSINSTALLER-6.7-9012020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-9012020.sh)
   
 [3. Useful Scripts](./Useful_Scripts/)
 
