@@ -1113,7 +1113,7 @@ INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.8' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
-hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)'
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server (RPMs)'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
@@ -1276,7 +1276,10 @@ echo "**************************************************************************
 echo "CREATE THE FIRST OR PRIMARY SUBNET TO CONNECT THE NODES TO THE SATELLITE:"
 echo "**************************************************************************"
 echo " "
-hammer subnet create --name $SUBNET_NAME --network $INTERNALNETWORK --mask $SUBNET_MASK --gateway $DHCP_GW --dns-primary $DNS --ipam 'Internal DB' --from $SUBNET_IPAM_BEGIN --to $SUBNET_IPAM_END --tftp-id 1 --dhcp-id 1 --domain-ids 1 --organizations $ORG --locations "$LOC"
+hammer subnet create --name $SUBNET_NAME --network $INTERNALNETWORK --mask $SUBNET_MASK \
+--gateway $DHCP_GW --dns-primary $DNS --ipam 'Internal DB' --from $SUBNET_IPAM_BEGIN \
+--to $SUBNET_IPAM_END --tftp-id 1 --dhcp-id 1 --domain-ids 1 --organizations $ORG --locations "$LOC" \
+
 sudo touch ~/Downloads/RHTI/CREATESUBNET
 }
 
@@ -1355,7 +1358,7 @@ echo "Create a content views"
 echo "***********************************************"
 echo ' '
 echo 'RHEL_7_x86_64'
-hammer content-view create --organization $ORG --name 'RHEL_7_x86_64' --label RHEL_8_x86_64 --description 'RHEL 7'
+hammer content-view create --organization $ORG --name 'RHEL_7_x86_64' --label RHEL_7_x86_64 --description 'RHEL 7'
 echo ' '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server '
@@ -1384,17 +1387,19 @@ echo ' '
 echo 'RHEL_8_x86_64'
 hammer content-view create --organization $ORG --name 'RHEL_8_x86_64' --label RHEL_8_x86_64 --description 'RHEL 8'
 echo ' '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs x86_64 8.2'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - AppStream'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.2'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs x86_64 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.2'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.2'
+echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary '
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.2'
 echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs x86_64 8.2'
-echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary'
-sleep 1000
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
+echo 'Adding Red Hat EPEL for RHEL 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
+sleep 10
 sudo touch ~/Downloads/RHTI/CONTENTVIEWS8
 }
 
@@ -1411,13 +1416,13 @@ INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 time hammer content-view publish --organization $ORG --name 'RHEL_7_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 400
+sleep 10
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
-sleep 200
+sleep 5
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
-sleep 200
+sleep 5
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7--to-lifecycle-environment PROD_RHEL_7 2>/dev/null
-sleep 200
+sleep 5
 touch ~/Downloads/RHTI/PUBLISHRHEL7CONTENT
 fi
 }
@@ -1433,13 +1438,13 @@ echo "***********************************************"
 echo "CREATE A CONTENT VIEW FOR RHEL 8"
 echo "***********************************************"
 time hammer content-view publish --organization $ORG --name 'RHEL_8_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 300
+sleep 10
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
-sleep 100
+sleep 5
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
-sleep 100
+sleep 5
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
-sleep 100
+sleep 5
 sudo touch ~/Downloads/RHTI/PUBLISHRHEL8CONTENT
 fi
 }
@@ -1487,9 +1492,11 @@ echo " "
 echo "*********************************************************"
 echo "Associate each activation key to host collection:"
 echo "*********************************************************"
-for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_7); do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' --organization $ORG; done
+for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_7); \
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' --organization $ORG; done
 sleep 1
-for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_8); do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' --organization $ORG; done
+for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_8); \
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' --organization $ORG; done
 sleep 1
 sudo touch ~/Downloads/RHTI/KEYSTOHOST
 }
@@ -1503,12 +1510,15 @@ echo " "
 echo "*********************************************************"
 echo "Add all subscriptions available to keys:"
 echo "*********************************************************"
-for i in $(hammer --csv activation-key list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); do for j in $(hammer --csv subscription list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); do hammer activation-key add-subscription --id ${i} --subscription-id ${j}; done; done
+for i in $(hammer --csv activation-key list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); \
+do for j in $(hammer --csv subscription list --organization $ORG | awk -F "," {'print $1'} | grep -vi '^ID'); \
+do hammer activation-key add-subscription --id ${i} --subscription-id ${j}; done; done
 echo " "
 echo "*********************************************************"
 echo "Enable all the base content for each OS by default:"
 echo "*********************************************************"
-for i in $(hammer activation-key list --organization $ORG | grep -v ID | grep -v '-' | awk -F '|' '{print $1}') ; do hammer activation-key product-content --content-access-mode-all true --organization $ORG  --id $i ;done
+for i in $(hammer activation-key list --organization $ORG | grep -v ID | grep -v '-' | awk -F '|' '{print $1}') ; \
+do hammer activation-key product-content --content-access-mode-all true --organization $ORG  --id $i ;done
 sudo touch ~/Downloads/RHTI/SUBTOKEYS
 }
 
@@ -1754,6 +1764,7 @@ rm -rf ~/FILES
 rm -rf /root/FILES
 rm -rf /tmp/*
 mv -f /root/.bashrc.bak /root/.bashrc
+for i in $(hammer config-report list |grep -v ID |grep -v -  |awk -F '|' '{print $1}') ; do hammer config-report delete --location $LOC --organization $ORG --id $i ; done
 for i in $(hammer --csv config-report list |awk -F ',' '{print $1}' ) ; do hammer config-report delete --organization $ORG --location $LOC --id $i ; done
 foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true
 foreman-rake katello:delete_orphaned_content --trace
