@@ -188,7 +188,7 @@ Ansible Tower Features:
  * [Whats components comprise Satellite?](https://access.redhat.com/articles/1343683)
 
         NOTE: Satellite has a lot of features so the request will be started with a conversation with
-              your sales person and the technical account team to assist in the archatecturewhen
+              your sales person and the technical account team to assist in the archatecture when
               you request a evaluation.
 
  * [Satellite_PDF](./Satellite/Satellite_PDF)

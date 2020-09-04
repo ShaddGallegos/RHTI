@@ -319,7 +319,7 @@ echo "
                                 ...SHOULD NOT BE USED ON A CURRENTlY OPERATING PRODUCTION SYSTEM - USE AT YOUR OWN RISK...
 
 
-                    However the if you have an issue with the products installed and have a valid subscription please contact Red Hat at:
+                    However, if you have an issue with the installed product and have a valid subscription please contact Red Hat at:
 
                           RED HAT Inc..
                           1-888-REDHAT-1 or 1-919-754-3700, then select the Menu Prompt for Customer Service
@@ -1685,9 +1685,7 @@ foreman-rake katello:reimport
 foreman-rake apipie:cache:index --trace
 
 echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! REBOOTING'
-
 sleep 10 
-init 6
 sudo touch ~/Downloads/RHTI/
 }
 
@@ -1697,9 +1695,50 @@ function DISASSOCIATE_TEMPLATES {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo "*********************************************************"
-echo "DISASSOCIATE UNSUPPORTED COMPONENTS NONDESTRUCTIVE"
+echo "DELETE UNSUPPORTED COMPONENTS (DESTRUCTIVE - Removes all 
+      non redhat templates)"
 echo "*********************************************************"
 echo " "
+echo 'Alterator default
+Alterator default finish
+Alterator default PXELinux
+alterator_pkglist
+AutoYaST default
+AutoYaST default user data
+AutoYaST default iPXE
+AutoYaST default PXELinux
+AutoYaST SLES default
+chef_client
+coreos_cloudconfig
+CoreOS provision
+CoreOS PXELinux
+Discovery Debian kexec
+FreeBSD (mfsBSD) finish
+FreeBSD (mfsBSD) provision
+FreeBSD (mfsBSD) PXELinux
+Jumpstart default
+Jumpstart default finish
+Jumpstart default PXEGrub
+Junos default finish
+Junos default SLAX
+Junos default ZTP config
+NX-OS default POAP setup
+Preseed default
+Preseed default finish
+Preseed default PXEGrub2
+Preseed default iPXE
+Preseed default PXELinux
+Preseed default user data
+preseed_networking_setup
+saltstack_minion
+WAIK default PXELinux
+XenServer default answerfile
+XenServer default finish
+XenServer default PXELinux '
+
+read -p "To Continue Press [Enter] or use Ctrl+c to exit"
+echo " "
+
 declare -a TEMPLATES=(
 "Alterator default"
 "Alterator default finish"
@@ -1740,10 +1779,13 @@ declare -a TEMPLATES=(
  )
 for INDEX in "${TEMPLATES[@]}"
 do
-echo disassoction of ${INDEX} from ${ORG}@${LOC}
-hammer organization remove-config-template --config-template "${INDEX}" --name "${ORG}"
-hammer location remove-config-template --config-template "${INDEX}" --name "${LOC}"
+hammer template update --name "${INDEX}" --locked no
+echo " "
+echo Delete ${INDEX} from ${ORG}@${LOC}
+hammer template delete --name "${INDEX}"
+echo " "
 done
+
 sudo touch ~/Downloads/RHTI/DISASSOCIATE_TEMPLATES
 }
 
@@ -1760,17 +1802,33 @@ satellite-maintain packages lock
 #-------------------------------
 function CLEANUP {
 #-------------------------------
+echo "**********************************"
+echo 'Removing Temp Files'
+echo "**********************************"
 rm -rf ~/FILES
 rm -rf /root/FILES
 rm -rf /tmp/*
+echo " "
+echo "**********************************"
+echo ' Restoring Original /root/.bashrc '
+echo "**********************************"
 mv -f /root/.bashrc.bak /root/.bashrc
-for i in $(hammer config-report list |grep -v ID |grep -v -  |awk -F '|' '{print $1}') ; do hammer config-report delete --location $LOC --organization $ORG --id $i ; done
+echo " "
+echo "******************************************"
+echo ' Removing any initial node config reports '
+echo "******************************************"
 for i in $(hammer --csv config-report list |awk -F ',' '{print $1}' ) ; do hammer config-report delete --organization $ORG --location $LOC --id $i ; done
+echo " "
+echo "**************************************"
+echo 'Setting up initial cache and Cleaning
+     temp items made when building satellite'
+echo "**************************************"
 foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true
-foreman-rake katello:delete_orphaned_content --trace
+foreman-rake katello:delete_orphaned_content
 foreman-rake db:migrate
 foreman-rake db:seed
 foreman-rake katello:reimport
+
 sudo touch ~/Downloads/RHTI/CLEANUP
 }
 
@@ -2537,18 +2595,6 @@ MEDIUM
 fi
 echo " "
 
-ls ~/Downloads/RHTI/DISASSOCIATE_TEMPLATES &>/dev/null
-if [ $? -eq 0 ]; then
-echo ' DISASSOCIATE_TEMPLATES Complete skipping'
-sleep 1
-else
-echo "*******************"
-echo "DISASSOCIATE_TEMPLATES"
-echo "*******************"
-DISASSOCIATE_TEMPLATES
-fi
-echo " "
-
 ls ~/Downloads/RHTI/INSIGHTS &>/dev/null
 if [ $? -eq 0 ]; then
 echo 'INSIGHTS Complete skipping'
@@ -2572,7 +2618,6 @@ echo "*******************"
 SATDONE
 fi
 echo " "
-
 
 ls ~/Downloads/RHTI/SATREENABLEFOIREWALL &>/dev/null
 echo 'This Script has set up Satellite to the point where it should be basicly 
@@ -2602,8 +2647,8 @@ ANSIBLESELINUX
 ;;
 3) dMsgBx "SATELLITE POST INSTALL CLEANUP" \
 #REMOVEUNSUPPORTED
-DISASSOCIATE_TEMPLATES
 CLEANUP
+DISASSOCIATE_TEMPLATES
 ;;
 4) dMsgBx "*** EXITING - THANK YOU ***"
 break
