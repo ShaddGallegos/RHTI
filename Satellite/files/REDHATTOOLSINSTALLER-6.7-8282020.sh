@@ -517,12 +517,11 @@ echo "ENABLE Satellite 6.7 REPOS"
 echo "**************************"
 subscription-manager repos --disable '*'
 yum-config-manager --enable epel
-subscription-manager repos --enable=rhel-7-server-extras-rpms
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.7-rpms \
---enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
+--enable=rhel-7-server-ansible-2.9-rpms \
+--enable=rhel-7-server-extras-rpms
+--enable=rhel-7-server-optional-rpms
 yum clean all
 rm -rf /var/cache/yum
 
@@ -549,19 +548,18 @@ yum -q list installed bind &>/dev/null && echo "bind is installed" || yum instal
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install dhcp -y --skip-broken
 yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install tftp -y --skip-broken
 yum -q list installed augeas &>/dev/null && echo "augeas is installed" || yum install augeas -y --skip-broken
-yum -q list installed rubygem-builder &>/dev/null && echo "rubygem-builder is installed" || yum install rubygem-builder -y --skip-broken
 yum -q list installed fio &>/dev/null && echo "fio is installed" || yum install fio -y --skip-broken
 yum -q list installed chrony &>/dev/null && echo "chrony is installed" || yum install chrony -y --skip-broken
 yum -q list installed sos &>/dev/null && echo "sos is installed" || yum install sos -y --skip-broken
-yum -q list installed livecd-tools &>/dev/null && echo "livecd-tools is installed" || time yum install -y 'livecd-tools' --skip-broken
-yum -q list installed rh-redis5-redis &>/dev/null && echo "rh-redis5-redis is installed" || time yum install -y 'rh-redis5-redis' --skip-broken
+yum -q list installed livecd-tools &>/dev/null && echo "livecd-tools is installed" || yum install -y 'livecd-tools' --skip-broken
+yum -q list installed rh-redis5-redis &>/dev/null && echo "rh-redis5-redis is installed" || yum install -y 'rh-redis5-redis' --skip-broken
 pip3 install --upgrade pip
 echo " "
 echo "*********************************************************"
 echo "UPGRADING OS"
 echo "*********************************************************"
  yum-config-manager --disable epel
- subscription-manager repos --disable=rhel-7-server-extras-rpms
+ subscription-manager repos --disable=rhel-7-server-extras-rpms --disable=rhel-7-server-optional-rpms
  yum clean all ; rm -rf /var/cache/yum
  yum upgrade -y; yum update -y
  sudo touch ~/Downloads/RHTI/INSTALLDEPS
@@ -670,7 +668,7 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-6.7-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
+--enable=rhel-7-server-ansible-2.9-rpms \
 yum clean all
 rm -rf /var/cache/yum
 sleep 1
@@ -679,34 +677,32 @@ echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
-subscription-manager repos --enable=rhel-7-server-extras-rpms
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || time yum install -y 'satellite' --skip-broken 
-yum -q list installed foreman-discovery* &>/dev/null && echo "foreman-discovery is installed" || time yum install -y 'foreman-discovery*' --skip-broken
-yum -q list installed tfm-rubygem-hammer_cli_foreman_discovery &>/dev/null && echo "tfm-rubygem-hammer_cli_foreman_discovery is installed" || time yum install -y 'tfm-rubygem-hammer_cli_foreman_discovery' --skip-broken 
-yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || time yum install -y 'tfm-rubygem-foreman_discovery*' --skip-broken 
-yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image is installed" || time yum install -y 'rubygem-smart_proxy_discovery_image' --skip-broken 
-yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || time yum install -y 'rubygem-smart_proxy_discovery' --skip-broken 
-yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || time yum install -y 'foreman-discovery-image' --skip-broken 
-yum -q list installed ansiblerole-foreman_scap_client &>/dev/null && echo "ansiblerole-foreman_scap_client is installed" || time yum install -y 'ansiblerole-foreman_scap_client' --skip-broken
-yum -q list installed ansiblerole-insights-client &>/dev/null && echo "ansiblerole-insights-client is installed" || time yum install -y 'ansiblerole-insights-client' --skip-broken
-yum -q list installed ansiblerole-satellite-receptor-installer &>/dev/null && echo "ansiblerole-satellite-receptor-installer is installed" || time yum install -y 'ansiblerole-satellite-receptor-installer' --skip-broken
-yum -q list installed hammer_cli_foreman_ansible &>/dev/null && echo "hammer_cli_foreman_ansible is installed" || time yum install -y 'hammer_cli_foreman_ansible' --skip-broken
-yum -q list installed tfm-rubygem-pulp_ansible_client &>/dev/null && echo "tfm-rubygem-pulp_ansible_client is installed" || time yum install -y 'tfm-rubygem-pulp_ansible_client' --skip-broken
-yum -q list installed tfm-rubygem-foreman_ansible &>/dev/null && echo "tfm-rubygem-foreman_ansible is installed" || time yum install -y 'tfm-rubygem-foreman_ansible' --skip-broken
-yum -q list installed tfm-rubygem-foreman_ansible_core &>/dev/null && echo "tfm-rubygem-foreman_ansible_core is installed" || time yum install -y 'tfm-rubygem-foreman_ansible_core' --skip-broken
-yum -q list installed rubygem-smart_proxy_ansible &>/dev/null && echo "rubygem-smart_proxy_ansible is installed" || time yum  install -y 'rubygem-smart_proxy_ansible' --skip-broken
-yum -q list installed python-virtualenv &>/dev/null && echo "python-virtualenv is installed" || time yum  install -y 'python-virtualenv' --skip-broken
-yum -q list installed bind-utils &>/dev/null && echo "bind-utils" || time yum install -y bind-utils --skip-broken
-yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || time yum install -y 'dhcp' --skip-broken
-yum -q list installed bind &>/dev/null && echo "insights-client is installed" || time yum  insights-client -y 'bind' --skip-broken
-rpm -e postgresql-9.2.24-4.el7_8.x86_64 --nodeps
-yum-builddep -y foreman* --skip-broken
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
+yum -q list installed foreman-discovery* &>/dev/null && echo "foreman-discovery is installed" || yum install -y 'foreman-discovery*' --skip-broken
+yum -q list installed tfm-rubygem-hammer_cli_foreman_discovery &>/dev/null && echo "tfm-rubygem-hammer_cli_foreman_discovery is installed" || yum install -y 'tfm-rubygem-hammer_cli_foreman_discovery' --skip-broken 
+yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || yum install -y 'tfm-rubygem-foreman_discovery*' --skip-broken 
+yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image is installed" || yum install -y 'rubygem-smart_proxy_discovery_image' --skip-broken 
+yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y 'rubygem-smart_proxy_discovery' --skip-broken 
+yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
+yum -q list installed ansiblerole-foreman_scap_client &>/dev/null && echo "ansiblerole-foreman_scap_client is installed" || yum install -y 'ansiblerole-foreman_scap_client' --skip-broken
+yum -q list installed ansiblerole-insights-client &>/dev/null && echo "ansiblerole-insights-client is installed" || yum install -y 'ansiblerole-insights-client' --skip-broken
+yum -q list installed ansiblerole-satellite-receptor-installer &>/dev/null && echo "ansiblerole-satellite-receptor-installer is installed" || yum install -y 'ansiblerole-satellite-receptor-installer' --skip-broken
+yum -q list installed tfm-rubygem-pulp_ansible_client &>/dev/null && echo "tfm-rubygem-pulp_ansible_client is installed" || yum install -y 'tfm-rubygem-pulp_ansible_client' --skip-broken
+yum -q list installed tfm-rubygem-foreman_ansible &>/dev/null && echo "tfm-rubygem-foreman_ansible is installed" || yum install -y 'tfm-rubygem-foreman_ansible' --skip-broken
+yum -q list installed tfm-rubygem-foreman_ansible_core &>/dev/null && echo "tfm-rubygem-foreman_ansible_core is installed" || yum install -y 'tfm-rubygem-foreman_ansible_core' --skip-broken
+yum -q list installed rubygem-smart_proxy_ansible &>/dev/null && echo "rubygem-smart_proxy_ansible is installed" || yum  install -y 'rubygem-smart_proxy_ansible' --skip-broken
+yum -q list installed python-virtualenv &>/dev/null && echo "python-virtualenv is installed" || yum  install -y 'python-virtualenv' --skip-broken
+yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y bind-utils --skip-broken
+yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
+yum -q list installed bind &>/dev/null && echo "insights-client is installed" || yum  insights-client -y 'bind' --skip-broken
+yum -q list installed rubygem-builder &>/dev/null && echo "rubygem-builder is installed" || yum  rubygem-builder -y 'bind' --skip-broken
 echo " "
 echo "INSTALLING ANSIBLE ROLES"
 subscription-manager repos --enable=rhel-7-server-extras-rpms
 yum-config-manager --enable epel
 yum clean all
 rm -rf /var/cache/yum
+yum-builddep -y foreman* --skip-broken
 yum -q list installed rhel-system-roles &>/dev/null && echo "rhel-system-roles is installed" || yum install rhel-system-roles -y --skip-broken
 sleep 1
 subscription-manager repos --disable=rhel-7-server-extras-rpms
@@ -882,7 +878,7 @@ echo "CONFIGURING SATELLITE CACHE"
 echo "*********************************************************"
 foreman-rake apipie:cache:index --trace
 echo " "
-sudo touch RHTI/CONFSATCACHE
+sudo touch ~/Downloads/RHTI/CONFSATCACHE
 }
 
 #--------------------------------------
@@ -936,7 +932,7 @@ echo " "
 subscription-manager repos --disable=rhel-7-server-extras-rpms
 yum clean all 
 rm -rf /var/cache/yum
-sudo touch RHTI/DISABLEEXTRAS
+sudo touch ~/Downloads/RHTI/DISABLEEXTRAS
 }
 
 #------------------------------
@@ -1039,7 +1035,7 @@ echo "STOP THE LOG SPAMMING OF /VAR/LOG/MESSAGES WITH SLICE"
 echo "*********************************************************"
 echo 'if $programname == "systemd" and ($msg contains "Starting Session" or $msg contains "Started Session" or $msg contains "Created slice" or $msg contains "Starting user-" or $msg contains "Starting User Slice of" or $msg contains "Removed session" or $msg contains "Removed slice User Slice of" or $msg contains "Stopping User Slice of") then stop' > /etc/rsyslog.d/ignore-systemd-session-slice.conf
 systemctl restart rsyslog 
-sudo touch RHTI/STOPSPAMMINGVARLOG
+sudo touch ~/Downloads/RHTI/STOPSPAMMINGVARLOG
 }
 
 #NOTE: Jenkins, CentOS Linux 7.8 Puppet Forge, Icinga, and Maven are examples of setting up a custom repository
@@ -1257,7 +1253,7 @@ echo "**************************************************************************
 for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}') ; do time hammer repository update --id $i --download-policy immediate ; done 
 for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID' |grep -v -i puppet); do time hammer repository synchronize --id ${i} --organization $ORG; done
 echo " "
-sudo touch RHTI/SYNC
+sudo touch ~/Downloads/RHTI/SYNC
 }
 
 #-------------------------------
@@ -1461,7 +1457,7 @@ echo "***********************************"
 hammer host-collection create --name='RHEL_7_x86_64' --organization $ORG
 hammer host-collection create --name='RHEL_8_x86_64' --organization $ORG
 sleep 10
-sudo touch RHTI/HOSTCOLLECTION
+sudo touch ~/Downloads/RHTI/HOSTCOLLECTION
 }
 
 #-------------------------------
@@ -1593,7 +1589,7 @@ hammer os set-default-template --id="${i}" --config-template-id="${PXEID}"
 hammer os add-config-template --id="${i}" --config-template-id="${SATID}"
 hammer os set-default-template --id="${i}" --config-template-id="${SATID}"
 done
-sudo touch RHTI/PARTITION_OS_PXE_TEMPLATE
+sudo touch ~/Downloads/RHTI/PARTITION_OS_PXE_TEMPLATE
 }
 
 #-------------------------------
@@ -1624,7 +1620,7 @@ echo "Setting up and Modifying default template for auto discovery"
 echo "*********************************************************"
 #sed -i 's/SATELLITE_CAPSULE_URL/'$(hostname)'/g' /usr/share/foreman/app/views/unattended/pxe/PXELinux_default.erb
 #hammer template update --id 1
-sudo touch RHTI/MODPXELINUXDEF 
+sudo touch ~/Downloads/RHTI/MODPXELINUXDEF 
 }
 
 #-------------------------------
@@ -1670,7 +1666,7 @@ firewall-cmd  --zone public --add-service mountd \
 && firewall-cmd --zone public --add-service rpc-bind \
 && firewall-cmd --zone public --add-service nfs \
 firewall-cmd --runtime-to-permanent
-sudo touch RHTI/SATREENABLEFOIREWALL
+sudo touch ~/Downloads/RHTI/SATREENABLEFOIREWALL
 }
 
 #-------------------------------
@@ -1686,7 +1682,7 @@ foreman-rake apipie:cache:index --trace
 
 echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! REBOOTING'
 sleep 10 
-sudo touch ~/Downloads/RHTI/
+sudo touch ~/Downloads/RHTI/SATDONE
 }
 
 #-------------------------------
@@ -1795,7 +1791,7 @@ function INSIGHTS {
 yum update python-requests -y
 yum install redhat-access-insights -y
 redhat-access-insights --register
-sudo touch RHTI/INSIGHTS
+sudo touch ~/Downloads/RHTI/INSIGHTS
 satellite-maintain packages lock
 }
 
