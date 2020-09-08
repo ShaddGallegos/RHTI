@@ -510,17 +510,15 @@ echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 7"
 echo "******************************************************************"
 echo -ne "\e[8;40;170t"
 source /root/.bashrc
-subscription-manager repos --disable '*'
 echo " "
 echo "**************************"
 echo "ENABLE Satellite 6.7 REPOS"
 echo "**************************"
 subscription-manager repos --disable '*'
-yum-config-manager --enable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms \
---enable=rhel-7-server-extras-rpms
+--enable=rhel-7-server-extras-rpms \
 --enable=rhel-7-server-optional-rpms
 yum clean all
 rm -rf /var/cache/yum
@@ -537,6 +535,8 @@ echo "INSTALLING DEPENDENCIES AND UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
 echo "************************************************************************"
 echo -ne "\e[8;40;170t"
 sleep 1
+yum groupinstall -y 'Base' 'Core'
+yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install yum-utils -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
 yum -q list installed python36-pip &>/dev/null && echo "python36-pip is installed" || yum install python36-pip -y --skip-broken
 yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || yum install python3-pip -y --skip-broken
