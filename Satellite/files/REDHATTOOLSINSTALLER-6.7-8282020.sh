@@ -1,4 +1,4 @@
-#!/bin/bash
+/etc/foreman-installer/scenarios.d/my-answer-file.yaml#!/bin/bash
 #POC/Demo
 #This Script is for setting up a basic Satellite 6.7 on RHEL 7 or Ansible Tower 6.3.1 on RHEL 7
 
@@ -535,6 +535,7 @@ echo "INSTALLING DEPENDENCIES AND UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
 echo "************************************************************************"
 echo -ne "\e[8;40;170t"
 sleep 1
+yum groups mark convert  'Base' 'Core'
 yum groupinstall -y 'Base' 'Core'
 yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install yum-utils -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
@@ -668,7 +669,7 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-6.7-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms \
+--enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
 sleep 1
@@ -720,16 +721,13 @@ function CONFSAT {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
+echo " " 
 echo "*********************************************************"
 echo "CONFIGURING SATELLITE"
 echo "*********************************************************"
-echo " "
-source /root/.bashrc
-echo -ne "\e[8;40;170t"
+sleep 2 
 yum clean all
 rm -rf /var/cache/yum
-sleep 1
-echo " "
 echo "*****************************"
 echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
@@ -741,104 +739,25 @@ satellite-installer --scenario satellite -v \
 --foreman-initial-admin-password=$ADMIN_PASSWORD \
 --foreman-initial-organization=$ORG \
 --foreman-initial-location=$LOC 
-echo " "
-sleep 5
-echo '*******************************************'
-echo 'Configuring REQUIRED Satellite Internal DNS'
-echo '*******************************************'
-echo " "
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
 --foreman-proxy-dns "true" \
+--foreman-proxy-dns-managed "true" \
 --foreman-proxy-dns-forwarders $DNS \
 --foreman-proxy-dns-interface $SAT_INTERFACE \
 --foreman-proxy-dns-listen-on "both" \
 --foreman-proxy-dns-managed "true" \
 --foreman-proxy-dns-provider "nsupdate" \
 --foreman-proxy-dns-reverse $DNS_REV \
---foreman-proxy-dns-server="127.0.0.1" \
---foreman-proxy-dns-zone=$DOM
-echo " "
-echo '*******************************************'
-echo 'Configuring Satellite PLUGINS'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
---enable-foreman-compute-ec2 \
---enable-foreman-compute-gce \
---enable-foreman-compute-libvirt \
---enable-foreman-compute-openstack \
---enable-foreman-compute-ovirt \
---enable-foreman-compute-vmware \
---enable-foreman-plugin-ansible \
---enable-foreman-plugin-azure \
---enable-foreman-plugin-bootdisk \
---enable-foreman-plugin-discovery \
---enable-foreman-plugin-hooks \
---enable-foreman-plugin-kubevirt \
---enable-foreman-plugin-openscap \
---enable-foreman-plugin-remote-execution \
---enable-foreman-plugin-remote-execution-cockpit \
---enable-foreman-plugin-tasks \
---enable-foreman-plugin-templates \
---enable-foreman-plugin-virt-who-configure \
-echo " "
-echo '*******************************************'
-echo 'Configuring Satellite Proxy PLUGINS'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
---enable-foreman-proxy-content \
---enable-foreman-proxy-plugin-ansible \
---enable-foreman-proxy-plugin-discovery \
---enable-foreman-proxy-plugin-openscap \
---enable-foreman-proxy-plugin-pulp \
---enable-foreman-proxy-plugin-remote-execution-ssh \
-echo " "
-echo '*******************************************'
-echo 'Configuring Satellite BMC PROVIDERS'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
---foreman-proxy-bmc "true" \
---foreman-proxy-bmc-default-provider "freeipmi" \
---foreman-proxy-bmc-listen-on "both"
-echo " "
-echo '*******************************************'
-echo 'Configuring Satellite DHCP (OPTIONAL)'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
+--foreman-proxy-dns-zone=$DOM \
 --foreman-proxy-dhcp "true" \
---enable-foreman-proxy-plugin-dhcp-remote-isc \
+--foreman-proxy-dhcp-managed "true" \
 --foreman-proxy-dhcp-gateway "$DHCP_GW" \
 --foreman-proxy-dhcp-interface "$SAT_INTERFACE" \
 --foreman-proxy-dhcp-listen-on "both" \
 --foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
 --foreman-proxy-dhcp-range="$DHCP_RANGE" \
---foreman-proxy-dhcp-server="$INTERNALIP"
-echo " "
-echo '*******************************************'
-echo 'Configuring Satellite listeners'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
---foreman-proxy-logs-listen-on "both" \
---foreman-proxy-realm-listen-on "both"
-echo " " 
-echo '*******************************************'
-echo 'Configuring Satellite Remote Execution'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
---foreman-proxy-plugin-remote-execution-ssh-install-key "true"
-echo " " 
-echo '*******************************************'
-echo 'Configuring Satellite TFTP (OPTIONAL)'
-echo '*******************************************'
-foreman-maintain packages unlock --assumeyes
-satellite-installer --scenario satellite -v \
+--foreman-proxy-dhcp-server="$INTERNALIP" \
 --foreman-proxy-tftp "true" \
+--foreman-proxy-tftp-managed true \
 --foreman-proxy-tftp-listen-on "both" \
 --foreman-proxy-tftp-servername="$(hostname)"
 echo " "
@@ -857,7 +776,7 @@ echo 'Starting and enabling Satellite services'
 echo '*******************************************'
 systemctl enable tftp.service
 systemctl start tftp.service
-systemctl enable dhcpd.service
+systemctl --system daemon-reload
 systemctl restart dhcpd.service
 systemctl enable named.service
 systemctl start named.service
@@ -1112,19 +1031,19 @@ hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise
 hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
+#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 -O /root/RPM-GPG-KEY-EPEL-7
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
 sleep 10
@@ -1161,6 +1080,8 @@ INPUT=${INPUT:-$RHEL8DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)'
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)' 2>/dev/null
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
@@ -1175,6 +1096,8 @@ sleep 10
 hammer product create --name='Extra Packages for Enterprise Linux 8' --organization $ORG
 sleep 10
 hammer repository create --name='Extra Packages for Enterprise Linux 8' --organization $ORG --product='Extra Packages for Enterprise Linux 8' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Extra Packages for Enterprise Linux 8' --name 'Extra Packages for Enterprise Linux 8'
+time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 8' --name 'Extra Packages for Enterprise Linux 8' 2>/dev/null
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
 echo -e "\n$NMESSAGE\n"
