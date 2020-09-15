@@ -93,7 +93,6 @@ Ansible Tower Features:
   * LDAP, AD, and other authentication integration
   * Made easy config for your logging aggragator 
 
-
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
 ## Resources
@@ -196,9 +195,9 @@ Ansible Tower Features:
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 
-  * [Ansible_Modules-Foreman-Katell](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
-  * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
+  * [Ansible_Modules-Foreman-Katello](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
+  * [REDHATTOOLSINSTALLER-6.7-8282020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 05 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
   * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
 
 #### RPM for an X enabled server (not required) 
@@ -214,8 +213,8 @@ Ansible Tower Features:
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
- * [REDHATTOOLSINSTALLER-6.7-8282020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
- * [REDHATTOOLSINSTALLER-6.8-9012020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
+  * [REDHATTOOLSINSTALLER-6.7-8282020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 05 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
   
 [3. Useful Scripts](./Useful_Scripts/)
 
@@ -227,4 +226,5 @@ Ansible Tower Features:
 ### Red Hat Tiger Team members
    * Michael Ford [Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85/cloud-deploy)
    * Orcun Aatakan [Many examples: Windows, VMWare, and Other](https://github.com/oatakan?tab=repositories)
+
 more to come 
