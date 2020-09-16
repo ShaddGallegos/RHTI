@@ -45,7 +45,8 @@ Working in tandem, this is what the optimal Management system would look like fr
         enterprise IT platform.
 
         Automation requires an investment in time, technology, and people. Make the most of your 
-        investment with an enterprise automation platform that delivers agility and flexibility.
+        investment with an enterprise automation platform that delivers supportability, agility
+        and flexibility.
 
 [Ansible Tower](https://www.ansible.com/products/tower)
 
@@ -93,9 +94,36 @@ Ansible Tower Features:
   * LDAP, AD, and other authentication integration
   * Made easy config for your logging aggragator 
 
+Ways To Interact With Ansible:
+
+AD-Hoc
+
+Playbooks
+
+Roles
+
+
+Ansible Collections 
+       https://www.ansible.com/blog/getting-started-with-ansible-collections
+
+        New content is continuously made available for consumption. Managing content in this manner also becomes easier as modules, plugins, roles, and docs are packaged and tagged with a collection version. Modules can be updated, renamed, improved upon; roles can be updated to reflect changes in module interaction; docs can be regenerated to reflect the edits and all are packaged and tagged together.
+
+        Before collections, it was not uncommon for modules to break or lack timely updates needed to interact with the services they were interfacing with. This often required Ansible users or Ansible Tower administrators to run multiple versions of Ansible in virtual environments in order to consume a patch that addressed a module issue. Ansible Content Collections bring stability and predictability by breaking modules out from the core distribution.
+        For automated organizations, this means that certified content is readily available to be applied to use-cases ripe for automation from day one.
+
+             By default ansible collections live in:
+                  /etc/ansible/collections              
+           
+             Finding Collections Community:
+                  https://galaxy.ansible.com/
+
+             Redhat Supported Content:
+                  https://cloud.redhat.com/ansible/automation-hub
+
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
 ## Resources
+ * [AnsibleFest - Virtual Event Oct 13 - 14, 2020](https://www.ansible.com/ansiblefest) - Register here FREE VIRTUAL EVENT
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets/) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/)
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF/)
@@ -106,6 +134,8 @@ Ansible Tower Features:
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
+ * [Ansible Roadmap](https://docs.ansible.com/ansible/devel/roadmap/index.html#roadmaps)
+ * [Ansible The Next Release](https://github.com/ansible-community/ansible-build-data/blob/main/2.10/CHANGELOG-v2.10.rst)
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
         
