@@ -1339,7 +1339,7 @@ time hammer content-view version promote --organization $ORG --content-view 'RHE
 sleep 5
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
 sleep 5
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7--to-lifecycle-environment PROD_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7 --to-lifecycle-environment PROD_RHEL_7 2>/dev/null
 sleep 5
 touch ~/Downloads/RHTI/PUBLISHRHEL7CONTENT
 fi
