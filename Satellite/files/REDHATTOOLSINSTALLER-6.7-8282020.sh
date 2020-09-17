@@ -738,7 +738,7 @@ satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username=$ADMIN \
 --foreman-initial-admin-password=$ADMIN_PASSWORD \
 --foreman-initial-organization=$ORG \
---foreman-initial-location=$LOC 
+--foreman-initial-location=$LOC \
 --foreman-proxy-dns "true" \
 --foreman-proxy-dns-managed "true" \
 --foreman-proxy-dns-forwarders $DNS \
@@ -757,9 +757,10 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dhcp-range="$DHCP_RANGE" \
 --foreman-proxy-dhcp-server="$INTERNALIP" \
 --foreman-proxy-tftp "true" \
---foreman-proxy-tftp-managed true \
+--foreman-proxy-tftp-managed "true" \
 --foreman-proxy-tftp-listen-on "both" \
---foreman-proxy-tftp-servername="$(hostname)"
+--foreman-proxy-tftp-servername="$(hostname)" \
+--foreman-plugin-tasks-automatic-cleanup "true"
 echo " "
 echo " " 
 sleep 1
