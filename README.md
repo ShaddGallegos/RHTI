@@ -227,7 +227,7 @@ Ansible Collections
 
   * [Ansible_Modules-Foreman-Katello](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
   * [REDHATTOOLSINSTALLER-6.7-8282020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 05 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 27 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh) <--Dont use yet 
   * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
 
 #### RPM for an X enabled server (not required) 
@@ -244,7 +244,7 @@ Ansible Collections
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 
   * [REDHATTOOLSINSTALLER-6.7-8282020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-8282020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 05 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 27 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh) <--Dont use yet 
   
 [3. Useful Scripts](./Useful_Scripts/)
 

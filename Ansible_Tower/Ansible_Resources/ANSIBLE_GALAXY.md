@@ -377,6 +377,20 @@ Example from below
      * https://galaxy.ansible.com/n3pjk/servicenow
      * https://galaxy.ansible.com/pulp/pulp_installer
 
+## Cyberark
+-------
+
+### Collections
+     * https://galaxy.ansible.com/cyberark/pas
+     * https://galaxy.ansible.com/cyberark/conjur
+     
+### Roles
+     * https://galaxy.ansible.com/cyberark/conjur-host-identity
+     * https://galaxy.ansible.com/cyberark/modules
+     * https://galaxy.ansible.com/cyberark/password_lookup_plugin
+     * https://galaxy.ansible.com/cyberark/conjur-lookup-plugin
+     * https://galaxy.ansible.com/cyberark/aimprovider
+
 ## Ect, ect, ect
 
 
