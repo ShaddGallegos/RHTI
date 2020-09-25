@@ -554,6 +554,9 @@ yum -q list installed chrony &>/dev/null && echo "chrony is installed" || yum in
 yum -q list installed sos &>/dev/null && echo "sos is installed" || yum install sos -y --skip-broken
 yum -q list installed livecd-tools &>/dev/null && echo "livecd-tools is installed" || yum install -y 'livecd-tools' --skip-broken
 yum -q list installed rh-redis5-redis &>/dev/null && echo "rh-redis5-redis is installed" || yum install -y 'rh-redis5-redis' --skip-broken
+yum -q list installed kernel-headers &>/dev/null && echo "kernel-headers is installed" || yum install -y 'kernel-headers' --skip-broken
+yum -q list installed kernel-devel &>/dev/null && echo "kernel-devel is installed" || yum install -y 'kernel-devel' --skip-broken
+yum -q list installed kernel-doc &>/dev/null && echo "kernel-doc is installed" || yum install -y 'kernel-doc' --skip-broken
 pip3 install --upgrade pip
 echo " "
 echo "*********************************************************"
