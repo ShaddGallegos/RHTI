@@ -760,7 +760,18 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-tftp-managed "true" \
 --foreman-proxy-tftp-listen-on "both" \
 --foreman-proxy-tftp-servername="$(hostname)" \
---foreman-plugin-tasks-automatic-cleanup "true"
+--foreman-plugin-tasks-automatic-cleanup "true" \
+--foreman-proxy-plugin-discovery-install-images "true" \
+--foreman-proxy-registered-proxy-url="https://$(hostname)" \
+--enable-foreman-plugin-inventory-upload "true" \
+--enable-foreman-plugin-bootdisk Enable "true" \
+--enable-foreman-compute-vmware "true" \
+--enable-foreman-compute-libvirt "true" \
+--enable-foreman-compute-gce "true" \
+--enable-foreman-compute-ec2 "true" \
+--foreman-proxy-templates "true"
+
+
 echo " "
 echo " " 
 sleep 1
