@@ -22,10 +22,9 @@ echo "Online: Continuing to Install"
 else
 echo "Offline"
 echo "This script requires access to the network to run please fix your settings and try again"
-sleep 3
+sleep 1
 exit 1
 fi
-sleep 1 
 reset
 if [ "$(whoami)" != "root" ]
 then
@@ -42,7 +41,7 @@ echo '
 echo ''
 read -p "To Continue Press [Enter] or use Ctrl+c to exit the installer"
 fi
-sleep 3 
+sleep 1 
 reset
 }
 CHECKONLINE
@@ -110,7 +109,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 setenforce 0
 service firewalld stop
 chkconfig firewalld off
-sleep 5
+sleep 1
 echo " "
 }
 
@@ -155,7 +154,7 @@ echo "*********************************************************"
 echo "*********************************************************"
 echo "FIRST DISABLE REPOS"
 echo "*********************************************************"
-subscription-manager repos --disable '*'
+subscription-manager repos --disable "*"
 echo " "
 echo "*********************************************************"
 echo "ENABLE PROPER REPOS"
@@ -360,14 +359,14 @@ echo "System is not registered, Please provide Red Hat CDN
 echo "*********************************************************"
 echo ' '
 subscription-manager register
-sleep 5
+sleep 1
 echo ' '
 echo "*******************************************************************"
 echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
 echo ' '
 subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 5
+sleep 1
 echo ' '
 else
 echo "*******************************************************************"
@@ -379,7 +378,7 @@ echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
 echo 'Checking your Satellite subscription status this may take a moment'
 subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 2
+sleep 1
 fi
 sudo touch ~/Downloads/RHTI/SATREGISTER
 }
@@ -515,11 +514,12 @@ echo " "
 echo "**************************"
 echo "ENABLE Satellite 6.7 REPOS"
 echo "**************************"
-subscription-manager repos --disable '*'
+subscription-manager repos --disable "*"
 subscription-manager repos --enable=rhel-7-server-rpms \
+--enable=rhel-7-server-satellite-6.7-rpms \
+--enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms \
---enable=rhel-7-server-satellite-maintenance-6-rpms
+--enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
 
@@ -535,28 +535,25 @@ echo "INSTALLING DEPENDENCIES AND UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
 echo "************************************************************************"
 echo -ne "\e[8;40;170t"
 sleep 1
-yum groups mark convert  'Base' 'Core'
-yum groupinstall -y 'Base' 'Core'
-yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install yum-utils -y --skip-broken
-yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
-yum -q list installed python36-pip &>/dev/null && echo "python36-pip is installed" || yum install python36-pip -y --skip-broken
-yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || yum install python3-pip -y --skip-broken
-yum -q list installed git &>/dev/null && echo "git is installed" || yum install git -y --skip-broken
-yum -q list installed automake &>/dev/null && echo "automake is installed" || yum install automake -y --skip-broken
-yum -q list installed kernel-devel &>/dev/null && echo "kernel-devel is installed" || yum install kernel-devel -y --skip-broken
-yum -q list installed libvirt-client &>/dev/null && echo "libvirt-client is installed" || yum install libvirt-client -y --skip-broken
-yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install bind -y --skip-broken
-yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install dhcp -y --skip-broken
-yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install tftp -y --skip-broken
 yum -q list installed augeas &>/dev/null && echo "augeas is installed" || yum install augeas -y --skip-broken
-yum -q list installed fio &>/dev/null && echo "fio is installed" || yum install fio -y --skip-broken
+yum -q list installed automake &>/dev/null && echo "automake is installed" || yum install automake -y --skip-broken
+yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install bind -y --skip-broken
 yum -q list installed chrony &>/dev/null && echo "chrony is installed" || yum install chrony -y --skip-broken
-yum -q list installed sos &>/dev/null && echo "sos is installed" || yum install sos -y --skip-broken
-yum -q list installed livecd-tools &>/dev/null && echo "livecd-tools is installed" || yum install -y 'livecd-tools' --skip-broken
-yum -q list installed rh-redis5-redis &>/dev/null && echo "rh-redis5-redis is installed" || yum install -y 'rh-redis5-redis' --skip-broken
-yum -q list installed kernel-headers &>/dev/null && echo "kernel-headers is installed" || yum install -y 'kernel-headers' --skip-broken
+yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install dhcp -y --skip-broken
+yum -q list installed fio &>/dev/null && echo "fio is installed" || yum install fio -y --skip-broken
+yum -q list installed git &>/dev/null && echo "git is installed" || yum install git -y --skip-broken
 yum -q list installed kernel-devel &>/dev/null && echo "kernel-devel is installed" || yum install -y 'kernel-devel' --skip-broken
 yum -q list installed kernel-doc &>/dev/null && echo "kernel-doc is installed" || yum install -y 'kernel-doc' --skip-broken
+yum -q list installed kernel-headers &>/dev/null && echo "kernel-headers is installed" || yum install -y 'kernel-headers' --skip-broken
+yum -q list installed libvirt-client &>/dev/null && echo "libvirt-client is installed" || yum install libvirt-client -y --skip-broken
+yum -q list installed livecd-tools &>/dev/null && echo "livecd-tools is installed" || yum install -y 'livecd-tools' --skip-broken
+yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || yum install python3-pip -y --skip-broken
+yum -q list installed python36-pip &>/dev/null && echo "python36-pip is installed" || yum install python36-pip -y --skip-broken
+yum -q list installed rh-redis5-redis &>/dev/null && echo "rh-redis5-redis is installed" || yum install -y 'rh-redis5-redis' --skip-broken
+yum -q list installed sos &>/dev/null && echo "sos is installed" || yum install sos -y --skip-broken
+yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
+yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install tftp -y --skip-broken
+yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || yum install yum-utils -y --skip-broken
 pip3 install --upgrade pip
 echo " "
 echo "*********************************************************"
@@ -664,7 +661,7 @@ echo " "
 echo "*********************************************************"
 echo "VERIFING REPOS FOR Satellite 6.7"
 echo "*********************************************************"
-subscription-manager repos --disable '*'
+subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 yum clean all
 rm -rf /var/cache/yum
@@ -682,24 +679,24 @@ echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
-yum -q list installed foreman-discovery* &>/dev/null && echo "foreman-discovery is installed" || yum install -y 'foreman-discovery*' --skip-broken
-yum -q list installed tfm-rubygem-hammer_cli_foreman_discovery &>/dev/null && echo "tfm-rubygem-hammer_cli_foreman_discovery is installed" || yum install -y 'tfm-rubygem-hammer_cli_foreman_discovery' --skip-broken 
-yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || yum install -y 'tfm-rubygem-foreman_discovery*' --skip-broken 
-yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image is installed" || yum install -y 'rubygem-smart_proxy_discovery_image' --skip-broken 
-yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y 'rubygem-smart_proxy_discovery' --skip-broken 
-yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
+foreman-maintain packages unlock
 yum -q list installed ansiblerole-foreman_scap_client &>/dev/null && echo "ansiblerole-foreman_scap_client is installed" || yum install -y 'ansiblerole-foreman_scap_client' --skip-broken
 yum -q list installed ansiblerole-insights-client &>/dev/null && echo "ansiblerole-insights-client is installed" || yum install -y 'ansiblerole-insights-client' --skip-broken
 yum -q list installed ansiblerole-satellite-receptor-installer &>/dev/null && echo "ansiblerole-satellite-receptor-installer is installed" || yum install -y 'ansiblerole-satellite-receptor-installer' --skip-broken
-yum -q list installed tfm-rubygem-pulp_ansible_client &>/dev/null && echo "tfm-rubygem-pulp_ansible_client is installed" || yum install -y 'tfm-rubygem-pulp_ansible_client' --skip-broken
-yum -q list installed tfm-rubygem-foreman_ansible &>/dev/null && echo "tfm-rubygem-foreman_ansible is installed" || yum install -y 'tfm-rubygem-foreman_ansible' --skip-broken
-yum -q list installed tfm-rubygem-foreman_ansible_core &>/dev/null && echo "tfm-rubygem-foreman_ansible_core is installed" || yum install -y 'tfm-rubygem-foreman_ansible_core' --skip-broken
-yum -q list installed rubygem-smart_proxy_ansible &>/dev/null && echo "rubygem-smart_proxy_ansible is installed" || yum  install -y 'rubygem-smart_proxy_ansible' --skip-broken
-yum -q list installed python-virtualenv &>/dev/null && echo "python-virtualenv is installed" || yum  install -y 'python-virtualenv' --skip-broken
+yum -q list installed ansible-runner &>/dev/null && echo "ansible-runner is installed" || yum  ansible-runner -y 'bind' --skip-broken
+yum -q list installed bind &>/dev/null && echo "insights-client is installed" || yum  insights-client -y 'bind' --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y bind-utils --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
-yum -q list installed bind &>/dev/null && echo "insights-client is installed" || yum  insights-client -y 'bind' --skip-broken
+yum -q list installed python-virtualenv &>/dev/null && echo "python-virtualenv is installed" || yum  install -y 'python-virtualenv' --skip-broken
 yum -q list installed rubygem-builder &>/dev/null && echo "rubygem-builder is installed" || yum  rubygem-builder -y 'bind' --skip-broken
+yum -q list installed rubygem-smart_proxy_ansible &>/dev/null && echo "rubygem-smart_proxy_ansible is installed" || yum  install -y 'rubygem-smart_proxy_ansible' --skip-broken
+yum -q list installed rubygem-smart_proxy_dhcp_remote_isc &>/dev/null && echo "rubygem-smart_proxy_dhcp_remote_isc is installed" || yum install -y 'rubygem-smart_proxy_dhcp_remote_isc' --skip-broken
+yum -q list installed rubygem-smart_proxy_openscap &>/dev/null && echo "rubygem-smart_proxy_openscap" || yum install -y 'rubygem-smart_proxy_openscap' --skip-broken
+yum -q list installed rubygem-smart_proxy_pulp &>/dev/null && echo "rubygem-smart_proxy_pulp" || yum install -y 'rubygem-smart_proxy_pulp' --skip-broken
+yum -q list installed rubygem-smart_proxy_remote_execution_ssh &>/dev/null && echo "rubygem-smart_proxy_remote_execution_ssh is installed" || yum install -y 'rubygem-smart_proxy_remote_execution_ssh' --skip-broken
+yum -q list installed tfm-rubygem-foreman_ansible &>/dev/null && echo "tfm-rubygem-foreman_ansible is installed" || yum install -y 'tfm-rubygem-foreman_ansible' --skip-broken
+yum -q list installed tfm-rubygem-foreman_ansible_core &>/dev/null && echo "tfm-rubygem-foreman_ansible_core is installed" || yum install -y 'tfm-rubygem-foreman_ansible_core' --skip-broken
+yum -q list installed tfm-rubygem-pulp_ansible_client &>/dev/null && echo "tfm-rubygem-pulp_ansible_client is installed" || yum install -y 'tfm-rubygem-pulp_ansible_client' --skip-broken
 echo " "
 echo "INSTALLING ANSIBLE ROLES"
 subscription-manager repos --enable=rhel-7-server-extras-rpms
@@ -728,7 +725,7 @@ echo " "
 echo "*********************************************************"
 echo "CONFIGURING SATELLITE"
 echo "*********************************************************"
-sleep 2 
+sleep 1 
 yum clean all
 rm -rf /var/cache/yum
 echo "*****************************"
@@ -796,7 +793,12 @@ systemctl restart dhcpd.service
 systemctl enable named.service
 systemctl start named.service
 systemctl --system daemon-reload
-foreman-maintain packages lock
+foreman-maintain packages unlock
+yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
+yum -q list installed rubygem-smart_proxy_discovery &>/dev/null && echo "rubygem-smart_proxy_discovery is installed" || yum install -y 'rubygem-smart_proxy_discovery' --skip-broken 
+yum -q list installed rubygem-smart_proxy_discovery_image &>/dev/null && echo "rubygem-smart_proxy_discovery_image is installed" || yum install -y 'rubygem-smart_proxy_discovery_image' --skip-broken 
+yum -q list installed tfm-rubygem-foreman_discovery &>/dev/null && echo "tfm-rubygem-foreman_discovery is installed" || yum install -y 'tfm-rubygem-foreman_discovery*' --skip-broken 
+yum -q list installed tfm-rubygem-hammer_cli_foreman_discovery &>/dev/null && echo "tfm-rubygem-hammer_cli_foreman_discovery is installed" || yum install -y 'tfm-rubygem-hammer_cli_foreman_discovery' --skip-broken 
 sudo touch ~/Downloads/RHTI/CONFSAT
 }
 
@@ -863,6 +865,7 @@ echo "*********************************************************"
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo " "
+foreman-maintain packages unlock
 subscription-manager repos --disable=rhel-7-server-extras-rpms
 yum clean all 
 rm -rf /var/cache/yum
@@ -880,7 +883,7 @@ echo "Setting up hammer will list the Satellite username and password in the /ro
 with default permissions set to -rw-r--r--, if this is a security concern it is recommended the file is
 deleted once the setup is complete"
 echo "*********************************************************"
-sleep 5
+sleep 1
 cat > /root/.hammer/cli_config.yml<< EOF
 :foreman:
  :host: 'https://$(hostname -f)'
@@ -919,11 +922,13 @@ echo "*********************************************************"
 echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN USERNAME AND PASSWORD'
 echo "*********************************************************"
 source /root/.bashrc
+foreman-rake apipie:cache
 hammer organization update --name $ORG
 hammer location update --name $LOC
-for i in $(sudo find /home/ |grep manifest | grep zip ); do sudo cp $i ~/Downloads/ ; done
+sudo rm -rf /root/Downloads/manifest*.zip
+for i in $(sudo find /home/ |grep manifest | grep zip); do sudo cp -p $i ~/Downloads/ ;done 
 sudo chmod 777 ~/Downloads/manifest*.zip
-for i in $(sudo find /home/ |grep manifest | grep zip); do sudo -u admin hammer subscription upload --file $i --organization $ORG ; done || exit 1
+sudo -u admin hammer subscription upload --file ~/Downloads/manifest*.zip --organization $ORG
 hammer subscription refresh-manifest --organization $ORG
 echo " "
 echo "*********************************************************"
@@ -1061,13 +1066,13 @@ hammer repository-set enable --organization "$ORG" --product 'Red Hat Software C
 #time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 -O /root/RPM-GPG-KEY-EPEL-7
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
-sleep 10
+sleep 1
 #hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7 --name 'GPG-EPEL-7' --organization $ORG
 hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7Server --name 'GPG-EPEL-7Sever' --organization $ORG
-sleep 10
+sleep 1
 #hammer product create --name='Extra Packages for Enterprise Linux 7' --organization $ORG
 hammer product create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG
-sleep 10
+sleep 1
 #hammer repository create --name='Extra Packages for Enterprise Linux 7' --organization $ORG --product='Extra Packages for Enterprise Linux 7' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7/x86_64/
 #time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 7' --name 'Extra Packages for Enterprise Linux 7' 2>/dev/null
 hammer repository create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG --product='Extra Packages for Enterprise Linux 7Server' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7Server/x86_64/
@@ -1105,11 +1110,11 @@ hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
-sleep 10
+sleep 1
 hammer gpg create --key /root/RPM-GPG-KEY-EPEL-8 --name 'RPM-GPG-KEY-EPEL-8' --organization $ORG
-sleep 10
+sleep 1
 hammer product create --name='Extra Packages for Enterprise Linux 8' --organization $ORG
-sleep 10
+sleep 1
 hammer repository create --name='Extra Packages for Enterprise Linux 8' --organization $ORG --product='Extra Packages for Enterprise Linux 8' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/
 hammer repository update --download-policy immediate --organization "$ORG" --product 'Extra Packages for Enterprise Linux 8' --name 'Extra Packages for Enterprise Linux 8'
 time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 8' --name 'Extra Packages for Enterprise Linux 8' 2>/dev/null
@@ -1308,7 +1313,7 @@ hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --
 echo 'Adding Red Hat Enterprise Linux 7 Server - Optional'
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Extras'
-sleep 10
+sleep 1
 sudo touch ~/Downloads/RHTI/CONTENTVIEWS7
 }
 
@@ -1331,7 +1336,7 @@ echo 'Adding Red Hat Satellite Tools 6.7 for RHEL 8'
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 RPMs x86_64'
 echo 'Adding Red Hat EPEL for RHEL 8'
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
-sleep 10
+sleep 1
 sudo touch ~/Downloads/RHTI/CONTENTVIEWS8
 }
 
@@ -1348,13 +1353,13 @@ INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 time hammer content-view publish --organization $ORG --name 'RHEL_7_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 10
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
-sleep 5
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
-sleep 5
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7 --to-lifecycle-environment PROD_RHEL_7 2>/dev/null
-sleep 5
+sleep 1
 touch ~/Downloads/RHTI/PUBLISHRHEL7CONTENT
 fi
 }
@@ -1370,13 +1375,13 @@ echo "***********************************************"
 echo "CREATE A CONTENT VIEW FOR RHEL 8"
 echo "***********************************************"
 time hammer content-view publish --organization $ORG --name 'RHEL_8_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 10
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
-sleep 5
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
-sleep 5
+sleep 1
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
-sleep 5
+sleep 1
 sudo touch ~/Downloads/RHTI/PUBLISHRHEL8CONTENT
 fi
 }
@@ -1392,7 +1397,7 @@ echo "Create a host collection for RHEL:"
 echo "***********************************"
 hammer host-collection create --name='RHEL_7_x86_64' --organization $ORG
 hammer host-collection create --name='RHEL_8_x86_64' --organization $ORG
-sleep 10
+sleep 1
 sudo touch ~/Downloads/RHTI/HOSTCOLLECTION
 }
 
@@ -1616,9 +1621,11 @@ foreman-rake db:seed
 foreman-rake katello:reimport
 foreman-rake apipie:cache:index --trace
 
-echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! REBOOTING'
-sleep 10 
+echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! READY TO REBOOT'
+read -p "Press [Enter] to continue"
+sleep 1
 sudo touch ~/Downloads/RHTI/SATDONE
+sudo init 6
 }
 
 #-------------------------------
@@ -1838,12 +1845,12 @@ wget -q --tries=10 --timeout=20 --spider http://google.com
 if [[ $? -eq 0 ]]; then
 echo "Online: 
  Continuing to Install"
-sleep 3
+sleep 1
 else
 echo "Offline"
 echo "This script requires access to 
  the network to run please fix your settings and try again"
-sleep 3
+sleep 1
 exit 1
 fi
 }
@@ -1996,7 +2003,7 @@ if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 sed -i 's/SELINUX=permissive/SELINUX=enforcing/g' /etc/selinux/config
 setenforce 1
 getenforce
-sleep 3
+sleep 1
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
 echo -e "\n$NMESSAGE\n"
 else
@@ -2026,7 +2033,7 @@ if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 firewall-cmd --permanent \
 --add-port="80/tcp" --add-port="443/tcp" \
 --add-port="22/tcp" --add-port="5432/tcp"
-sleep 3
+sleep 1
 
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
 service firewalld stop
@@ -2061,7 +2068,7 @@ $DIALOG --title " Prompt " --yesno "$1" 10 80
 function dMsgBx {
 #-----------------------
 $DIALOG --infobox "$1" 10 80
-sleep 10
+sleep 1
 }
 
 #----------------------
@@ -2099,7 +2106,7 @@ RC=$?
 Flag=$(cat $TmpFi)
 case $Flag in
 1) dMsgBx "Satellite 6.7 INSTALL" \
-sleep 2
+sleep 1
 #SCRIPT
 echo " "
 SATELLITEREQUIREMENTS
@@ -2426,7 +2433,7 @@ echo "************************"
 echo "CONTENTVIEWS RHEL 8 "
 echo "************************"
 CONTENTVIEWS8
-sleep 20
+sleep 1
 fi
 echo " "
 
@@ -2439,7 +2446,7 @@ echo "************************"
 echo "CONTENTVIEWS RHEL 7 "
 echo "************************"
 CONTENTVIEWS7
-sleep 20
+sleep 1
 fi
 echo " "
 
