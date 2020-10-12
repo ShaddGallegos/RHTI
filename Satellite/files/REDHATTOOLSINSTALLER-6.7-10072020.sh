@@ -52,8 +52,6 @@ function SETUPHOST {
 HNAME=$(hostname)
 SHNAME=$(hostname -s)
 DOM="$(hostname -d)"
-setenforce 0
-service firewalld stop
 mkdir -p ~/Downloads/RHTI
 mkdir /run/user/1000/dconf/ &>/dev/null
 touch /run/user/1000/dconf/user &>/dev/null
@@ -108,8 +106,10 @@ echo "SET SELINUX TO PERMISSIVE AND DISABLING FIREWALL
       to reenable once the system completes "
 echo "*****************************************************************"
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+setenforce 0
 service firewalld stop
 chkconfig firewalld off
+sleep 1
 echo " "
 }
 
@@ -119,7 +119,9 @@ function SYSREGISTER {
 echo "*********************************************************"
 echo "REGESTERING RHEL SYSTEM"
 echo "*********************************************************"
-echo " "
+echo "***********************************"
+echo "Registering RHEL 7 system if needed"
+echo "***********************************"
 subscription-manager status | awk -F ':' '{print $2}'|grep Current > /dev/null
 status=$?
 if test $status -eq 1
@@ -160,7 +162,6 @@ echo "*********************************************************"
 subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-extras-rpms \
 --enable=rhel-7-server-optional-rpms \
---enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-supplementary-rpms
 echo " "
 echo "*********************************************************"
@@ -168,6 +169,7 @@ echo "ENABLE EPEL FOR A FEW PACKAGES"
 echo "*********************************************************"
 yum -q list installed epel-release-latest-7 &>/dev/null && echo "epel-release-latest-7 is installed" || \
 yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm --skip-broken
+yum-config-manager --enable epel 
 yum-config-manager --save --setopt=*.skip_if_unavailable=true
 yum clean all
 rm -fr /var/cache/yum
@@ -491,14 +493,66 @@ touch ~/Downloads/RHTI/VARIABLES1
 function SERVICEUSER {
 #-------------------------------
 echo "*********************************************************"
-echo "SETTING ADMIN PASSWORD"
+echo "ADMIN PASSWORD - What would you like your default web UI
+      password to be for the initial Satellite user 'admin'?"
 echo "*********************************************************"
 echo 'ADMIN=admin'  >> /root/.bashrc
-echo 'What will the password be for your FOREMAN/admin user?'
+echo 'What will the password be for your admin user?'
 read  ADMIN_PASSWORD
 echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
 echo " "
 touch ~/Downloads/RHTI/SERVICEUSER
+}
+
+#------------------------------
+function INSTALLREPOS {
+#------------------------------
+echo "******************************************************************"
+echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.7"
+echo "******************************************************************"
+echo -ne "\e[8;40;170t"
+source /root/.bashrc
+echo " "
+echo "**************************"
+echo "Disabling Non Critical Repos"
+echo "**************************"
+subscription-manager repos --disable "*"
+echo " "
+echo "**************************"
+echo "ENABLE Satellite 6.7 REPOS"
+echo "**************************"
+subscription-manager repos --enable=rhel-7-server-rpms \
+--enable=rhel-7-server-satellite-6.7-rpms \
+--enable=rhel-7-server-satellite-maintenance-6-rpms \
+--enable=rhel-server-rhscl-7-rpms \
+--enable=rhel-7-server-ansible-2.9-rpms 
+yum clean all
+rm -rf /var/cache/yum
+
+echo " "
+sudo touch ~/Downloads/RHTI/INSTALLREPOS
+}
+
+#------------------------------
+function INSTALLDEPS {
+#------------------------------
+echo "************************************************************************"
+echo "INSTALLING DEPENDENCIES AND UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
+echo "************************************************************************"
+echo -ne "\e[8;40;170t"
+sleep 1
+yum -q list installed kernel-devel &>/dev/null && echo "kernel-devel is installed" || yum install -y 'kernel-devel' --skip-broken
+yum -q list installed kernel-doc &>/dev/null && echo "kernel-doc is installed" || yum install -y 'kernel-doc' --skip-broken
+yum -q list installed kernel-headers &>/dev/null && echo "kernel-headers is installed" || yum install -y 'kernel-headers' --skip-broken
+echo " "
+echo "*********************************************************"
+echo "UPGRADING OS"
+echo "*********************************************************"
+ yum-config-manager --disable epel
+ subscription-manager repos --disable=rhel-7-server-extras-rpms --disable=rhel-7-server-optional-rpms
+ yum clean all ; rm -rf /var/cache/yum
+ yum upgrade -y --skip-broken
+ sudo touch ~/Downloads/RHTI/INSTALLDEPS
 }
 
 #----------------------------------
@@ -517,9 +571,6 @@ echo “SET DOMAIN”
 echo "*********************************************************"
 echo 'inet.ipv4.ip_forward=1' >> /etc/sysctl.conf
 echo "kernel.domainname=$DOM" >> /etc/sysctl.conf
-echo "Testing"
-echo "Domain "$(hostname -d)""
-echo "FQDN "$(hostname -f)""
 echo " "
 cd ~/Downloads/
 mkdir -p /root/.hammer
@@ -601,6 +652,8 @@ echo "VERIFING REPOS FOR Satellite 6.7"
 echo "*********************************************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
+yum clean all
+rm -rf /var/cache/yum
 subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-6.7-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
@@ -609,25 +662,17 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 yum clean all
 rm -rf /var/cache/yum
 sleep 1
-echo "*********************************************************"
-echo "UPGRADING OS"
-echo "*********************************************************"
-yum upgrade -y
-echo " "
 echo " "
 echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
-foreman-maintain packages unlock
+echo "INSTALLING SATELLITE"
 yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y bind --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y bind-utils --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
 yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install tftp -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
-echo " "
-yum clean all
-rm -rf /var/cache/yum
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
 
@@ -653,11 +698,19 @@ echo "*****************************"
 echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
 source /root/.bashrc
+foreman-maintain packages unlock
 satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username "$ADMIN" \
 --foreman-initial-admin-password "$ADMIN_PASSWORD" \
 --foreman-initial-organization "$ORG" \
---foreman-initial-location "$LOC" \
+--foreman-initial-location "$LOC"
+echo " "
+echo " "
+echo "***************************************************"
+echo "Satellite 6.7 DNS Configuration"
+echo "***************************************************"
+foreman-maintain packages unlock
+foreman-installer -v \
 --foreman-proxy-dns "true" \
 --foreman-proxy-dns-managed "true" \
 --foreman-proxy-dns-forwarders "$DNS" \
@@ -666,7 +719,15 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dns-provider "nsupdate" \
 --foreman-proxy-dns-reverse "$DNS_REV" \
 --foreman-proxy-dns-zone "$DOM" \
---foreman-proxy-registered-proxy-url "https://$(hostname)" \
+--foreman-proxy-registered-proxy-url="https://$(hostname)"
+echo " "
+echo " "
+echo "***************************************************"
+echo "Satellite 6.7 DHCP Configuration (Optional)"
+echo "***************************************************"
+source /root/.bashrc
+foreman-maintain packages unlock
+foreman-installer -v \
 --foreman-proxy-dhcp "true" \
 --foreman-proxy-dhcp-managed "true" \
 --foreman-proxy-dhcp-gateway "$DHCP_GW" \
@@ -674,23 +735,44 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dhcp-listen-on "both" \
 --foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
 --foreman-proxy-dhcp-range "$DHCP_RANGE" \
---foreman-proxy-dhcp-server "$INTERNALIP" \
+--foreman-proxy-dhcp-server "$INTERNALIP"
+echo " "
+echo " "
+echo "***************************************************"
+echo "Satellite 6.7 TFTP Configuration"
+echo "***************************************************"
+source /root/.bashrc
+foreman-maintain packages unlock
+foreman-installer -v \
 --foreman-proxy-tftp "true" \
 --foreman-proxy-tftp-managed "true" \
 --foreman-proxy-tftp-listen-on "both" \
---foreman-proxy-tftp-servername "$(hostname)" \
---foreman-plugin-tasks-automatic-cleanup "true" \
---foreman-proxy-plugin-discovery-install-images "true" \
+--foreman-proxy-tftp-servername "$(hostname)" 
+echo " "
+echo " "
+echo "***************************************************"
+echo "Satellite 6.7 Task and Cleanup Configuration"
+echo "***************************************************"
+source /root/.bashrc
+foreman-maintain packages unlock
+foreman-installer -v \
+--foreman-plugin-tasks-automatic-cleanup true \
+--foreman-proxy-plugin-discovery-install-images true \
 --enable-foreman-plugin-inventory-upload \
---enable-foreman-plugin-bootdisk \
---enable-foreman-compute-vmware \
---enable-foreman-compute-libvirt \
---enable-foreman-compute-gce \
---enable-foreman-compute-ec2 \
---enable-foreman-compute-ovirt \
---enable-foreman-compute-vmware \
---enable-foreman-compute-ovirt \
---enable-foreman-compute-openstack
+--enable-foreman-plugin-bootdisk 
+echo " "
+echo " "
+echo "***************************************************"
+echo "Satellite 6.7 Cloud Management Option Configuration"
+echo "***************************************************"
+source /root/.bashrc
+foreman-maintain packages unlock
+foreman-installer -v \
+--enable-foreman-compute-vmware "true" \
+--enable-foreman-compute-libvirt "true" \
+--enable-foreman-compute-gce "true" \
+--enable-foreman-compute-ec2 "true" \
+--foreman-proxy-templates "true"
 echo " "
 echo " " 
 sleep 1
@@ -712,6 +794,8 @@ systemctl restart dhcpd.service
 systemctl enable named.service
 systemctl start named.service
 systemctl --system daemon-reload
+
+yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
 sudo touch ~/Downloads/RHTI/CONFSAT
 }
 
@@ -831,17 +915,14 @@ echo "*********************************************************"
 echo "Just making sure"
 read -p "Press [Enter] to continue"
 echo " "
-echo "*********************************************************"
+echo "*********************************************************************"
 echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN USERNAME AND PASSWORD'
-echo "*********************************************************"
+echo "*********************************************************************"
 source /root/.bashrc
 foreman-rake apipie:cache
 hammer organization update --name $ORG
 hammer location update --name $LOC
-sudo rm -rf /root/Downloads/manifest*.zip
-for i in $(sudo find /home/ |grep manifest | grep zip); do sudo cp -p $i ~/Downloads/ ;done 
-sudo chmod 777 ~/Downloads/manifest*.zip
-sudo -u admin hammer subscription upload --file ~/Downloads/manifest*.zip --organization $ORG
+for i in $(command & find / |grep manifest |grep zip > ~/Downloads/RHTI/file ; cat ~/Downloads/RHTI/file |grep -v Permission) ; do sudo -u admin hammer subscription upload --file $i --organization $ORG ;done
 hammer subscription refresh-manifest --organization $ORG
 echo " "
 echo "*********************************************************"
@@ -2071,6 +2152,31 @@ SERVICEUSER
 sleep 1
 echo " "
 fi
+
+ls ~/Downloads/RHTI/INSTALLREPOS &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' INSTALLREPOS Complete skipping'
+sleep 1
+else
+echo "**********"
+echo "INSTALLREPOS"
+echo "**********"
+INSTALLREPOS
+sleep 1
+fi
+echo " "
+
+ls ~/Downloads/RHTI/INSTALLDEPS &>/dev/null
+if [ $? -eq 0 ]; then
+echo ' INSTALLDEPS Complete skipping'
+sleep 1
+else
+echo "**********"
+echo "INSTALLDEPS"
+echo "**********"
+#INSTALLDEPS
+fi
+echo " "
 
 ls ~/Downloads/RHTI/GENERALSETUP &>/dev/null
 if [ $? -eq 0 ]; then
