@@ -1,11 +1,100 @@
 #!/bin/bash
+#Red Hat tools installer – for RHEL 7.X
 #POC/Demo
-#This Script is for setting up a basic Satellite 6.7 on RHEL 7 or Ansible Tower 6.3.1 on RHEL 7
+#This Script is for setting up a basic Satellite 6.7 on RHEL 7 or Ansible Tower 6.7.1 on RHEL 7
 
 echo -ne "\e[8;40;170t"
 
 # Hammer referance to assist in modifing the script can be found at 
 # https://www.gitbook.com/book/abradshaw/getting-started-with-satellite-6-command-line/details
+
+#What this script does in cronalogical order
+#Verify the server can get to the internet
+#Verify you are “root”
+#Ensure GW connectivity
+#Set selinux to permissive and disable firewall 
+#Register RHEL
+#Set repositories
+#Enable repositories
+#Install packages enable script to run
+#Collect variables
+#Install dependencies 
+#Upgrade OS
+#Root ssh keys
+#Set domain
+#Check all requirements have been met
+#Check FQDN
+#Verify repositories for Satellite 6.7
+#Install Satellite 6.7
+#Configure Satellite 6.7
+#Satellite 6.7 configure Satellite base
+#Satellite 6.7 internal DNS configuration
+#Satellite 6.7 DHCP configuration (optional)
+#Satellite 6.7 TFTP configuration
+#Satellite 6.7 task and cleanup configuration
+#Satellite 6.7 cloud management option configuration
+#Start and enable Satellite services
+#Configure Satellite cache
+#Verify DHCP is wanted for new systems (default is enabled)
+#Enable hammer 
+#If you have put your manifest into ~/downloads/
+#When prompted please enter your Satellite admin/foreman username and password
+#Refresh the capsule content
+#Set Satellite environment settings
+#Tune the Satellite for medium Satellite 
+#Stop the log spamming of /var/log/messages with slice
+#RHEL 7 standard repositories
+#RHEL 8 standard repositories
+#Sync all repositories
+#Create the first or primary subnet to connect the nodes to the Satellite
+#Create environments DEV_RHEL→ TEST_RHEL→ PROD_RHEL
+#Create a daily sync plan
+#Associate plan to products
+#Create a content views
+#Create a host collection for RHEL
+#Create an activation keys for environments
+#Associate each activation key to host collection
+#Add all subscriptions available to keys
+#Enable all the base content for each os by default
+#Create media
+#Create a RHEL hostgroups
+#
+#                                              **************************
+#                                              Satellite 6.7 REQUIREMENTS
+#                                              **************************
+#                                    Hardware Requirements
+#                                        32  GB Ram
+#                                        300 GB Storage
+#                                        8   CPU
+#
+#                                    Official Storage Requirements https://url.corp.redhat.com/SAT-6-7-Storage-Requirements
+#                                    Filesystems Required for this script to run
+#                                        /              Rest of Drive
+#                                        /boot          1024 MB
+#                                        /swap          18 GB
+#
+#                                    2 etthernet ports
+#                                        eth0 internal for provisioning
+#                                        eth1 external for syncing to cdn
+#
+#                                    The Server
+#                                        Basic system or System with GUI
+#
+#           Your manifest from https://access.redhat.com/management/subscription_allocations
+#
+#           A ~/Downloads directory
+#
+#           Copy this script, and your manifest into ~/Downloads/
+#
+#           To run it
+#           change to root user
+#           sudo su
+#
+#           cd into the admin downloads dir
+#           cd ~/Downloads
+#
+#           Run the script
+#           sh REDHATTOOLSINSTALLER-6.7.sh"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------ Functions ------------------------------------------------------
@@ -493,11 +582,10 @@ touch ~/Downloads/RHTI/VARIABLES1
 function SERVICEUSER {
 #-------------------------------
 echo "*********************************************************"
-echo "ADMIN PASSWORD - What would you like your default web UI
-      password to be for the initial Satellite user 'admin'?"
+echo "ADMIN/FOREMAN PASSWORD"
 echo "*********************************************************"
+echo 'What will the password be for your admin (FOREMAN) user?'
 echo 'ADMIN=admin'  >> /root/.bashrc
-echo 'What will the password be for your admin user?'
 read  ADMIN_PASSWORD
 echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
 echo " "
@@ -672,6 +760,27 @@ yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" |
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
 yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install tftp -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install syslinux -y --skip-broken
+yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
+yum install -y -x *infoblox* \
+tfm-rubygem* \
+tfm-ror52-rubygem-sqlite3 \
+*smart_proxy* \
+hexedit-1.2.13-5.el7.x86_64 libguestfs-1.40.2-10.el7.x86_64 \
+perl-hivex-1.3.10-6.10.el7.x86_64 \
+libguestfs-tools-c-1.40.2-10.el7.x86_64 \
+foreman-discovery-image-3.5.4-8.el7sat.noarch \
+scrub-2.5.2-7.el7.x86_64 \
+hivex-1.3.10-6.10.el7.x86_64
+
+yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
+
+mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
+cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
+group :dhcp_remote_isc do
+  gem 'rsec', '< 1'
+end
+gem 'smart_proxy_dhcp_remote_isc'
+EOF
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
@@ -703,16 +812,18 @@ satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username "$ADMIN" \
 --foreman-initial-admin-password "$ADMIN_PASSWORD" \
 --foreman-initial-organization "$ORG" \
---foreman-initial-location "$LOC"
+--foreman-initial-location "$LOC" 
+
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 DNS Configuration"
+echo "Satellite 6.7 Internal DNS Configuration"
 echo "***************************************************"
-foreman-maintain packages unlock
+
 foreman-installer -v \
 --foreman-proxy-dns "true" \
 --foreman-proxy-dns-managed "true" \
+--foreman-proxy-dns-server "https://$(hostname)"
 --foreman-proxy-dns-forwarders "$DNS" \
 --foreman-proxy-dns-interface "$SAT_INTERFACE" \
 --foreman-proxy-dns-listen-on "both" \
@@ -781,6 +892,7 @@ cat > /etc/systemd/system/dhcpd.service.d/interfaces.conf<< EOF
 [Service]
 ExecStart=/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -user dhcpd -group dhcpd --no-pid "$INTERNAL"
 EOF
+
 echo " "
 echo " "
 sleep 1
@@ -795,7 +907,6 @@ systemctl enable named.service
 systemctl start named.service
 systemctl --system daemon-reload
 
-yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
 sudo touch ~/Downloads/RHTI/CONFSAT
 }
 
@@ -916,14 +1027,14 @@ echo "Just making sure"
 read -p "Press [Enter] to continue"
 echo " "
 echo "*********************************************************************"
-echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN USERNAME AND PASSWORD'
+echo 'WHEN PROMPTED PLEASE ENTER YOUR SATELLITE ADMIN/FOREMAN USERNAME AND PASSWORD'
 echo "*********************************************************************"
 source /root/.bashrc
-foreman-rake apipie:cache
 hammer organization update --name $ORG
 hammer location update --name $LOC
-for i in $(command & find / |grep manifest |grep zip > ~/Downloads/RHTI/file ; cat ~/Downloads/RHTI/file |grep -v Permission) ; do sudo -u admin hammer subscription upload --file $i --organization $ORG ;done
+for i in $(command & find / |grep manifest |grep zip > ~/Downloads/RHTI/file ; cat ~/Downloads/RHTI/file |grep -v Permission) ; do time sudo -u admin hammer subscription upload --file $i --organization $ORG ;done
 hammer subscription refresh-manifest --organization $ORG
+foreman-rake apipie:cache
 echo " "
 echo "*********************************************************"
 echo 'REFRESHING THE CAPSULE CONTENT'
@@ -978,23 +1089,25 @@ QMESSAGE7="Would you like to enable and sync RHEL 7 Content
 This will enable:
  Red Hat Enterprise Linux 7 Server (Kickstart)
  Red Hat Enterprise Linux 7 Server
- Red Hat Satellite Tools 8 (for RHEL 7 Server)
+ Red Hat Satellite Tools 6.7 (for RHEL 7 Server)
  Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server
  Red Hat Enterprise Linux 7 Server - Extras
  Red Hat Enterprise Linux 7 Server - Optional
  Red Hat Enterprise Linux 7 Server - Supplementary
  Red Hat Enterprise Linux 7 Server - RH Common
- Extra Packages for Enterprise Linux 7"
+ Extra Packages for Enterprise Linux 7
+ "
+
 
 QMESSAGE8="Would you like to enable and sync RHEL 8 Content
 This will enable:
 Red Hat Storage Native Client for RHEL 8 (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
-Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)
 Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)"
+Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)
+"
 
 QMESSAGEJBOSS="Would you like to download JBoss Enterprise Application Platform 7 (RHEL 7 Server) content"
 QMESSAGEVIRTAGENT="Would you like to download Red Hat Virtualization 4 Management Agents for RHEL 7 content"
@@ -2187,6 +2300,7 @@ echo "************"
 echo "GENERALSETUP"
 echo "************"
 GENERALSETUP
+DISABLESECURITY
 fi
 echo " "
 
