@@ -1032,7 +1032,8 @@ echo "*********************************************************************"
 source /root/.bashrc
 hammer organization update --name $ORG
 hammer location update --name $LOC
-for i in $(command & find / |grep manifest |grep zip > ~/Downloads/RHTI/file ; cat ~/Downloads/RHTI/file |grep -v Permission) ; do time sudo -u admin hammer subscription upload --file $i --organization $ORG ;done
+for i in $(ls /home/); do cp /home/$i/Downloads/manifest*zip ~/Downloads/ ; done
+sudo -u admin hammer subscription upload --file /home/$i/Downloads/manifest*zip --organization $ORG
 hammer subscription refresh-manifest --organization $ORG
 foreman-rake apipie:cache
 echo " "
@@ -2257,9 +2258,9 @@ if [ $? -eq 0 ]; then
 echo 'The requirements to run this script have been met, proceeding'
 sleep 1
 else
-echo "****************************"
-echo "Service Account 'admin'"
-echo "****************************"
+echo "*******************************"
+echo "FOREMAN Service Account 'admin'"
+echo "*******************************"
 echo "Installing service account please stand by"
 SERVICEUSER
 sleep 1
