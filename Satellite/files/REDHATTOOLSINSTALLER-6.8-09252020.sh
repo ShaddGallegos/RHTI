@@ -782,17 +782,6 @@ end
 gem 'smart_proxy_dhcp_remote_isc'
 EOF
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
-subscription-manager repos --disable "*"
-yum-config-manager --disable epel
-yum clean all
-rm -rf /var/cache/yum
-subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.8-rpms \
---enable=rhel-7-server-satellite-maintenance-6-rpms \
---enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
-yum clean all
-rm -rf /var/cache/yum
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
 
@@ -1043,7 +1032,8 @@ echo "*********************************************************************"
 source /root/.bashrc
 hammer organization update --name $ORG
 hammer location update --name $LOC
-for i in $(command & find / |grep manifest |grep zip > ~/Downloads/RHTI/file ; cat ~/Downloads/RHTI/file |grep -v Permission) ; do time sudo -u admin hammer subscription upload --file $i --organization $ORG ;done
+for i in $(ls /home/); do cp /home/$i/Downloads/manifest*zip ~/Downloads/ ; done
+sudo -u admin hammer subscription upload --file /home/$i/Downloads/manifest*zip --organization $ORG
 hammer subscription refresh-manifest --organization $ORG
 foreman-rake apipie:cache
 echo " "
@@ -1849,20 +1839,6 @@ sudo touch ~/Downloads/RHTI/DISASSOCIATE_TEMPLATES
 #-------------------------------
 function INSIGHTS {
 #-------------------------------
-foreman-maintain packages unlock
-subscription-manager repos --disable "*"
-yum-config-manager --disable epel
-yum clean all
-rm -rf /var/cache/yum
-subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-extras-rpms \
---enable=rhel-7-server-satellite-6.8-rpms \
---enable=rhel-7-server-satellite-maintenance-6-rpms \
---enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
-yum clean all
-rm -rf /var/cache/yum
-sleep 1
 yum update python-requests -y
 yum install redhat-access-insights -y
 redhat-access-insights --register
@@ -2282,9 +2258,9 @@ if [ $? -eq 0 ]; then
 echo 'The requirements to run this script have been met, proceeding'
 sleep 1
 else
-echo "****************************"
-echo "Service Account 'admin'"
-echo "****************************"
+echo "*******************************"
+echo "FOREMAN Service Account 'admin'"
+echo "*******************************"
 echo "Installing service account please stand by"
 SERVICEUSER
 sleep 1
