@@ -1999,9 +1999,9 @@ echo 'Setting up initial cache and Cleaning
 echo "**************************************"
 foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true
 foreman-rake katello:delete_orphaned_content
-foreman-rake db:migrate
-foreman-rake db:seed
-foreman-rake katello:reimport
+#foreman-rake db:migrate
+#foreman-rake db:seed
+#foreman-rake katello:reimport
 
 sudo touch ~/Downloads/RHTI/CLEANUP
 }

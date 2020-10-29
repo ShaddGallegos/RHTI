@@ -123,19 +123,60 @@ Ansible Collections
 [Request a Ansible Tower License](https://www.redhat.com/en/technologies/management/ansible/try-it?extIdCarryOver=true&sc_cid=701f2000001OH6uAAG)
 
 ## Resources
- * [AnsibleFest - Virtual Event Oct 13 - 14, 2020](https://www.ansible.com/ansiblefest) - Register here FREE VIRTUAL EVENT
+
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets/) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
- * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/)
+       1. [Ansible-cheat-sheet-1](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-cheat-sheet-1.webp)
+       2. [Ansible_Cheat_Sheet-DevOps_Quickstart_Guide](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet-DevOps_Quickstart_Guide.png)
+       3. [Ansible_Cheat_Sheet_Wall-Skills1 PNG](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet_Wall-Skills1.png)
+       4. [Ansible-Cheat-Sheet_Wall-Skills2 PDF](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-Cheat-Sheet_Wall-Skills2.pdf)
+
+ * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/) - Currently MT
+
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF/)
+       1. [Ansible_Engine_and_Tower-Preferred_Practices](./Ansible_Tower/Ansible_PDF/Ansible_Engine_and_Tower-Preferred_Practices.pdf)
+       2. [Ansible_G2_Case_Study_Percussion](./Ansible_Tower/Ansible_PDF/Ansible_G2_Case_Study_Percussion.pdf)
+       3. [Ansible From Stack Overflow](./Ansible_Tower/Ansible_PDF/Ansible.pdf)
+       4. [Ansible_Tower-RBAC_Recommendations](./Ansible_Tower/Ansible_PDF/Ansible_Tower-RBAC_Recommendations.pdf)
+       5. [Ansible_Tower-Review_&_Customer_Use_Cases](./Ansible_Tower/Ansible_PDF/Ansible_Tower-Review_&_Customer_Use_Cases.pdf)
+       6. [Ansible_Tower_Training](./Ansible_Tower/Ansible_PDF/Ansible_Tower_Training.pd)
+       7. [Ansible_Tower-vs-awx](./Ansible_Tower/Ansible_PDF/Ansible_Tower-vs-awx.pdf)
+       8. [Getting_Started_with_RH_Ansible_Tower](./Ansible_Tower/Ansible_PDF/Getting_Started_with_RH_Ansible_Tower.pdf)
+
  * [Ansible_PPT](./Ansible_Tower/Ansible_PPT/)
+       1. [Ansible_Automation_Platform](./Ansible_Tower/Ansible_PPT/Ansible_Automation_Platform.pptx)
+       2. [Ansible_Importance_Deck](./Ansible_Tower/Ansible_PPT/Ansible_Importance_Deck.pptx)
+       3. [Ansible_Tower](./Ansible_Tower/Ansible_PPT/Ansible_Tower.pptx)
+       4. [Networking_Deck](./Ansible_Tower/Ansible_PPT/Networking_Deck.pptx)
+       5. [Ansible_Best_Practices](./Ansible_Tower/Ansible_PPT/Ansible_Best_Practices.pptx)
+       6. [Ansible_Technical](./Ansible_Tower/Ansible_PPT/Ansible_Technical.pptx)
+       7. [Ansible_Windows_Automation](./Ansible_Tower/Ansible_PPT/Ansible_Windows_Automation.pptx)
+       8. [Standard_Ansible_Tower](./Ansible_Tower/Ansible_PPT/Standard_Ansible_Tower.pptx)
+       9. [Ansible_Deck] Ansible_Deck.pptx)
+       10.[ Ansible_Tower_Automation](./Ansible_Tower/Ansible_PPT/Ansible_Tower_Automation.pptx)
+       11.[ MBU_Red_Hat_Ansible_Automation_Platform_Technical_Deck](./Ansible_Tower/Ansible_PPT/MBU_Red_Hat_Ansible_Automation_Platform_Technical_Deck.pptx)
+
  * [Ansible Use Cases](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
+
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos/)
+       1. [Ansible_automation_analytics.mp4 DEMO_1-Ansible_automation_analytics.mp4)
+       2. [Ansible_multivendor_network_automation.](./Ansible_Tower/Ansible_Video_Demos/DEMO_2-Ansible_multivendor_network_automation.mp4)
+       3. [Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS.](./Ansible_Tower/Ansible_Video_Demos/DEMO_3-Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS.mp4)
+       4. [Ansible_automation_security_response.](./Ansible_Tower/Ansible_Video_Demos/DEMO_4-Ansible_automation_security_response.mp4)
+       5. [Red_Hat_Ansible_Tower_application_deployment.](./Ansible_Tower/Ansible_Video_Demos/DEMO_5_-Red_Hat_Ansible_Tower_application_deployment.mp4)
+       6. [ansible-helm-jenkins-demo.](./Ansible_Tower/Ansible_Video_Demos/DEMO_6-ansible-helm-jenkins-demo.mp4)
+       7. [Red_Hat_Ansible_Tower_with_ServiceNow.](./Ansible_Tower/Ansible_Video_Demos/DEMO_7-Red_Hat_Ansible_Tower_with_ServiceNow.mp4)
+       8. [Red_Hat_Ansible_Tower_workflow.](./Ansible_Tower/Ansible_Video_Demos/DEMO_8-Red_Hat_Ansible_Tower_workflow.mp4)
+       9. [Introduction_to_the_expanded_Red_Hat_Insights.](./Ansible_Tower/Ansible_Video_Demos/DEMO_9-Introduction_to_the_expanded_Red_Hat_Insights.mp4)
+
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
+
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)
  * [Ansible Roadmap](https://docs.ansible.com/ansible/devel/roadmap/index.html#roadmaps)
+
  * [Ansible The Next Release](https://github.com/ansible-community/ansible-build-data/blob/main/2.10/CHANGELOG-v2.10.rst)
+        NOTE: Stay at Ansible v2.9.x - DO NOT upgrade to 2.10 yet 
 
 #### Simple Scripts for installing Ansible Tower P.O.C on a single node/vm on RHEL7/8:
         
@@ -221,30 +262,39 @@ Ansible Collections
               you request a evaluation.
 
  * [Satellite_PDF](./Satellite/Satellite_PDF)
+    1. [Standard-Operating-Environment-ebook](./Satellite/Satellite_PDF/co-standard-operating-environment-ebook-f16684-201909-en.pdf)
+    2. [Getting-Started-With-Satellite-6](./Satellite/Satellite_PDF/getting-started-with-satellite-6-command-line.pdf)
+    3. [OpenSCAP](./Satellite/Satellite_PDF/Openscap.pdf)
+    4. [Performance_Tuning_for_Red_Hat_Satellite_6.7](./Satellite/Satellite_PDF/performance_tuning_for_red_hat_satellite_6.7.pdf)
+    5. [Red_Hat_Satellite_Power_User_Tips_and_Tricks](./Satellite/Satellite_PDF/Red_Hat_Satellite_Power_User_Tips_and_Tricks_Summit_2018.pdf)
+    6. [Satellite_6_Prereqs](./Satellite/Satellite_PDF/Satellite_6_Prereqs.pdf)
+    7. [Steps_to_Build_an_SOE_How_Red_Hat_Satellite](./Satellite/Satellite_PDF/Steps_to_Build_an_SOE_How_Red_Hat_Satellite.pdf)
+    8. [Summit_Preso_V2](./Satellite/Satellite_PDF/Summit_Preso_V2.pdf)
+
  * [Satellite_DOC](./Satellite/Satellite_DOC)
+    1. [Satellite_6.x_Contents]](./Satellite/Satellite_DOCSatellite_6.x_Contents.doc)
+    2. [Sync_from_one_Satellite_server_to_another_over_HTTP_or_HTTPS](./Satellite/Satellite_DOC/Satellite_content_can_be_synced_from_one_Satellite_server_to_another_over_HTTP_or_HTTPS.txt)
+
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 
   * [Ansible_Modules-Foreman-Katello](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
-  * [REDHATTOOLSINSTALLER-6.7-10072020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10072020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 28 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
-  * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
-
-#### RPM for an X enabled server (not required) 
- * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
-#### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
- * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
-#### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
 
         DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
 
-![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
-
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
+#### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
+  * [REDHATTOOLSINSTALLER-6.7-10072020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10072020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 28 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
 
-  * [REDHATTOOLSINSTALLER-6.7-8282020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10072020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 28 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-09252020.sh)
+#### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
+  * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
+
+#### RPM for an X enabled server (not required) 
+ * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
+
+![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
   
 [3. Useful Scripts](./Useful_Scripts/)
 
