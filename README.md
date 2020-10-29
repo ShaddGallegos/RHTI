@@ -125,16 +125,14 @@ Ansible Collections
 ## Resources
 
  * [Ansible_Cheat_Sheets](./Ansible_Tower/Ansible_Cheat_Sheets/) - Training vendors with nice wall cheat sheets for ansible visit their sites if you want more info
-
-       [1. Ansible-cheat-sheet-1](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-cheat-sheet-1.webp)
-       [2. Ansible_Cheat_Sheet-DevOps_Quickstart_Guide](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet-DevOps_Quickstart_Guide.png)
-       [3. Ansible_Cheat_Sheet_Wall-Skills1 PNG](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet_Wall-Skills1.png)
-       [4. Ansible-Cheat-Sheet_Wall-Skills2 PDF](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-Cheat-Sheet_Wall-Skills2.pdf)
+   * [1. Ansible-cheat-sheet-1](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-cheat-sheet-1.webp)
+   * [2. Ansible_Cheat_Sheet-DevOps_Quickstart_Guide](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet-DevOps_Quickstart_Guide.png)
+   * [3. Ansible_Cheat_Sheet_Wall-Skills1 PNG](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible_Cheat_Sheet_Wall-Skills1.png)
+   * [4. Ansible-Cheat-Sheet_Wall-Skills2 PDF](./Ansible_Tower/Ansible_Cheat_Sheets/Ansible-Cheat-Sheet_Wall-Skills2.pdf)
 
  * [Ansible_DOC](./Ansible_Tower/Ansible_DOC/) - Currently MT
 
  * [Ansible_PDF](./Ansible_Tower/Ansible_PDF/)
-
    * [1. Ansible_Engine_and_Tower-Preferred_Practices](./Ansible_Tower/Ansible_PDF/Ansible_Engine_and_Tower-Preferred_Practices.pdf)
    * [2. Ansible_G2_Case_Study_Percussion](./Ansible_Tower/Ansible_PDF/Ansible_G2_Case_Study_Percussion.pdf)
    * [3. Ansible From Stack Overflow](./Ansible_Tower/Ansible_PDF/Ansible.pdf)
@@ -145,7 +143,6 @@ Ansible Collections
    * [8. Getting_Started_with_RH_Ansible_Tower](./Ansible_Tower/Ansible_PDF/Getting_Started_with_RH_Ansible_Tower.pdf)
 
  * [Ansible_PPT](./Ansible_Tower/Ansible_PPT/)
-
    * [1. Ansible_Automation_Platform](./Ansible_Tower/Ansible_PPT/Ansible_Automation_Platform.pptx)
    * [2. Ansible_Importance_Deck](./Ansible_Tower/Ansible_PPT/Ansible_Importance_Deck.pptx)
    * [3. Ansible_Tower](./Ansible_Tower/Ansible_PPT/Ansible_Tower.pptx)
@@ -154,23 +151,22 @@ Ansible Collections
    * [6. Ansible_Technical](./Ansible_Tower/Ansible_PPT/Ansible_Technical.pptx)
    * [7. Ansible_Windows_Automation](./Ansible_Tower/Ansible_PPT/Ansible_Windows_Automation.pptx)
    * [8. Standard_Ansible_Tower](./Ansible_Tower/Ansible_PPT/Standard_Ansible_Tower.pptx)
-   * [9. Ansible_Deck] Ansible_Deck.pptx)
+   * [9. Ansible_Deck](./Ansible_Tower/Ansible_PPT/Ansible_Deck.pptx)
    * [10. Ansible_Tower_Automation](./Ansible_Tower/Ansible_PPT/Ansible_Tower_Automation.pptx)
    * [11. MBU_Red_Hat_Ansible_Automation_Platform_Technical_Deck](./Ansible_Tower/Ansible_PPT/MBU_Red_Hat_Ansible_Automation_Platform_Technical_Deck.pptx)
 
  * [Ansible Use Cases](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/Ansible_Use_Cases/Ansible%20Use%20Case%20List.xlsx) - Downloads the xls spread sheet
 
  * [Ansible_Video_Demos](./Ansible_Tower/Ansible_Video_Demos/)
-
-   * [1. Ansible_automation_analytics.mp4](./Ansible_Tower/Ansible_Video_Demos/DEMO_1-Ansible_automation_analytics.mp4)
-   * [2. Ansible_multivendor_network_automation.](./Ansible_Tower/Ansible_Video_Demos/DEMO_2-Ansible_multivendor_network_automation.mp4)
-   * [3. Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS.](./Ansible_Tower/Ansible_Video_Demos/DEMO_3-Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS.mp4)
-   * [4. Ansible_automation_security_response.](./Ansible_Tower/Ansible_Video_Demos/DEMO_4-Ansible_automation_security_response.mp4)
-   * [5.Red_Hat_Ansible_Tower_application_deployment.](./Ansible_Tower/Ansible_Video_Demos/DEMO_5_-Red_Hat_Ansible_Tower_application_deployment.mp4)
-   * [6. ansible-helm-jenkins-demo.](./Ansible_Tower/Ansible_Video_Demos/DEMO_6-ansible-helm-jenkins-demo.mp4)
-   * [7. Red_Hat_Ansible_Tower_with_ServiceNow.](./Ansible_Tower/Ansible_Video_Demos/DEMO_7-Red_Hat_Ansible_Tower_with_ServiceNow.mp4)
-   * [8. Red_Hat_Ansible_Tower_workflow.](./Ansible_Tower/Ansible_Video_Demos/DEMO_8-Red_Hat_Ansible_Tower_workflow.mp4)
-   * [9. Introduction_to_the_expanded_Red_Hat_Insights.](./Ansible_Tower/Ansible_Video_Demos/DEMO_9-Introduction_to_the_expanded_Red_Hat_Insights.mp4)
+   * [1. Ansible_automation_analytics](./Ansible_Tower/Ansible_Video_Demos/DEMO_1-Ansible_automation_analytics.mp4)
+   * [2. Ansible_multivendor_network_automation](./Ansible_Tower/Ansible_Video_Demos/DEMO_2-Ansible_multivendor_network_automation.mp4)
+   * [3. Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS](./Ansible_Tower/Ansible_Video_Demos/DEMO_3-Ansible_provisions_Red_Hat_Enterprise_Linux_on_AWS.mp4)
+   * [4. Ansible_automation_security_response](./Ansible_Tower/Ansible_Video_Demos/DEMO_4-Ansible_automation_security_response.mp4)
+   * [5.Red_Hat_Ansible_Tower_application_deployment](./Ansible_Tower/Ansible_Video_Demos/DEMO_5_-Red_Hat_Ansible_Tower_application_deployment.mp4)
+   * [6. ansible-helm-jenkins-demo](./Ansible_Tower/Ansible_Video_Demos/DEMO_6-ansible-helm-jenkins-demo.mp4)
+   * [7. Red_Hat_Ansible_Tower_with_ServiceNow](./Ansible_Tower/Ansible_Video_Demos/DEMO_7-Red_Hat_Ansible_Tower_with_ServiceNow.mp4)
+   * [8. Red_Hat_Ansible_Tower_workflow](./Ansible_Tower/Ansible_Video_Demos/DEMO_8-Red_Hat_Ansible_Tower_workflow.mp4)
+   * [9. Introduction_to_the_expanded_Red_Hat_Insights](./Ansible_Tower/Ansible_Video_Demos/DEMO_9-Introduction_to_the_expanded_Red_Hat_Insights.mp4)
 
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
  * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
@@ -266,7 +262,6 @@ Ansible Collections
               you request a evaluation.
 
  * [Satellite_PDF](./Satellite/Satellite_PDF)
-
    * [1. Standard-Operating-Environment-ebook](./Satellite/Satellite_PDF/co-standard-operating-environment-ebook-f16684-201909-en.pdf)
    * [2. Getting-Started-With-Satellite-6](./Satellite/Satellite_PDF/getting-started-with-satellite-6-command-line.pdf)
    * [3. OpenSCAP](./Satellite/Satellite_PDF/Openscap.pdf)
@@ -277,8 +272,7 @@ Ansible Collections
    * [8. Summit_Preso_V2](./Satellite/Satellite_PDF/Summit_Preso_V2.pdf)
 
  * [Satellite_DOC](./Satellite/Satellite_DOC)
-
-   * [1. Satellite_6.x_Contents]](./Satellite/Satellite_DOCSatellite_6.x_Contents.doc)
+   * [1. Satellite_6.x_Contents](./Satellite/Satellite_DOCSatellite_6.x_Contents.doc)
    * [2. Sync_from_one_Satellite_server_to_another_over_HTTP_or_HTTPS](./Satellite/Satellite_DOC/Satellite_content_can_be_synced_from_one_Satellite_server_to_another_over_HTTP_or_HTTPS.txt)
 
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
