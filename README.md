@@ -312,6 +312,9 @@ Ansible Collections
  * Orcun Aatakan
    * [Many examples: Windows, VMWare, and Other](https://github.com/oatakan)
 
+ * Jimmy Conner
+   * [Ninja Blog](http://ansible.ninja)
+
  * Will Tome 
    * [Demo_Playbooks](https://github.com/willtome/ansible-demokit) 
    * [Insights](https://www.ansible.com/blog/manage-red-hat-enterprise-linux-like-a-boss-with-red-hat-ansible-content-collection-for-red-hat-insights)
@@ -329,6 +332,9 @@ Ansible Collections
 
  * Kevin Holmes
    * [General Ansible](https://github.com/gokev)
+
+ * Greg Sowell
+   * [Networking and Zabbix](https://github.com/gregsowell)
 
 
 
