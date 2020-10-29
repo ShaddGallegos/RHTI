@@ -856,6 +856,7 @@ echo "*********************************************************"
 echo "CONFIGURING SATELLITE"
 echo "*********************************************************"
 foreman-maintain packages unlock
+source /root/.bashrc
 yum clean all
 rm -rf /var/cache/yum
 clear
@@ -875,7 +876,7 @@ echo " "
 echo "***************************************************"
 echo "Satellite 6.8 Internal DNS Configuration"
 echo "***************************************************"
-
+source /root/.bashrc
 foreman-maintain packages unlock
 foreman-installer -v \
 --foreman-proxy-dns "true" \
@@ -915,9 +916,9 @@ foreman-installer -v \
 --foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
 --foreman-proxy-dhcp-range "$DHCP_RANGE" \
 --foreman-proxy-dhcp-server "$INTERNALIP"
-chmod o+rx /etc/dhcp/
-chmod o+r /etc/dhcp/dhcpd.conf
-chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
+#chmod o+rx /etc/dhcp/
+#chmod o+r /etc/dhcp/dhcpd.conf
+#chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
 systemctl start dhcpd
 echo " "
 echo " "
@@ -955,7 +956,6 @@ foreman-installer -v \
 --enable-foreman-compute-libvirt \
 --enable-foreman-compute-gce \
 --enable-foreman-compute-ec2 \
---enable-foreman-compute-azure_rm \
 --foreman-proxy-templates "true"
 echo " "
 echo " " 

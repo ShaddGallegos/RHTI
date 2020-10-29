@@ -285,8 +285,8 @@ Ansible Collections
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
-  * [REDHATTOOLSINSTALLER-6.7-10072020.sh Currently working](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10072020.sh)
-  * [REDHATTOOLSINSTALLER-6.8-9012020.sh Will work Oct 28 2020](./Satellite/files/REDHATTOOLSINSTALLER-6.8-9012020.sh)
+  * [REDHATTOOLSINSTALLER-6.7-10272020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10272020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-10272020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.8-1027020.sh)
 
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
   * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
@@ -304,7 +304,32 @@ Ansible Collections
  * [Ansible Tower/ServiceNow](./Intergrations/Ansible_Tower-ServiceNow) - in progress
  
 ### Red Hat Tiger Team members
-   * Michael Ford [Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85/cloud-deploy)
-   * Orcun Aatakan [Many examples: Windows, VMWare, and Other](https://github.com/oatakan?tab=repositories)
+#### Trusted Red Hat colleagues that I often use for reference
+
+ * Michael Ford 
+   * [Cloud Agnostic and ServiceNow Integration](https://github.com/michaelford85)
+
+ * Orcun Aatakan
+   * [Many examples: Windows, VMWare, and Other](https://github.com/oatakan)
+
+ * Will Tome 
+   * [Demo_Playbooks](https://github.com/willtome/ansible-demokit) 
+   * [Insights](https://www.ansible.com/blog/manage-red-hat-enterprise-linux-like-a-boss-with-red-hat-ansible-content-collection-for-red-hat-insights)
+   * [Inventory](https://github.com/willtome/ansible-inventory]
+   * [Automated Smart Management](https://github.com/willtome/automated-smart-management)
+
+ * Phil Avery
+   * [Avery Tech Guy BLOG](https://averytechguy.wordpress.com/)
+
+ * Gerald Dykeman
+   * [Azure, Networking, Workshops and more](https://github.com/gdykeman)
+
+ * Eric Mcleroy
+   * [NETWORK](https://github.com/jmcleroy/jpoc)
+
+ * Kevin Holmes
+   * [General Ansible](https://github.com/gokev)
+
+
 
 more to come 
