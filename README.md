@@ -315,7 +315,7 @@ Ansible Collections
  * Will Tome 
    * [Demo_Playbooks](https://github.com/willtome/ansible-demokit) 
    * [Insights](https://www.ansible.com/blog/manage-red-hat-enterprise-linux-like-a-boss-with-red-hat-ansible-content-collection-for-red-hat-insights)
-   * [Inventory](https://github.com/willtome/ansible-inventory]
+   * [Inventory](https://github.com/willtome/ansible-inventory)
    * [Automated Smart Management](https://github.com/willtome/automated-smart-management)
 
  * Phil Avery
