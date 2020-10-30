@@ -335,7 +335,7 @@ Ansible Collections
 
  * Greg Sowell
    * [Networking and Zabbix](https://github.com/gregsowell)
-
+     [Network and Telco BLOG](http://gregsowell.com)
 
 
 more to come 
