@@ -1,12 +1,13 @@
 #!/bin/bash
 #Red Hat tools installer – for RHEL 7.X
 #POC/Demo
-#This Script is for setting up a basic Satellite 6.7 on RHEL 7 or Ansible Tower 6.7.1 on RHEL 7
+#This Script is for setting up a basic Satellite 6.8 on RHEL 7 or Ansible Tower 6.8.1 on RHEL 7
 
 echo -ne "\e[8;40;170t"
 
 # Hammer referance to assist in modifing the script can be found at 
 # https://www.gitbook.com/book/abradshaw/getting-started-with-satellite-6-command-line/details
+
 
 #What this script does in cronalogical order
 #Verify the server can get to the internet
@@ -24,15 +25,15 @@ echo -ne "\e[8;40;170t"
 #Set domain
 #Check all requirements have been met
 #Check FQDN
-#Verify repositories for Satellite 6.7
-#Install Satellite 6.7
-#Configure Satellite 6.7
-#Satellite 6.7 configure Satellite base
-#Satellite 6.7 internal DNS configuration
-#Satellite 6.7 DHCP configuration (optional)
-#Satellite 6.7 TFTP configuration
-#Satellite 6.7 task and cleanup configuration
-#Satellite 6.7 cloud management option configuration
+#Verify repositories for Satellite 6.8
+#Install Satellite 6.8
+#Configure Satellite 6.8
+#Satellite 6.8 configure Satellite base
+#Satellite 6.8 internal DNS configuration
+#Satellite 6.8 DHCP configuration (optional)
+#Satellite 6.8 TFTP configuration
+#Satellite 6.8 task and cleanup configuration
+#Satellite 6.8 cloud management option configuration
 #Start and enable Satellite services
 #Configure Satellite cache
 #Verify DHCP is wanted for new systems (default is enabled)
@@ -60,7 +61,7 @@ echo -ne "\e[8;40;170t"
 #Create a RHEL hostgroups
 #
 #                                              **************************
-#                                              Satellite 6.7 REQUIREMENTS
+#                                              Satellite 6.8 REQUIREMENTS
 #                                              **************************
 #                                    Hardware Requirements
 #                                        32  GB Ram
@@ -94,7 +95,7 @@ echo -ne "\e[8;40;170t"
 #           cd ~/Downloads
 #
 #           Run the script
-#           sh REDHATTOOLSINSTALLER-6.7.sh"
+#           sh REDHATTOOLSINSTALLER-6.8.sh"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------ Functions ------------------------------------------------------
@@ -400,7 +401,7 @@ echo " "
 echo "************************************************************************************************************************************"
 echo "
                                               **************************
-                                              Satellite 6.7 REQUIREMENTS
+                                              Satellite 6.8 REQUIREMENTS
                                               **************************
                                     Hardware Requirements
                                         32  GB Ram
@@ -434,7 +435,7 @@ echo "
            cd ~/Downloads
 
            Run the script
-           sh REDHATTOOLSINSTALLER-6.7.sh"
+           sh REDHATTOOLSINSTALLER-6.8.sh"
 echo " "
 echo "************************************************************************************************************************************"
 read -p "Press [Enter] to continue"
@@ -452,7 +453,7 @@ echo " "
 echo " "
 echo "
 
-                                              P.O.C Satellite 6.7 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
+                                              P.O.C Satellite 6.8 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
                                                    THIS SCRIPT CONTAINS NO CONFIDENTIAL INFORMATION
 
                                            This script is designed to set up a basic standalone Satellite 6.X system
@@ -649,7 +650,7 @@ touch ~/Downloads/RHTI/SERVICEUSER
 function INSTALLREPOS {
 #------------------------------
 echo "******************************************************************"
-echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.7"
+echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.8"
 echo "******************************************************************"
 echo -ne "\e[8;40;170t"
 source /root/.bashrc
@@ -660,10 +661,10 @@ echo "**************************"
 subscription-manager repos --disable "*"
 echo " "
 echo "**************************"
-echo "ENABLE Satellite 6.7 REPOS"
+echo "ENABLE Satellite 6.8 REPOS"
 echo "**************************"
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.7-rpms \
+--enable=rhel-7-server-satellite-6.8-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
@@ -789,12 +790,12 @@ echo -ne "\e[8;40;170t"
 source /root/.bashrc
 echo " "
 echo "*********************************************************"
-echo "VERIFING REPOS FOR Satellite 6.7"
+echo "VERIFING REPOS FOR Satellite 6.8"
 echo "*********************************************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.7-rpms \
+--enable=rhel-7-server-satellite-6.8-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
@@ -830,13 +831,13 @@ rubygem-bundler
 
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
 
-mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
-cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
-group :dhcp_remote_isc do
-  gem 'rsec', '< 1'
-end
-gem 'smart_proxy_dhcp_remote_isc'
-EOF
+#mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
+#cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
+#group :dhcp_remote_isc do
+#  gem 'rsec', '< 1'
+#end
+#gem 'smart_proxy_dhcp_remote_isc'
+#EOF
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
@@ -874,7 +875,7 @@ satellite-installer --scenario satellite -v \
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 Internal DNS Configuration"
+echo "Satellite 6.8 Internal DNS Configuration"
 echo "***************************************************"
 source /root/.bashrc
 foreman-maintain packages unlock
@@ -890,14 +891,15 @@ foreman-installer -v \
 --foreman-proxy-dns-zone "$DOM" \
 --foreman-proxy-registered-proxy-url="https://$(hostname)"
 
-restorecon -v /etc/rndc.key
-chown -v root:named /etc/rndc.key
-chmod -v 640 /etc/rndc.key
 usermod -a -G named foreman-proxy
+
+#restorecon -v /etc/rndc.key
+#chown -v root:named /etc/rndc.key
+#chmod -v 640 /etc/rndc.key
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 DHCP Configuration (Optional)"
+echo "Satellite 6.8 DHCP Configuration (Optional)"
 echo "***************************************************"
 source /root/.bashrc
 foreman-maintain packages unlock
@@ -916,14 +918,16 @@ foreman-installer -v \
 --foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
 --foreman-proxy-dhcp-range "$DHCP_RANGE" \
 --foreman-proxy-dhcp-server "$INTERNALIP"
+--enable-foreman-proxy-plugin-dhcp-remote-isc
+
+usermod -a -G dhcpd foreman-proxy
 #chmod o+rx /etc/dhcp/
 #chmod o+r /etc/dhcp/dhcpd.conf
 #chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
-systemctl start dhcpd
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 TFTP Configuration"
+echo "Satellite 6.8 TFTP Configuration"
 echo "***************************************************"
 source /root/.bashrc
 foreman-maintain packages unlock
@@ -935,7 +939,7 @@ foreman-installer -v \
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 Task and Cleanup Configuration"
+echo "Satellite 6.8 Task and Cleanup Configuration"
 echo "***************************************************"
 source /root/.bashrc
 foreman-maintain packages unlock
@@ -947,7 +951,7 @@ foreman-installer -v \
 echo " "
 echo " "
 echo "***************************************************"
-echo "Satellite 6.7 Cloud Management Option Configuration"
+echo "Satellite 6.8 Cloud Management Option Configuration"
 echo "***************************************************"
 source /root/.bashrc
 foreman-maintain packages unlock
@@ -1151,7 +1155,7 @@ QMESSAGE7="Would you like to enable and sync RHEL 7 Content
 This will enable:
  Red Hat Enterprise Linux 7 Server (Kickstart)
  Red Hat Enterprise Linux 7 Server
- Red Hat Satellite Tools 6.7 (for RHEL 7 Server)
+ Red Hat Satellite Tools 6.8 (for RHEL 7 Server)
  Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server
  Red Hat Enterprise Linux 7 Server - Extras
  Red Hat Enterprise Linux 7 Server - Optional
@@ -1168,13 +1172,13 @@ Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
 Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)
+Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)
 "
 
 QMESSAGEJBOSS="Would you like to download JBoss Enterprise Application Platform 7 (RHEL 7 Server) content"
 QMESSAGEVIRTAGENT="Would you like to download Red Hat Virtualization 4 Management Agents for RHEL 7 content"
-QMESSAGESAT65="Would you like to download Red Hat Satellite 6.7 (for RHEL 7 Server) content"
-QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.7 (for RHEL 7 Server) content"
+QMESSAGESAT65="Would you like to download Red Hat Satellite 6.8 (for RHEL 7 Server) content"
+QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.8 (for RHEL 7 Server) content"
 QMESSAGEOSC="Would you like to download Red Hat OpenShift Container Platform 3.10 content"
 QMESSAGECEPH="Would you like to download Red Hat Ceph Storage Tools 3.0 for Red Hat Enterprise Linux 7 Server content"
 QMESSAGESNC="Would you like to download Red Hat Storage Native Client for RHEL 7 content"
@@ -1232,9 +1236,9 @@ time hammer repository synchronize --organization "$ORG" --product 'Red Hat Ente
 echo "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64' 2>/dev/null
-echo "'Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
+echo "'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
 echo "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name ''
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server' 2>/dev/null
@@ -1287,8 +1291,8 @@ echo "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
-echo "Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 (RPMs)' 
+echo "Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)' 
 echo "Red Hat Storage Native Client for RHEL 8 (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Storage Native Client for RHEL 8 (RPMs)'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
@@ -1492,8 +1496,8 @@ echo 'Adding Red Hat Enterprise Linux 7 Server '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server Kickstart '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8'
-echo 'Adding Red Hat Satellite Tools 6.7 for RHEL 7 Server'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.7 for RHEL 7 Server RPMs x86_64'
+echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 7 Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
 echo 'Adding Red Hat Software Collections'
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Supplementary'
@@ -1523,8 +1527,8 @@ echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS '
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.2'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary '
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.2'
-echo 'Adding Red Hat Satellite Tools 6.7 for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.7 for RHEL 8 x86_64 RPMs x86_64'
+echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
 echo 'Adding Red Hat EPEL for RHEL 8'
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
 sleep 1
@@ -2287,7 +2291,7 @@ fi
 function dMainMenu {
 #-----------------------
 $DIALOG --stdout --title "Red Hat P.O.C. Tools - RHEL 7.X" --menu "********** Menu ********* \n Please choose [1 -> 4]?" 30 90 10 \
-1 "Satellite 6.7 INSTALL" \
+1 "Satellite 6.8 INSTALL" \
 2 "ANSIBLE TOWER 3.6.4 INSTALL" \
 3 "SATELLITE POST INSTALL CLEANUP" \
 4 "EXIT"
@@ -2340,7 +2344,7 @@ RC=$?
 [[ $RC -ne 0 ]] && break
 Flag=$(cat $TmpFi)
 case $Flag in
-1) dMsgBx "Satellite 6.7 INSTALL" \
+1) dMsgBx "Satellite 6.8 INSTALL" \
 sleep 1
 #SCRIPT
 echo " "
