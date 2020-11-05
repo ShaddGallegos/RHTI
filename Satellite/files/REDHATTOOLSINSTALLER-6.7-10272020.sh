@@ -290,9 +290,6 @@ function SYSREPOS {
 #---------------------
 echo " "
 echo "*********************************************************"
-s_echo "SET REPOS ENABLING SCRIPT TO RUN" 
-echo "*********************************************************"
-echo "*********************************************************"
 echo "FIRST DISABLE REPOS"
 echo "*********************************************************"
 subscription-manager repos --disable "*" 
@@ -807,6 +804,7 @@ echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
+yum -q list installed postgresql &>/dev/null && echo "postgresql found, will be removed" || yum remove -y 'postgresql' --skip-broken
 yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y 'bind' --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
@@ -824,7 +822,6 @@ hexedit-1.2.13-5.el7.x86_64 \
 libguestfs-1.40.2-10.el7.x86_64 \
 perl-hivex-1.3.10-6.10.el7.x86_64 \
 libguestfs-tools-c-1.40.2-10.el7.x86_64 \
-foreman-discovery-image-3.5.4-8.el7sat.noarch \
 scrub-2.5.2-7.el7.x86_64 \
 hivex-1.3.10-6.10.el7.x86_64 \
 rubygem-bundler
@@ -838,8 +835,7 @@ yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-disco
 #end
 #gem 'smart_proxy_dhcp_remote_isc'
 #EOF
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
-yum upgrade -y --skip-broken 
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
 
@@ -857,7 +853,6 @@ echo " "
 echo "*********************************************************"
 echo "CONFIGURING SATELLITE"
 echo "*********************************************************"
-foreman-maintain packages unlock
 source /root/.bashrc
 yum clean all
 rm -rf /var/cache/yum
@@ -866,7 +861,6 @@ echo "*****************************"
 echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
 source /root/.bashrc
-foreman-maintain packages unlock
 satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username "$ADMIN" \
 --foreman-initial-admin-password "$ADMIN_PASSWORD" \

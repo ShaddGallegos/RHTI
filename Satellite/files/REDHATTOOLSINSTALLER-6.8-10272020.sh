@@ -290,9 +290,6 @@ function SYSREPOS {
 #---------------------
 echo " "
 echo "*********************************************************"
-s_echo "SET REPOS ENABLING SCRIPT TO RUN" 
-echo "*********************************************************"
-echo "*********************************************************"
 echo "FIRST DISABLE REPOS"
 echo "*********************************************************"
 subscription-manager repos --disable "*" 
@@ -807,6 +804,7 @@ echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
+yum -q list installed postgresql &>/dev/null && echo "postgresql found, will be removed" || yum remove -y 'postgresql' --skip-broken
 yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y 'bind' --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
@@ -824,7 +822,6 @@ hexedit-1.2.13-5.el7.x86_64 \
 libguestfs-1.40.2-10.el7.x86_64 \
 perl-hivex-1.3.10-6.10.el7.x86_64 \
 libguestfs-tools-c-1.40.2-10.el7.x86_64 \
-foreman-discovery-image-3.5.4-8.el7sat.noarch \
 scrub-2.5.2-7.el7.x86_64 \
 hivex-1.3.10-6.10.el7.x86_64 \
 rubygem-bundler
@@ -856,7 +853,6 @@ echo " "
 echo "*********************************************************"
 echo "CONFIGURING SATELLITE"
 echo "*********************************************************"
-foreman-maintain packages unlock
 source /root/.bashrc
 yum clean all
 rm -rf /var/cache/yum
@@ -865,7 +861,6 @@ echo "*****************************"
 echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
 source /root/.bashrc
-foreman-maintain packages unlock
 satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username "$ADMIN" \
 --foreman-initial-admin-password "$ADMIN_PASSWORD" \
@@ -1382,7 +1377,6 @@ echo "SYNC ALL REPOSITORIES (WAIT FOR THIS TO COMPLETE BEFORE CONTINUING):"
 echo "**************************************************************************"
 for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}' |sort -n ) ; do time hammer repository update --id $i --download-policy immediate ; done 
 for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID' |grep -v -i puppet |grep -v Id |sort -n); do time hammer repository synchronize --id ${i} --organization $ORG; done
-sleep 500
 echo " "
 sudo touch ~/Downloads/RHTI/SYNC
 }
@@ -1549,16 +1543,15 @@ if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 echo "RHEL_7_x86_64 - Initial Publishing"
 time hammer content-view publish --organization $ORG --name 'RHEL_7_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 50
 echo "Library --> DEV_RHEL_7"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
-sleep 10
+
 echo "DEV_RHEL_7 --> TEST_RHEL_7"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
-sleep 10
+
 echo "TEST_RHEL_7 --> PROD_RHEL_7"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7 --to-lifecycle-environment PROD_RHEL_7 2>/dev/null
-sleep 10
+
 touch ~/Downloads/RHTI/PUBLISHRHEL7CONTENT
 fi
 }
@@ -1575,16 +1568,15 @@ echo "CREATE A CONTENT VIEW FOR RHEL 8"
 echo "***********************************************"
 echo "RHEL_8_x86_64 - Initial Publishing"
 time hammer content-view publish --organization $ORG --name 'RHEL_8_x86_64' --description 'Initial Publishing' 2>/dev/null
-sleep 50
 echo "Library --> DEV_RHEL_8"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
-sleep 10
+
 echo "DEV_RHEL_8 --> TEST_RHEL_8"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
-sleep 10
+
 echo "TEST_RHEL_8 --> PROD_RHEL_8"
 time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
-sleep 10
+
 sudo touch ~/Downloads/RHTI/PUBLISHRHEL8CONTENT
 fi
 }
