@@ -106,6 +106,9 @@ Roles
 Ansible Collections 
        https://www.ansible.com/blog/getting-started-with-ansible-collections
 
+ * Certified Content in Ansible Automation Hub
+       https://access.redhat.com/articles/3642632
+
         New content is continuously made available for consumption. Managing content in this manner also becomes easier as modules, plugins, roles, and docs are packaged and tagged with a collection version. Modules can be updated, renamed, improved upon; roles can be updated to reflect changes in module interaction; docs can be regenerated to reflect the edits and all are packaged and tagged together.
 
         Before collections, it was not uncommon for modules to break or lack timely updates needed to interact with the services they were interfacing with. This often required Ansible users or Ansible Tower administrators to run multiple versions of Ansible in virtual environments in order to consume a patch that addressed a module issue. Ansible Content Collections bring stability and predictability by breaking modules out from the core distribution.
