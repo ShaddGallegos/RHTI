@@ -825,6 +825,8 @@ scrub-2.5.2-7.el7.x86_64 \
 hivex-1.3.10-6.10.el7.x86_64 \
 rubygem-bundler
 
+gem install rest-client json
+
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
 
 #mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
@@ -865,26 +867,21 @@ satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username "$ADMIN" \
 --foreman-initial-admin-password "$ADMIN_PASSWORD" \
 --foreman-initial-organization "$ORG" \
---foreman-initial-location "$LOC" 
-
-echo " "
-echo " "
-echo "***************************************************"
-echo "Satellite 6.8 Internal DNS Configuration"
-echo "***************************************************"
-source /root/.bashrc
-foreman-maintain packages unlock
-foreman-installer -v \
+--foreman-initial-location "$LOC" \
+--foreman-proxy-puppetca true \
+--foreman-proxy-tftp true \
+--enable-foreman-plugin-discovery \
 --foreman-proxy-dns "true" \
 --foreman-proxy-dns-managed "true" \
---foreman-proxy-dns-server "https://$(hostname)"
 --foreman-proxy-dns-forwarders "$DNS" \
+--foreman-proxy-dns-server "https://$(hostname)" \
 --foreman-proxy-dns-interface "$SAT_INTERFACE" \
 --foreman-proxy-dns-listen-on "both" \
 --foreman-proxy-dns-provider "nsupdate" \
 --foreman-proxy-dns-reverse "$DNS_REV" \
 --foreman-proxy-dns-zone "$DOM" \
 --foreman-proxy-registered-proxy-url="https://$(hostname)"
+
 
 usermod -a -G named foreman-proxy
 
@@ -912,7 +909,7 @@ foreman-installer -v \
 --foreman-proxy-dhcp-listen-on "both" \
 --foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
 --foreman-proxy-dhcp-range "$DHCP_RANGE" \
---foreman-proxy-dhcp-server "$INTERNALIP"
+--foreman-proxy-dhcp-server "$INTERNALIP" \
 --enable-foreman-proxy-plugin-dhcp-remote-isc
 
 usermod -a -G dhcpd foreman-proxy
