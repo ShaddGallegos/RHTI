@@ -798,12 +798,14 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
+yum upgrade -y
 sleep 1
 echo " "
 echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
 yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y 'bind' --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
@@ -812,32 +814,27 @@ yum -q list installed nfs-utils &>/dev/null && echo "nfs-utils is installed" || 
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install 'syslinux' -y --skip-broken
 yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
 yum -q list installed rh-mongodb34 &>/dev/null && echo "rh-mongodb34 is installed" || yum install -y 'rh-mongodb34' --skip-broken 
-
-yum install -y -x *infoblox* \
-tfm-rubygem* \
-tfm-ror52-rubygem-sqlite3 \
-*smart_proxy* \
-hexedit-1.2.13-5.el7.x86_64 \
-libguestfs-1.40.2-10.el7.x86_64 \
-perl-hivex-1.3.10-6.10.el7.x86_64 \
-libguestfs-tools-c-1.40.2-10.el7.x86_64 \
-scrub-2.5.2-7.el7.x86_64 \
-hivex-1.3.10-6.10.el7.x86_64 \
-rubygem-bundler
-
-gem install rest-client json
-
+yum -q list installed rubygem-bundler &>/dev/null && echo "rubygem-bundler is installed" || yum install -y 'rubygem-bundler' --skip-broken 
+yum -q list installed hivex &>/dev/null && echo "hivex is installed" || yum install -y 'hivex' --skip-broken 
+yum -q list installed scrub &>/dev/null && echo "scrub is installed" || yum install -y 'scrub' --skip-broken 
+yum -q list installed libguestfs-tools-c &>/dev/null && echo "libguestfs-tools-c is installed" || yum install -y 'libguestfs-tools-c' --skip-broken 
+yum -q list installed perl-hivex &>/dev/null && echo "perl-hivex is installed" || yum install -y 'perl-hivex' --skip-broken 
+yum -q list installed libguestfs &>/dev/null && echo "libguestfs is installed" || yum install -y 'libguestfs' --skip-broken 
+yum -q list installed hexedit &>/dev/null && echo "hexedit is installed" || yum install -y 'hexedit' --skip-broken 
+yum -q list installed smart_proxy &>/dev/null && echo "smart_proxy is installed" || yum install -y '*smart_proxy*' --skip-broken 
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
-
-#mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
-#cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
-#group :dhcp_remote_isc do
-#  gem 'rsec', '< 1'
-#end
-#gem 'smart_proxy_dhcp_remote_isc'
-#EOF
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
+yum downgrade -y rubygem-foreman_maintain-0.3.5-1.el7sat.noarch
 rpm -e --nodeps postgresql-9.2.24-4.el7_8.x86_64
+rpm -e --nodeps infoblox 
+
+cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
+group :dhcp_remote_isc do
+  gem 'rsec', '< 1'
+end
+gem 'smart_proxy_dhcp_remote_isc'
+EOF
+
+
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
 
@@ -864,95 +861,66 @@ echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
 source /root/.bashrc
 satellite-installer --scenario satellite -v \
---foreman-initial-admin-username "$ADMIN" \
---foreman-initial-admin-password "$ADMIN_PASSWORD" \
---foreman-initial-organization "$ORG" \
+--foreman-initial-admin-username="$ADMIN" \
+--foreman-initial-admin-password="$ADMIN_PASSWORD" \
+--foreman-initial-organization="$ORG" \
 --foreman-initial-location "$LOC" \
---foreman-proxy-puppetca true \
---foreman-proxy-tftp true \
---enable-foreman-plugin-discovery \
---foreman-proxy-dns "true" \
---foreman-proxy-dns-managed "true" \
---foreman-proxy-dns-forwarders "$DNS" \
---foreman-proxy-dns-server "https://$(hostname)" \
---foreman-proxy-dns-interface "$SAT_INTERFACE" \
---foreman-proxy-dns-listen-on "both" \
---foreman-proxy-dns-provider "nsupdate" \
---foreman-proxy-dns-reverse "$DNS_REV" \
---foreman-proxy-dns-zone "$DOM" \
---foreman-proxy-registered-proxy-url="https://$(hostname)"
-
-
-usermod -a -G named foreman-proxy
-
-#restorecon -v /etc/rndc.key
-#chown -v root:named /etc/rndc.key
-#chmod -v 640 /etc/rndc.key
-echo " "
-echo " "
-echo "***************************************************"
-echo "Satellite 6.8 DHCP Configuration (Optional)"
-echo "***************************************************"
-source /root/.bashrc
-foreman-maintain packages unlock
-#Adding Multihomed DHCP details
-#mkdir -p /etc/systemd/system/dhcpd.service.d/
-#cat > /etc/systemd/system/dhcpd.service.d/interfaces.conf<< EOF
-#[Service]
-#ExecStart=/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -user dhcpd -group dhcpd --no-pid "$INTERNAL"
-#EOF
-foreman-installer -v \
---foreman-proxy-dhcp "true" \
---foreman-proxy-dhcp-managed "true" \
---foreman-proxy-dhcp-gateway "$DHCP_GW" \
---foreman-proxy-dhcp-interface "$SAT_INTERFACE" \
---foreman-proxy-dhcp-listen-on "both" \
---foreman-proxy-dhcp-nameservers "$DHCP_DNS" \
---foreman-proxy-dhcp-range "$DHCP_RANGE" \
---foreman-proxy-dhcp-server "$INTERNALIP" \
---enable-foreman-proxy-plugin-dhcp-remote-isc
-
-usermod -a -G dhcpd foreman-proxy
-#chmod o+rx /etc/dhcp/
-#chmod o+r /etc/dhcp/dhcpd.conf
-#chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
-echo " "
-echo " "
-echo "***************************************************"
-echo "Satellite 6.8 TFTP Configuration"
-echo "***************************************************"
-source /root/.bashrc
-foreman-maintain packages unlock
-foreman-installer -v \
---foreman-proxy-tftp "true" \
---foreman-proxy-tftp-managed "true" \
---foreman-proxy-tftp-listen-on "both" \
---foreman-proxy-tftp-servername "$(hostname)" 
-echo " "
-echo " "
-echo "***************************************************"
-echo "Satellite 6.8 Task and Cleanup Configuration"
-echo "***************************************************"
-source /root/.bashrc
-foreman-maintain packages unlock
-foreman-installer -v \
---foreman-plugin-tasks-automatic-cleanup true \
---foreman-proxy-plugin-discovery-install-images true \
---enable-foreman-plugin-inventory-upload \
---enable-foreman-plugin-bootdisk 
-echo " "
-echo " "
-echo "***************************************************"
-echo "Satellite 6.8 Cloud Management Option Configuration"
-echo "***************************************************"
-source /root/.bashrc
-foreman-maintain packages unlock
-foreman-installer -v \
+--foreman-proxy-puppetca=true \
+--foreman-proxy-tftp=true \
+--foreman-proxy-tftp-managed=false \
+--foreman-proxy-tftp-listen-on=both \
+--foreman-proxy-tftp-servername="$(hostname)" \
+--foreman-proxy-dns=true \
+--foreman-proxy-dns-managed=true \
+--foreman-proxy-dns-forwarders="$DNS" \
+--foreman-proxy-dns-server="$(hostname)" \
+--foreman-proxy-dns-interface="$SAT_INTERFACE" \
+--foreman-proxy-dns-listen-on=both \
+--foreman-proxy-dns-provider=nsupdate \
+--foreman-proxy-dns-reverse="$DNS_REV" \
+--foreman-proxy-dns-zone="$DOM" \
+--foreman-proxy-dhcp=true \
+--foreman-proxy-dhcp-managed=false \
+--foreman-proxy-dhcp-gateway="$DHCP_GW" \
+--foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
+--foreman-proxy-dhcp-listen-on=both \
+--foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
+--foreman-proxy-dhcp-range="$DHCP_RANGE" \
+--foreman-proxy-dhcp-server="$INTERNALIP" \
+--enable-foreman-proxy-plugin-dhcp-remote-isc \
 --enable-foreman-compute-vmware \
 --enable-foreman-compute-libvirt \
 --enable-foreman-compute-gce \
 --enable-foreman-compute-ec2 \
---foreman-proxy-templates "true"
+--enable-foreman-plugin-discovery \
+--foreman-proxy-templates=true \
+--foreman-plugin-tasks-automatic-cleanup true \
+--foreman-proxy-plugin-discovery-install-images true \
+--enable-foreman-plugin-bootdisk 
+
+echo " "
+echo " " 
+echo '*******************************************'
+echo 'Settinging Permissions For Services'
+echo '*******************************************'
+mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
+
+usermod -a -G named foreman-proxy
+restorecon -v /etc/rndc.key
+chown -v root:named /etc/rndc.key
+chmod -v 640 /etc/rndc.key
+mkdir -p /etc/systemd/system/dhcpd.service.d/
+
+cat > /etc/systemd/system/dhcpd.service.d/interfaces.conf<< EOF
+[Service]
+ExecStart=/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -user dhcpd -group dhcpd --no-pid "$INTERNAL"
+EOF
+
+usermod -a -G dhcpd foreman-proxy
+chmod o+rx /etc/dhcp/
+chmod o+r /etc/dhcp/dhcpd.conf
+#chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
+
 echo " "
 echo " " 
 echo '*******************************************'
@@ -967,21 +935,6 @@ systemctl start named.service
 systemctl --system daemon-reload
 
 sudo touch ~/Downloads/RHTI/CONFSAT
-}
-
-#--------------------------------------
-function CONFSATCACHE {
-#--------------------------------------
-source /root/.bashrc
-echo -ne "\e[8;40;170t"
-echo " "
-sleep 1
-echo "*********************************************************"
-echo "CONFIGURING SATELLITE CACHE"
-echo "*********************************************************"
-foreman-rake apipie:cache:index --trace
-echo " "
-sudo touch ~/Downloads/RHTI/CONFSATCACHE
 }
 
 #--------------------------------------
@@ -1091,8 +1044,6 @@ hammer organization update --name $ORG
 hammer location update --name $LOC
 for i in $(ls /home/); do cp /home/$i/Downloads/manifest*zip ~/Downloads/ ; done
 sudo -u admin hammer subscription upload --file /home/$i/Downloads/manifest*zip --organization $ORG
-hammer subscription refresh-manifest --organization $ORG
-foreman-rake apipie:cache
 echo " "
 echo "*********************************************************"
 echo 'REFRESHING THE CAPSULE CONTENT'
@@ -1104,7 +1055,7 @@ echo "*********************************************************"
 echo 'SETTING SATELLITE ENV SETTINGS'
 echo "*********************************************************"
 hammer settings set --name default_download_policy --value on_demand
-hammer settings set --name default_redhat_download_policy --value on_demand
+hammer settings set --name default_redhat_download_policy --value immediate
 hammer settings set --name default_proxy_download_policy --value immediate
 hammer settings set --name default_organization --value "$ORG"
 hammer settings set --name default_location --value "$LOC"
@@ -1116,7 +1067,7 @@ hammer settings set --name content_view_solve_dependencies --value true
 hammer settings set --name remote_execution_by_default --value true
 hammer settings set --name ansible_ssh_private_key_file --value /root/.ssh/id_rsa
 hammer settings set --name unregister_delete_host --value true
-hammer settings set --name default_puppet_environment --value common
+hammer settings set --name default_puppet_environment --value production
 hammer settings set --name ansible_verbosity --value "Level 3(-vvv)"
 echo " "
 echo "*********************************************************"
@@ -1140,7 +1091,7 @@ systemctl restart rsyslog
 sudo touch ~/Downloads/RHTI/STOPSPAMMINGVARLOG
 }
 
-#NOTE: Jenkins, CentOS Linux 7.8 Puppet Forge, Icinga, and Maven are examples of setting up a custom repository
+#NOTE: Jenkins, CentOS Linux 7.9 Puppet Forge, Icinga, and Maven are examples of setting up a custom repository
 #---START OF REPO CONFIGURE AND SYNC SCRIPT---
 source /root/.bashrc
 QMESSAGE7="Would you like to enable and sync RHEL 7 Content
@@ -1185,8 +1136,8 @@ QMESSAGEPUPPET="Would you like to download Puppet Forge custom content"
 QMESSAGEJENKINS="Would you like to download JENKINS custom content"
 QMESSAGEMAVEN="Would you like to download Maven custom content"
 QMESSAGEICINGA="Would you like to download Icinga custom content"
-QMESSAGEICENTOS7="Would you like to download CentOS Linux 7.8 custom content"
-QMESSAGEISCIENTIFICLINUX7="Would you like to download SCIENTIFIC LINUX 7.8 custom content"
+QMESSAGEICENTOS7="Would you like to download CentOS Linux 7.9 custom content"
+QMESSAGEISCIENTIFICLINUX7="Would you like to download SCIENTIFIC LINUX 7.9 custom content"
 
 YMESSAGE="Adding avalable content. This step will take the longest,
 (Depending on your network)"
@@ -1213,41 +1164,30 @@ INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 echo "Red Hat Enterprise Linux 7 Server (Kickstart)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.8' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
-hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8' 2>/dev/null
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.9' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9' 2>/dev/null
 echo "Red Hat Enterprise Linux 7 Server (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server (RPMs)'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server' 2>/dev/null
 echo "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server' 2>/dev/null
 echo "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server' 2>/dev/null
 echo "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64' 2>/dev/null
 echo "'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
 echo "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name ''
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server' 2>/dev/null
 echo "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
-#time hammer repository synchronize --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server' 2>/dev/null
-#wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7 -O /root/RPM-GPG-KEY-EPEL-7
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
 sleep 1
-#hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7 --name 'GPG-EPEL-7' --organization $ORG
 hammer gpg create --key /root/RPM-GPG-KEY-EPEL-7Server --name 'GPG-EPEL-7Sever' --organization $ORG
 sleep 1
-#hammer product create --name='Extra Packages for Enterprise Linux 7' --organization $ORG
 hammer product create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG
 sleep 1
-#hammer repository create --name='Extra Packages for Enterprise Linux 7' --organization $ORG --product='Extra Packages for Enterprise Linux 7' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7/x86_64/
-#time hammer repository synchronize --organization "$ORG" --product 'Extra Packages for Enterprise Linux 7' --name 'Extra Packages for Enterprise Linux 7' 2>/dev/null
 echo "Extra Packages for Enterprise Linux 7Server"
 hammer repository create --name='Extra Packages for Enterprise Linux 7Server' --organization $ORG --product='Extra Packages for Enterprise Linux 7Server' --content-type yum --publish-via-http=true --url=https://dl.fedoraproject.org/pub/epel/7Server/x86_64/
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Extra Packages for Enterprise Linux 7Server' 2>/dev/null
@@ -1274,15 +1214,15 @@ INPUT=${INPUT:-$RHEL8DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)'
-hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.2'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.2' 2>/dev/null
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)'
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.3'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart x86_64 8.3' 2>/dev/null
 echo "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.2' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
 echo "Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)' 
 echo "Red Hat Storage Native Client for RHEL 8 (RPMs)"
@@ -1313,46 +1253,46 @@ function REQUESTCENTOS7 {
 source /root/.bashrc
 echo -ne "\e[8;40;170t"
 echo "*********************************************************"
-echo "CentOS Linux 7.8:"
+echo "CentOS Linux 7.9:"
 echo "*********************************************************"
 read -n1 -t "$COUNTDOWN" -p "$QMESSAGEICENTOS7 ? Y/N " INPUT
 INPUT=${INPUT:-$OTHER7REPOSDEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 cd /root/Downloads
-wget http://mirror.centos.org/centos/7.8.2003/os/x86_64/RPM-GPG-KEY-CentOS-7
-hammer gpg create --organization $ORG --name RPM-GPG-KEY-CentOS-Linux-7.8 --key RPM-GPG-KEY-CentOS-7
-hammer product create --name='CentOS Linux 7.8' --organization $ORG
+wget http://mirror.centos.org/centos/7.9.2003/os/x86_64/RPM-GPG-KEY-CentOS-7
+hammer gpg create --organization $ORG --name RPM-GPG-KEY-CentOS-Linux-7.9 --key RPM-GPG-KEY-CentOS-7
+hammer product create --name='CentOS Linux 7.9' --organization $ORG
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 (Kickstart)' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/os/x86_64/ 
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 (Kickstart)' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 (Kickstart)' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/os/x86_64/ 
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 (Kickstart)' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 CentOS Plus' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/centosplus/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 CentOSplus' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 CentOS Plus' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/centosplus/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 CentOSplus' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 DotNET' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/dotnet/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 DotNET' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 DotNET' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/dotnet/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 DotNET' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Extras' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/extras/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Extras' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 Extras' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/extras/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 Extras' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Fasttrack' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/fasttrack/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Fasttrack' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 Fasttrack' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/fasttrack/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 Fasttrack' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Openshift Origin 311' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/paas/x86_64/openshift-origin311/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Openshift Origin 311' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 Openshift Origin 311' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/paas/x86_64/openshift-origin311/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 Openshift Origin 311' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 OpsTools' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/opstools/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 OpsTools' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 OpsTools' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/opstools/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 OpsTools' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Updates' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/updates/x86_64/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Updates' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 Updates' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/updates/x86_64/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 Updates' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 OpenStack Stein' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/cloud/x86_64/openstack-stein/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 OpenStack Stein' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 OpenStack Stein' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/cloud/x86_64/openstack-stein/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 OpenStack Stein' 2>/dev/null
 
-hammer repository create --organization $ORG --name='CentOS Linux 7.8 Config Management' --product='CentOS Linux 7.8' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.8 --publish-via-http=true --url=http://mirror.centos.org/centos/7.8.2003/configmanagement/x86_64/ansible-29/ --checksum-type=sha256
-time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.8' --name 'CentOS Linux 7.8 Config Management' 2>/dev/null
+hammer repository create --organization $ORG --name='CentOS Linux 7.9 Config Management' --product='CentOS Linux 7.9' --content-type='yum' --gpg-key=RPM-GPG-KEY-CentOS-Linux-7.9 --publish-via-http=true --url=http://mirror.centos.org/centos/7.9.2003/configmanagement/x86_64/ansible-29/ --checksum-type=sha256
+time hammer repository synchronize --organization "$ORG" --product 'CentOS Linux 7.9' --name 'CentOS Linux 7.9 Config Management' 2>/dev/null
 
 #COMMANDEXECUTION
 elif [ "$INPUT" = "n" -o "$INPUT" = "N" ] ;then
@@ -1446,16 +1386,6 @@ sudo touch ~/Downloads/RHTI/SYNCPLANS
 }
 
 #-------------------------------
-function SYNCPLANCOMPONENTS {
-#-------------------------------
-source /root/.bashrc
-echo -ne "\e[8;40;170t"
-echo " "
-for i in $(hammer --csv product list --enabled yes --organization $ORG |grep -v "-" |grep -v ID| awk -F ',' '{print $1}'|sort -n) ; do time hammer product set-sync-plan --id $i --organization $ORG --sync-plan 'Weekly_Sync' ; done
-sudo touch ~/Downloads/RHTI/SYNCPLANCOMPONENTS
-}
-
-#-------------------------------
 function ASSOCPLANTOPRODUCTS {
 #-------------------------------
 source /root/.bashrc
@@ -1469,6 +1399,18 @@ sudo touch ~/Downloads/RHTI/ASSOCPLANTOPRODUCTS
 }
 
 #-------------------------------
+function SYNCPLANCOMPONENTS {
+#-------------------------------
+source /root/.bashrc
+echo -ne "\e[8;40;170t"
+echo " "
+for i in $(hammer --csv product list --enabled yes --organization $ORG |grep -v "-" |grep -v ID| awk -F ',' '{print $1}'|sort -n) ; do time hammer product set-sync-plan --id $i --organization $ORG --sync-plan 'Weekly_Sync' ; done
+sudo touch ~/Downloads/RHTI/SYNCPLANCOMPONENTS
+}
+
+
+
+#-------------------------------
 function CONTENTVIEWS7 {
 #-------------------------------
 source /root/.bashrc
@@ -1479,26 +1421,33 @@ echo "***********************************************"
 echo "Create a content views"
 echo "***********************************************"
 echo " "
-echo 'RHEL_7_x86_64'
-hammer content-view create --organization $ORG --name 'RHEL_7_x86_64' --label RHEL_7_x86_64 --description 'RHEL 7'
+echo 'RHEL_7.9_x86_64'
+hammer content-view create --organization $ORG --name 'RHEL_7.9_x86_64' --label RHEL_7-9_x86_64 --description 'RHEL 7.9'
 echo " "
 echo 'Adding Red Hat Enterprise Linux 7 Server '
-
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server Kickstart '
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9'
 echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 7 Server'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
 echo 'Adding Red Hat Software Collections'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Supplementary'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Supplementary RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - RH Common'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - RH Common RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Optional'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Optional RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Extras'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server - Extras RPMs x86_64'
+
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Extra Packages for Enterprise Linux 7Server' --repository 'Extra Packages for Enterprise Linux 7Server'
+
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Ansible Engine' --repository 'Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server x86_64'
+
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server from RHUI' --repository 'Red Hat Enterprise Linux 7 Server - Extras from RHUI RPMs x86_64'
+
+
 sleep 1
 sudo touch ~/Downloads/RHTI/CONTENTVIEWS7
 }
@@ -1507,21 +1456,21 @@ sudo touch ~/Downloads/RHTI/CONTENTVIEWS7
 function CONTENTVIEWS8 {
 #-------------------------------
 echo " "
-echo 'RHEL_8_x86_64'
-hammer content-view create --organization $ORG --name 'RHEL_8_x86_64' --label RHEL_8_x86_64 --description 'RHEL 8'
+echo 'RHEL_8.3_x86_64'
+hammer content-view create --organization $ORG --name 'RHEL_8.3_x86_64' --label RHEL_8-3_x86_64 --description 'RHEL 8.3'
 echo " "
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - AppStream'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.3'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.3'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.3'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.2'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.3'
 echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
 echo 'Adding Red Hat EPEL for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
 sleep 1
 sudo touch ~/Downloads/RHTI/CONTENTVIEWS8
 }
@@ -1538,17 +1487,17 @@ read -n1 -t "$COUNTDOWN" -p "$QMESSAGE7 ? Y/N " INPUT
 INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
-echo "RHEL_7_x86_64 - Initial Publishing"
-time hammer content-view publish --organization $ORG --name 'RHEL_7_x86_64' --description 'Initial Publishing' 2>/dev/null
+echo "RHEL_7.9_x86_64 - Initial Publishing"
+time hammer content-view publish --organization $ORG --name 'RHEL_7.9_x86_64' --description 'Initial Publishing' 2>/dev/null
 sleep 500
 echo "Library --> DEV_RHEL_7"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7.9_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_7 2>/dev/null
 
 echo "DEV_RHEL_7 --> TEST_RHEL_7"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7.9_x86_64' --from-lifecycle-environment DEV_RHEL_7 --to-lifecycle-environment TEST_RHEL_7 2>/dev/null
 
 echo "TEST_RHEL_7 --> PROD_RHEL_7"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_7_x86_64' --from-lifecycle-environment TEST_RHEL_7 --to-lifecycle-environment PROD_RHEL_7 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_7.9_x86_64' --from-lifecycle-environment TEST_RHEL_7 --to-lifecycle-environment PROD_RHEL_7 2>/dev/null
 
 touch ~/Downloads/RHTI/PUBLISHRHEL7CONTENT
 fi
@@ -1564,15 +1513,15 @@ echo -e "\n$YMESSAGE\n"
 echo "***********************************************"
 echo "CREATE A CONTENT VIEW FOR RHEL 8"
 echo "***********************************************"
-echo "RHEL_8_x86_64 - Initial Publishing"
-time hammer content-view publish --organization $ORG --name 'RHEL_8_x86_64' --description 'Initial Publishing' 2>/dev/null
+echo "RHEL_8.3_x86_64 - Initial Publishing"
+time hammer content-view publish --organization $ORG --name 'RHEL_8.3_x86_64' --description 'Initial Publishing' 2>/dev/null
 sleep 500
 echo "Library --> DEV_RHEL_8"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8.3_x86_64' --from-lifecycle-environment Library  --to-lifecycle-environment DEV_RHEL_8 2>/dev/null
 echo "DEV_RHEL_8 --> TEST_RHEL_8"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8.3_x86_64' --from-lifecycle-environment DEV_RHEL_8 --to-lifecycle-environment TEST_RHEL_8 2>/dev/null
 echo "TEST_RHEL_8 --> PROD_RHEL_8"
-time hammer content-view version promote --organization $ORG --content-view 'RHEL_8_x86_64' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
+time hammer content-view version promote --organization $ORG --content-view 'RHEL_8.3_x86_64' --from-lifecycle-environment TEST_RHEL_8 --to-lifecycle-environment PROD_RHEL_8 2>/dev/null
 sudo touch ~/Downloads/RHTI/PUBLISHRHEL8CONTENT
 fi
 }
@@ -1586,10 +1535,10 @@ echo " "
 echo "***********************************"
 echo "Create a host collection for RHEL:"
 echo "***********************************"
-echo "RHEL_7_x86_64"
-hammer host-collection create --name='RHEL_7_x86_64' --organization $ORG
-echo "RHEL_8_x86_64"
-hammer host-collection create --name='RHEL_8_x86_64' --organization $ORG
+echo "RHEL_7.9_x86_64"
+hammer host-collection create --name='RHEL_7.9_x86_64' --organization $ORG
+echo "RHEL_8.3_x86_64"
+hammer host-collection create --name='RHEL_8.3_x86_64' --organization $ORG
 sleep 1
 sudo touch ~/Downloads/RHTI/HOSTCOLLECTION
 }
@@ -1604,18 +1553,18 @@ echo "*********************************************************"
 echo "Create an activation keys for environments:"
 echo "*********************************************************"
 echo "Activation Key - DEV_RHEL_7"
-hammer activation-key create --name 'DEV_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'DEV_RHEL_7'
+hammer activation-key create --name 'DEV_RHEL_7.9' --organization $ORG --content-view='RHEL_7.9_x86_64' --lifecycle-environment 'DEV_RHEL_7'
 echo "Activation Key - TEST_RHEL_7"
-hammer activation-key create --name 'TEST_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'TEST_RHEL_7'
+hammer activation-key create --name 'TEST_RHEL_7.9' --organization $ORG --content-view='RHEL_7.9_x86_64' --lifecycle-environment 'TEST_RHEL_7'
 echo "Activation Key - PROD_RHEL_7"
-hammer activation-key create --name 'PROD_RHEL_7' --organization $ORG --content-view='RHEL_7_x86_64' --lifecycle-environment 'PROD_RHEL_7'
+hammer activation-key create --name 'PROD_RHEL_7.9' --organization $ORG --content-view='RHEL_7.9_x86_64' --lifecycle-environment 'PROD_RHEL_7'
 
 echo "Activation Key - DEV_RHEL_8"
-hammer activation-key create --name 'DEV_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'DEV_RHEL_8'
+hammer activation-key create --name 'DEV_RHEL_8.3' --organization $ORG --content-view='RHEL_8.3_x86_64' --lifecycle-environment 'DEV_RHEL_8'
 echo "Activation Key - TEST_RHEL_8"
-hammer activation-key create --name 'TEST_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'TEST_RHEL_8'
+hammer activation-key create --name 'TEST_RHEL_8.3' --organization $ORG --content-view='RHEL_8.3_x86_64' --lifecycle-environment 'TEST_RHEL_8'
 echo "Activation Key - PROD_RHEL_8"
-hammer activation-key create --name 'PROD_RHEL_8' --organization $ORG --content-view='RHEL_8_x86_64' --lifecycle-environment 'PROD_RHEL_8'
+hammer activation-key create --name 'PROD_RHEL_8.3' --organization $ORG --content-view='RHEL_8.3_x86_64' --lifecycle-environment 'PROD_RHEL_8'
 sudo touch ~/Downloads/RHTI/KEYSFORENV
 }
 
@@ -1628,11 +1577,17 @@ echo " "
 echo "*********************************************************"
 echo "Associate each activation key to host collection:"
 echo "*********************************************************"
-for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_7); \
-do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' --organization $ORG; done
+for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F ',' '{print $2}' | grep RHEL_7); \
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7.9_x86_64' \
+--organization $ORG; done
 sleep 1
-for i in $(hammer activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F '|' '{print $2}' | grep RHEL_8); \
-do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' --organization $ORG; done
+for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F ',' '{print $2}' | grep RHEL_8); \
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8.3_x86_64' \
+--organization $ORG; done
+sleep 1
+for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |awk -F ',' '{print $2}' |grep Satellite_6); \
+do hammer activation-key add-host-collection --name $i --host-collection='Satellite_6.8-RHEL_7.9_x86_64' \
+--organization $ORG; done
 sleep 1
 sudo touch ~/Downloads/RHTI/KEYSTOHOST
 }
@@ -1668,10 +1623,10 @@ echo "*********************************************************"
 echo "Create Media:"
 echo "*********************************************************"
 #RHEL 7
-hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.8/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.8 Kickstart" --operatingsystems="RedHat 7.8"
+hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.9/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.9 Kickstart" --operatingsystems="RedHat 7.9"
 
 #RHEL 8 
-hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.2/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.2 Kickstart" --operatingsystems="RedHat 8.2"
+hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel8/8.3/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.3 Kickstart" --operatingsystems="RedHat 8.3"
 sudo touch ~/Downloads/RHTI/MEDIUM
 }
 
@@ -1687,11 +1642,11 @@ echo -ne "\e[8;40;170t"
 ENVIROMENT=$(hammer --csv environment list |awk -F "," {'print $2'}|grep -v Name |grep -v production)
 LEL=$(hammer --csv lifecycle-environment list |awk -F "," {'print $2'} |grep -v NAME)
 echo "CAID=1" >> /root/.bashrc
-echo "MEDID1=$(hammer --csv medium list |grep 'RHEL 7.8' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
+echo "MEDID1=$(hammer --csv medium list |grep 'RHEL 7.9' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 #echo "MEDID2=$(hammer --csv medium list |grep 'CentOS 7' |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 echo "SUBNETID=$(hammer --csv subnet list |awk -F "," {'print $1'}| grep -v Id)" >> /root/.bashrc
-echo "OSID1=$(hammer os list |grep -i "RedHat 7.8" |awk -F "|" {'print $1'})" >> /root/.bashrc
-#echo "OSID2=$(hammer os list |grep -i "CentOS 7.8" |awk -F "|" {'print $1'})" >> /root/.bashrc
+echo "OSID1=$(hammer os list |grep -i "RedHat 7.9" |awk -F "|" {'print $1'})" >> /root/.bashrc
+#echo "OSID2=$(hammer os list |grep -i "CentOS 7.9" |awk -F "|" {'print $1'})" >> /root/.bashrc
 echo "PROXYID=$(hammer --csv proxy list |awk -F "," {'print $1'} |grep -v Id)" >> /root/.bashrc
 echo "PARTID=$(hammer --csv partition-table list | grep "Kickstart default" | grep -i -v thin |cut -d, -f1)" >> /root/.bashrc
 echo "PXEID=$(hammer --csv template list --per-page=1000 | grep "Kickstart default PXELinux" | cut -d, -f1)" >> /root/.bashrc
@@ -1744,23 +1699,9 @@ echo "*********************************************************"
 #MAKES ROOTPASSWORD ON NODES rreeddhhaatt BECAUSE THE SYSTEM REQUIRES IT TO BE 8+ CHAR (--root-pass rreeddhhaatt)
 ENVIROMENT=$(hammer --csv lifecycle-environment list |awk -F "," {'print $2'}|grep -v Name |grep -v production)
 LEL=$(hammer --csv environment list |awk -F "," {'print $2'}|grep -v Name)
-for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name RHEL-7.8-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID1 --operatingsystem-id $OSID1 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=rreeddhhaatt ; done; done
-#for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name CentOS Linux 7.8-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID2 --operatingsystem-id $OSID2 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=redhat ; done; done
+for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name RHEL-7.9-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID1 --operatingsystem-id $OSID1 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=rreeddhhaatt ; done; done
+#for i in $LEL; do for j in $(hammer --csv environment list |awk -F "," {'print $2'}| awk -F "_" {'print $1'}|grep -v Name); do hammer hostgroup create --name CentOS Linux 7.9-$j --puppet-environments $i --architecture-id $ARCHID --content-view-id $CVID --domain-id $DOMID --location-ids $LOCID --medium-id $MEDID2 --operatingsystem-id $OSID2 --organization-id=$ORGID --partition-table-id $PARTID --puppet-ca-proxy-id $PROXYID --subnet-id $SUBNETID --root-pass=redhat ; done; done
 sudo touch ~/Downloads/RHTI/HOSTGROUPS
-}
-
-#-------------------------------
-function MODPXELINUXDEF {
-#-------------------------------
-source /root/.bashrc
-echo -ne "\e[8;40;170t"
-echo " "
-echo "*********************************************************"
-echo "Setting up and Modifying default template for auto discovery"
-echo "*********************************************************"
-#sed -i 's/SATELLITE_CAPSULE_URL/'$(hostname)'/g' /usr/share/foreman/app/views/unattended/pxe/PXELinux_default.erb
-#hammer template update --id 1
-sudo touch ~/Downloads/RHTI/MODPXELINUXDEF 
 }
 
 #-------------------------------
@@ -1772,7 +1713,7 @@ echo " "
 echo "*********************************************************"
 echo "ASSOCIATE OS TO TEMPLATE"
 echo "*********************************************************"
-hammer template add-operatingsystem --operatingsystem-id 1 --id 1
+for i in $(hammer --csv os list |awk -F ',' '{print $1}' |grep -v Id) ; do hammer template add-operatingsystem --operatingsystem-id $i --id 1 ;done
 sudo touch ~/Downloads/RHTI/ADD_OS_TO_TEMPLATE
 }
 
@@ -1841,10 +1782,8 @@ sudo touch ~/Downloads/RHTI/SATREENABLEFOIREWALL
 function SATDONE {
 #-------------------------------
 hammer template build-pxe-default
-foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true
+foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true --trace
 foreman-rake katello:delete_orphaned_content --trace
-foreman-rake db:migrate
-foreman-rake db:seed
 foreman-rake katello:reimport
 foreman-rake apipie:cache:index --trace
 
