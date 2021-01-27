@@ -1,0 +1,15 @@
+[satellite]
+satellite.test.spg  ansible_host=10.168.1.1
+
+[ansible]
+ansible.test.spg    ansible_host=10.168.1.2
+
+[git]
+git.test.spg        ansible_host=10.168.1.3
+
+[compute]
+node01.test.spg     ansible_host=10.168.1.101
+node02.test.spg     ansible_host=10.168.1.102
+node03.test.spg     ansible_host=10.168.1.103
+node04.test.spg     ansible_host=10.168.1.104
+node05.test.spg     ansible_host=10.168.1.105

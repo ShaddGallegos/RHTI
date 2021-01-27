@@ -299,9 +299,7 @@ echo "*********************************************************"
 echo "ENABLE PROPER REPOS"
 echo "*********************************************************"
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-extras-rpms \
---enable=rhel-7-server-optional-rpms \
---enable=rhel-7-server-supplementary-rpms
+--enable=rhel-7-server-extras-rpms 
 echo " "
 echo "*********************************************************"
 echo "ENABLE EPEL FOR A FEW PACKAGES"
@@ -651,20 +649,19 @@ echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.8"
 echo "******************************************************************"
 echo -ne "\e[8;40;170t"
 source /root/.bashrc
-echo " "
+subscription-manager repos --disable "*"
 echo "**************************"
-echo "Disabling Non Critical Repos"
+echo "ENABLE REPOS"
 echo "**************************"
 subscription-manager repos --disable "*"
-echo " "
-echo "**************************"
-echo "ENABLE Satellite 6.8 REPOS"
-echo "**************************"
+yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-6.8-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
+yum clean all
+rm -rf /var/cache/yum
 yum clean all
 rm -rf /var/cache/yum
 
@@ -798,18 +795,16 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
-yum upgrade -y
 sleep 1
 echo " "
 echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
 yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y 'bind' --skip-broken
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
-yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install 'tftp' -y --skip-broken1
+yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install 'tftp' -y --skip-broken
 yum -q list installed nfs-utils &>/dev/null && echo "nfs-utils is installed" || yum install 'nfs-utils' -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install 'syslinux' -y --skip-broken
 yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
@@ -823,9 +818,11 @@ yum -q list installed libguestfs &>/dev/null && echo "libguestfs is installed" |
 yum -q list installed hexedit &>/dev/null && echo "hexedit is installed" || yum install -y 'hexedit' --skip-broken 
 yum -q list installed smart_proxy &>/dev/null && echo "smart_proxy is installed" || yum install -y '*smart_proxy*' --skip-broken 
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
-yum downgrade -y rubygem-foreman_maintain-0.3.5-1.el7sat.noarch
+yum -q list installed grub2-efi-x64 &>/dev/null && echo "grub2-efi-x64 is installed" || yum install -y 'grub2-efi-x64' --skip-broken 
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
 rpm -e --nodeps postgresql-9.2.24-4.el7_8.x86_64
 rpm -e --nodeps infoblox 
+yum upgrade -y
 
 cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
 group :dhcp_remote_isc do
@@ -860,6 +857,7 @@ echo "*****************************"
 echo "CONFIGURING SATELLITE BASE"
 echo "*****************************"
 source /root/.bashrc
+foreman-maintain packages unlock 
 satellite-installer --scenario satellite -v \
 --foreman-initial-admin-username="$ADMIN" \
 --foreman-initial-admin-password="$ADMIN_PASSWORD" \
@@ -867,7 +865,7 @@ satellite-installer --scenario satellite -v \
 --foreman-initial-location "$LOC" \
 --foreman-proxy-puppetca=true \
 --foreman-proxy-tftp=true \
---foreman-proxy-tftp-managed=false \
+--foreman-proxy-tftp-managed=true \
 --foreman-proxy-tftp-listen-on=both \
 --foreman-proxy-tftp-servername="$(hostname)" \
 --foreman-proxy-dns=true \
@@ -879,14 +877,6 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dns-provider=nsupdate \
 --foreman-proxy-dns-reverse="$DNS_REV" \
 --foreman-proxy-dns-zone="$DOM" \
---foreman-proxy-dhcp=true \
---foreman-proxy-dhcp-managed=false \
---foreman-proxy-dhcp-gateway="$DHCP_GW" \
---foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
---foreman-proxy-dhcp-listen-on=both \
---foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
---foreman-proxy-dhcp-range="$DHCP_RANGE" \
---foreman-proxy-dhcp-server="$INTERNALIP" \
 --enable-foreman-proxy-plugin-dhcp-remote-isc \
 --enable-foreman-compute-vmware \
 --enable-foreman-compute-libvirt \
@@ -896,7 +886,16 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-templates=true \
 --foreman-plugin-tasks-automatic-cleanup true \
 --foreman-proxy-plugin-discovery-install-images true \
---enable-foreman-plugin-bootdisk 
+--enable-foreman-plugin-bootdisk \
+--foreman-proxy-dhcp=true \
+--foreman-proxy-dhcp-managed=true \
+--foreman-proxy-dhcp-gateway="$DHCP_GW" \
+--foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
+--foreman-proxy-dhcp-listen-on="both" \
+--foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
+--foreman-proxy-dhcp-range="$DHCP_RANGE" \
+--foreman-proxy-dhcp-server="$INTERNALIP" 
+
 
 echo " "
 echo " " 
@@ -1054,7 +1053,7 @@ echo " "
 echo "*********************************************************"
 echo 'SETTING SATELLITE ENV SETTINGS'
 echo "*********************************************************"
-hammer settings set --name default_download_policy --value on_demand
+hammer settings set --name default_download_policy --value immediate
 hammer settings set --name default_redhat_download_policy --value immediate
 hammer settings set --name default_proxy_download_policy --value immediate
 hammer settings set --name default_organization --value "$ORG"
@@ -1178,8 +1177,6 @@ echo "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
 echo "'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)'
-echo "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name ''
 echo "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server

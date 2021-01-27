@@ -172,7 +172,7 @@ Ansible Collections
    * [9. Introduction_to_the_expanded_Red_Hat_Insights](./Ansible_Tower/Ansible_Video_Demos/DEMO_9-Introduction_to_the_expanded_Red_Hat_Insights.mp4)
 
  * [Ansible Playbook Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GITHUB.md)
- * [Ansible Galaxy Role Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
+ * [Ansible Galaxy Roll Examples](./Ansible_Tower/Ansible_Resources/ANSIBLE_GALAXY.md)
  * [Internet Resources](./Ansible_Tower/Ansible_Resources/Internet_Resources/README.md) - Vendor specific resources all in one spot.
 
  * [Ansible, From The Command Line](./Ansible_Tower/Ansible_Resources/ANSIBLE_COMMANDLINE.md)

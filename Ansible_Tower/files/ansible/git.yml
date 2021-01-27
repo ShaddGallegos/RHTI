@@ -1,0 +1,4 @@
+- hosts: git.test.spg
+  become: true
+  roles:
+    - role: geerlingguy.gitlab 
