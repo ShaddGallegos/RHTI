@@ -288,7 +288,6 @@ Ansible Collections
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
-  * [REDHATTOOLSINSTALLER-6.7-10272020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.7-10272020.sh)
   * [REDHATTOOLSINSTALLER-6.8-10272020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.8-1027020.sh)
 
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
