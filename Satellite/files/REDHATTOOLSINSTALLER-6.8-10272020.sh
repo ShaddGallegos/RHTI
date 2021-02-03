@@ -104,7 +104,9 @@ echo -ne "\e[8;40;170t"
 #-------------------------
 function CHECKONLINE {
 #-------------------------
-reset
+if [ -t 0 ]; then
+  reset
+fi
 echo 'REDHAT TOOLS INSTALLER – FOR RHEL 7.X'
 wget -q --tries=10 --timeout=20 --spider http://redhat.com
 if [[ $? -eq 0 ]]; then
