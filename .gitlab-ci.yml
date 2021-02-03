@@ -10,5 +10,6 @@ build-code-job:
 test-code-job1:
   stage: test
   script:
+    - sudo yum install expect -y
     - chmod +x ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
-    - ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
+    - sudo ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
