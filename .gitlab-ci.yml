@@ -10,5 +10,5 @@ build-code-job:
 test-code-job1:
   stage: test
   script:
-    - chmod +x ./RHTI/Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
-    - ./RHTI/Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
+    - chmod +x ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
+    - ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
