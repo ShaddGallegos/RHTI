@@ -329,11 +329,13 @@ echo " "
 echo "*********************************************************"
 echo "INSTALLING PACKAGES ENABLING SCRIPT TO RUN"
 echo "*********************************************************"
+mkdir -p ~/Downloads
 cd ~/Downloads
 yum-config-manager --enable epel
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y 'wget' --skip-broken
 wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm
-chmod 777 ~/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm 
+chmod 777 ~/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm
+cp -fp xdialog-2.3.1-13.el7.centos.x86_64.rpm ~/Downloads
 yum -q list installed xdialog &>/dev/null && echo "xdialog is installed" || yum localinstall -y  ~/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm --skip-broken
 yum -q list installed dialog &>/dev/null && echo "dialog is installed" || yum install -y 'dialog' --skip-broken
 yum -q list installed rhel-system-roles &>/dev/null && echo "rhel-system-roles is installed" || yum install 'rhel-system-roles' -y --skip-broken
@@ -805,6 +807,7 @@ yum -q list installed bind &>/dev/null && echo "bind is installed" || yum instal
 yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
 yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
 yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install 'tftp' -y --skip-broken
+yum -q list installed tftp-server &>/dev/null && echo "tftp-server is installed" || yum install 'tftp-server' -y --skip-broken
 yum -q list installed nfs-utils &>/dev/null && echo "nfs-utils is installed" || yum install 'nfs-utils' -y --skip-broken
 yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install 'syslinux' -y --skip-broken
 yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
@@ -818,6 +821,7 @@ yum -q list installed libguestfs &>/dev/null && echo "libguestfs is installed" |
 yum -q list installed hexedit &>/dev/null && echo "hexedit is installed" || yum install -y 'hexedit' --skip-broken 
 yum -q list installed smart_proxy &>/dev/null && echo "smart_proxy is installed" || yum install -y '*smart_proxy*' --skip-broken 
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
+yum -q list installed foreman &>/dev/null && echo "foreman is installed" || yum install -y 'foreman' --skip-broken 
 yum -q list installed grub2-efi-x64 &>/dev/null && echo "grub2-efi-x64 is installed" || yum install -y 'grub2-efi-x64' --skip-broken 
 yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
 rpm -e --nodeps postgresql-9.2.24-4.el7_8.x86_64
