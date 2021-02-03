@@ -5,11 +5,10 @@ stages:
 build-code-job:
   stage: build
   script:
-    - ls -la
+    - ls -al
 
 test-code-job1:
   stage: test
   script:
-    - git clone git@github.com:ShaddGallegos/RHTI.git
     - chmod +x ./RHTI/Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
     - ./RHTI/Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
