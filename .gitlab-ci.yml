@@ -1,3 +1,8 @@
+default:
+  only:
+    changes:
+      - Satellite/files/
+
 stages:
   - build
   - test
@@ -5,6 +10,7 @@ stages:
 build-code-job:
   stage: build
   script:
+    - export
     - ls -al
 
 test-code-job1:
