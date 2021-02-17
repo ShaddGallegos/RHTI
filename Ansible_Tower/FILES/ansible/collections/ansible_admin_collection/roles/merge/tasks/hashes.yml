@@ -1,0 +1,8 @@
+---
+
+- name: hashes > Set
+  set:
+    hash: "{{ query('manala.roles.merge', item.hashes) }}"
+    prefix: "{{ item.prefix|default(omit) }}"
+    var: "{{ item.var|default(omit) }}"
+  with_items: "{{ manala_merge_hashes }}"

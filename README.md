@@ -196,9 +196,9 @@ Ansible Collections
         DISCLAMER: Also these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
  
- * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
- * [ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/files/ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/FILES/ANSIBLE_TOWER-3.6.4-1-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/FILES/ANSIBLE_TOWER-3.7.0-4-INSTALLER.sh)
+ * [ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh](https://github.com/ShaddGallegos/RHTI/blob/master/Ansible_Tower/FILES/ANSIBLE_TOWER-3.7.1-1-INSTALLER.sh)
 
 #### FREE Ansible Tower Workshops (listed below)
 ---------------------------------
@@ -281,20 +281,20 @@ Ansible Collections
  * [Satellite-Ansible Playbook Examples](./Satellite/Satellite-Ansible_Resources/GITHUB_FOR_SATELLITE.md)
  * [Satellite-Ansible Galaxy Roll Examples](./Satellite/Satellite-Ansible_Resources/ANSIBLE_GALAXY_FOR_SATELLITE.md)
 
-  * [Ansible_Modules-Foreman-Katello](./Satellite/files/Ansible_Modules-Foreman-Katello.tar.gz)
+  * [Ansible_Modules-Foreman-Katello](./Satellite/FILES/Ansible_Modules-Foreman-Katello.tar.gz)
 
         DISCLAMER: Again these are "my scripts" and are not supported in any way (use at own risk) 
                    Do not use on a currently running production system. No implied warrenty or other.
 
 [Requirements to run the script](https://github.com/ShaddGallegos/RHTI/blob/master/Satellite/README.md)
 #### Simple script for installing Satellite P.O.C on a single node/vm on RHEL7:
-  * [REDHATTOOLSINSTALLER-6.8-10272020.sh](./Satellite/files/REDHATTOOLSINSTALLER-6.8-1027020.sh)
+  * [REDHATTOOLSINSTALLER-6.8-10272020.sh](./Satellite/FILES/REDHATTOOLSINSTALLER-6.8-10272020.sh)
 
 #### Simple script checking the health of your Satellite once it is set up on your RHEL7 sys:
-  * [sat6_healthCheck.sh](./Satellite/files/sat6_healthCheck.sh)
+  * [sat6_healthCheck.sh Sat6.7 and lower](./Satellite/FILES/Satellite6.7_on_RHEL7_ONLY_healthCheck.sh)
 
 #### RPM for an X enabled server (not required) 
- * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
+ * [xdialog-2.3.1-13.el7.centos.x86_64.rpm](./Satellite/FILES/xdialog-2.3.1-13.el7.centos.x86_64.rpm)
 
 ![REDHATTOOLSINSTALLER](./Satellite/PNG/REDHATTOOLSINSTALLER-6.7.png)
   

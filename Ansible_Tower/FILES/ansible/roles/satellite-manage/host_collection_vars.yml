@@ -1,0 +1,34 @@
+host_collection_vars:
+  - host_collection: rhel5-servers
+    description: All RHEL 5 Server
+  - host_collection: rhel6-servers
+    description: All RHEL 6 Server
+  - host_collection: rhel7-servers
+    description: All RHEL 7 Server
+  - host_collection: rhel8-servers
+    description: All RHEL 8 Server
+  - host_collection: rhel5-development
+    description: All RHEL 5 Development Servers
+  - host_collection: rhel5-qa
+    description: All RHEL 5 QA Servers
+  - host_collection: rhel5-production
+    description: All RHEL 5 Production Servers
+  - host_collection: rhel6-development
+    description: All RHEL 6 Development Servers
+  - host_collection: rhel6-qa
+    description: All RHEL 6 QA Servers
+  - host_collection: rhel6-production
+    description: All RHEL 6 Production Servers
+  - host_collection: rhel7-development
+    description: All RHEL 7 Development Servers
+  - host_collection: rhel7-qa
+    description: All RHEL 7 QA Servers
+  - host_collection: rhel7-production
+    description: All RHEL 7 Production Servers
+  - host_collection: rhel8-development
+    description: All RHEL 8 Development Servers
+  - host_collection: rhel8-qa
+    description: All RHEL 8 QA Servers
+  - host_collection: rhel8-production
+    description: All RHEL 8 Production Servers
+

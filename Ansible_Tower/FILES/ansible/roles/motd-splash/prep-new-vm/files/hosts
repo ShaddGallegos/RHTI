@@ -1,0 +1,9 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+
+10.0.30.50	towerdb.lab towerdb
+10.0.30.51	tower01.lab tower01
+10.0.30.52	tower02.lab tower02
+10.0.30.53	tower03.lab tower03
+10.0.30.60	towerha.lab towerha

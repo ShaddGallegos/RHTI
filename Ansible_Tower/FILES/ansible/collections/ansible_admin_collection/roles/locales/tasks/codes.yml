@@ -1,0 +1,12 @@
+---
+
+- name: codes > Handle
+  locale_gen:
+    name: "{{ item.code }}"
+    state: "{{ item.state }}"
+  loop: "{{ query(
+      'manala.roles.locales_codes',
+      manala_locales_codes,
+      []
+    )
+  }}"

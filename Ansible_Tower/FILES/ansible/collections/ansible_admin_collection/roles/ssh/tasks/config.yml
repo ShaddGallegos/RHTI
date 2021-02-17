@@ -1,0 +1,39 @@
+---
+
+- name: config > Server - Template
+  template:
+    src: "{{
+      manala_ssh_server_config_template|ternary(
+        manala_ssh_server_config_template,
+        'config/server/' ~ ansible_distribution|lower ~ '_' ~ ansible_distribution_release ~ '.j2'
+      )
+    }}"
+    dest: "{{ manala_ssh_server_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: (manala_ssh_server)
+        and (
+          (manala_ssh_server_config_template is not none)
+          or (manala_ssh_server_config|length)
+        )
+  notify:
+    - ssh reload
+
+- name: config > Client - Template
+  template:
+    src: "{{
+      manala_ssh_client_config_template|ternary(
+        manala_ssh_client_config_template,
+        'config/client/' ~ ansible_distribution|lower ~ '_' ~ ansible_distribution_release ~ '.j2'
+      )
+    }}"
+    dest: "{{ manala_ssh_client_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: (manala_ssh_client)
+        and (
+          (manala_ssh_client_config_template is not none)
+          or (manala_ssh_client_config|length)
+        )

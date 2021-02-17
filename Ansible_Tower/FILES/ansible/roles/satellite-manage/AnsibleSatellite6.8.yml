@@ -1,0 +1,338 @@
+---
+- name: Install Satellite 6.8 on RHEL 7.9
+  hosts: satellite
+  become: true
+  
+#Collect variables
+#Check all requirements have been met
+#Configure Satellite 6.8
+#Satellite 6.8 configure Satellite base
+#Satellite 6.8 internal DNS configuration
+#Satellite 6.8 DHCP configuration (optional)
+#Satellite 6.8 TFTP configuration
+#Satellite 6.8 task and cleanup configuration
+#Satellite 6.8 cloud management option configuration
+#Start and enable Satellite services
+#Configure Satellite cache
+#Verify DHCP is wanted for new systems (default is enabled)
+#Enable hammer 
+#If you have put your manifest into ~/downloads/
+#When prompted please enter your Satellite admin/foreman username and password
+#Refresh the capsule content
+#Set Satellite environment settings
+#Tune the Satellite for medium Satellite 
+#Stop the log spamming of /var/log/messages with slice
+#RHEL 7 standard repositories
+#RHEL 8 standard repositories
+#Sync all repositories
+#Create the first or primary subnet to connect the nodes to the Satellite
+#Create environments DEV_RHEL→ TEST_RHEL→ PROD_RHEL
+#Create a daily sync plan
+#Associate plan to products
+#Create a content views
+#Create a host collection for RHEL
+#Create an activation keys for environments
+#Associate each activation key to host collection
+#Add all subscriptions available to keys
+#Enable all the base content for each os by default
+#Create media
+#Create a RHEL hostgroups
+
+  vars_prompt:
+    - name: "rhn_username"
+      prompt: "Enter Red Hat Network username"
+
+    - name: "rhn_password"
+      prompt: "Enter Red Hat Networt password"
+      private: yes
+
+    - name: "HOSTNAME"
+      prompt: "What is FQDN for your satellite server"
+
+    - name: "GATEWAY_IP"
+      prompt: "What is gateway ip"
+
+    - name: "GATEWAY_FQDN"
+      prompt: "What is gateway FQDN"
+
+    - name: "SATELLITE_ADMIN"
+      prompt: "Enter the username for the Admin/Service account"
+
+    - name: "SATELLITE_ADMIN_PASSWORD"
+      prompt: "Enter the password for the Admin/Service account"
+      private: yes
+
+  vars:
+    ssh_key_filename: id_rsa
+    satellite_configure_capsule: true
+    satellite_packages:
+      - satellite
+
+    satellite_scenario_location: /etc/foreman-installer/scenarios.d/satellite.yaml
+
+    satellite_deployment_version: 6.8
+    satellite_deployment_hostname_short: '{{ ansible_nodename.hostname }}'
+    satellite_deployment_hostname_full: "{{ ansible_fqdn }}"
+    satellite_deployment_admin_username: "admin"
+    satellite_deployment_admin_password: "redhat"
+    satellite_deployment_organization: "ORG1"
+    satellite_deployment_location: "LOC1"
+
+# registration:
+    satellite_connected: "True" 
+    satellite_deployment_rhn_user: "your_rhn_user"
+    satellite_deployment_rhn_password: "your_rhn_pass"
+
+    satellite_deployment_answers:
+      "foreman-initial-organization": "{{ satellite_deployment_organization }}"
+      "foreman-initial-location": "{{ satellite_deployment_location }}"
+      "foreman-admin-username": "{{ satellite_deployment_admin_username }}"
+      "foreman-admin-password": "{{ satellite_deployment_admin_password }}"
+
+# configure_satellite:
+    satellite_deployment_manifest_path: '*manifest*.zip'
+    satellite_deployment_manifest_dest_path: '/root/satellite_manifest.zip'
+    satellite_deployment_puppet_env: 'production'
+    satellite_deployment_repositories:
+      
+    satellite_deployment_install_repos:
+      "6.8":
+        - "rhel-7-server-rpms"
+        - "rhel-server-rhscl-7-rpms"
+        - "rhel-7-server-satellite-6.8-rpms"
+        - "rhel-7-server-satellite-maintenance-6-rpms"
+        - "rhel-7-server-ansible-2.9-rpms"
+        - "rhel-7-server-rh-common-rpms"
+# configure_capsules:
+    satellite_deployment_puppet_env: "production"
+    satellite_deployment_install_repos:
+      "6.8":
+        - "rhel-7-server-rpms"
+        - "rhel-server-rhscl-7-rpms"
+        - "rhel-7-server-satellite-6.8-rpms"
+        - "rhel-7-server-satellite-maintenance-6-rpms"
+        - "rhel-7-server-ansible-2.9-rpms"
+        - "rhel-7-server-rh-common-rpms"
+
+# Package
+    satellite_deployment_packages:
+       "6.8":
+        - "satellite"
+        - "satellite-capsule"
+
+    satellite_deployment_extra_packages:
+      - "wget"
+      - "ansible"
+      - "git"
+      - "net-tools"
+      - "bash-completion"
+      - "screen"
+      - "vim-*"
+      - "ansible-collection-redhat-satellite"
+      - "bind"
+      - "bind-utils"
+      - "dhcp"
+      - "tftp"
+      - "nfs-utils"
+      - "syslinux"
+      - "rh-mongodb34-syspaths"
+      - "rh-mongodb34"
+      - "rubygem-bundler"
+      - "hivex"
+      - "perl-hivex"
+      - "scrub"
+      - "libguestfs-tools-c"
+      - "libguestfs"
+      - "libvirt-client"
+      - "hexedit"
+      - "*smart_proxy*"
+      - "foreman-discovery-image"
+
+# Firewall services and ports
+  satellite_deployment_fw_ports: []
+  satellite_deployment_fw_services:
+    - ssh
+    - RH-Satellite-6
+
+  satellite_deployment_installer_cmd: "/usr/sbin/satellite-installer --scenario satellite"
+
+# IPA Enabled / Disabled
+  satellite_ipa_integrated: 'false'
+
+# network
+  satellite_deployment_ip_address: '192.168.0.130'
+  satellite_deployment_network_address: 192.168.0.130'
+  satellite_deployment_net_prefix: '24'
+  satellite_deployment_gw_address: '192.168.0.1'
+  satellite_deployment_net_interface: 'ens192'
+  satellite_deployment_subnet_name: 'sat_subnet1'
+  satellite_deployment_plugin_ports: '[]'
+
+#DNS
+  satellite_deployment_dns: 'true'
+  satellite_deployment_dns_interface: "{{ satellite_deployment_net_interface }}"
+  satellite_deployment_dns_forwarder: "[]"
+  satellite_deployment_dns_zone: "example.com"
+  satellite_deployment_dns_reverse_zone: "0.168.192.in-addr.arpa"
+
+#DHCP
+  satellite_deployment_dhcp: "true"
+  satellite_deployment_dhcp_interface: "{{ satellite_deployment_net_interface }}"
+  satellite_deployment_dhcp_start: "192.168.0.135"
+  satellite_deployment_dhcp_end: "192.168.0.139"
+
+#TFTP
+  satellite_deployment_tftp: "true"
+
+  satellite_deployment_plugin_packages:
+    - "foreman-discovery-image"
+   
+  tasks:
+
+    - name: Verify port eth1/external can be contacted from satellite host
+      ansible.netcommon.net_ping:
+        dest: redhat.com
+        state: present
+
+    - name: Add blank line to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: ' '
+
+    - name: Add gateway to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: '{{ GATEWAYIP }} {{ GATEWAYFQDN }}'
+
+    - name: Verify port eth1/external is listening on satellite host
+      ansible.netcommon.net_ping:
+        dest: '{{ GATEWAYIP }}'
+        state: present
+
+    - name: Change selinux to permissive for install
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=permissive'
+    
+    - name: Disable firewall for install 
+      systemd:
+        state: stopped
+        name: firewalld
+
+    - name: Registering Satellite 6.8 to Red Hat Network with username "{{ rhn_username }}"
+      redhat_subscription: 
+        state: present
+        username: "{{rhn_username}}" 
+        password: "{{rhn_password}}" 
+        pool: '^(Red Hat Enterprise Server|Red Hat Satellite Infrastructure Subscription)$' 
+        autosubscribe: true
+
+    - name: Enabling RHEL 7 and Satellite 6.8 needed repos on nodes
+      command: subscription-manager repos --enable {{ item }}
+      with_items:
+        - rhel-7-server-rpms
+        - rhel-7-server-satellite-6.8-rpms
+        - rhel-7-server-satellite-maintenance-6-rpms
+        - rhel-server-rhscl-7-rpms
+        - rhel-7-server-ansible-2.9-rpms 
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
+
+    - name: Applying latest patches on Satellite 
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install required packages module
+      yum: package={{ item }}  update_cache=yes
+      with_items:
+
+
+    - name: Remove postgresql-9.2.24-4.el7_8.x86_64 if installed
+      shell: rpm -e --nodeps postgresql-9.2.24-4.el7_8.x86_64
+
+    - name: Remove infoblox if installed
+      shell: rpm -e --nodeps infoblox
+
+    - name: create {{ ansible_domain }} domain
+      redhat.satellite.domain:
+        name: {{ ansible_domain }}
+        state: present
+        server_url: https://{{ HOSTNAME }}
+        username: admin
+        password: changeme
+
+    - name: Add a line to /etc/sysctl.conf if the file does not exist
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: inet.ipv4.ip_forward=1
+        create: yes
+
+    - name: Add a line to /etc/sysctl.conf if the file does not exist
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: kernel.domainname={{ ansible_domain }}
+        create: yes
+
+    - name: Create an admin user
+      user:
+        name: admin
+        password: 'redhat'
+        groups:
+         - root
+         - sudo
+         - wheel
+         - libvirt
+         - kvm
+         - qemu
+        state: present
+        shell: /bin/bash
+        system: yes
+        createhome: yes
+        home: /home/admin
+
+    - name: generate SSH key "{{ssh_key_filename}}"
+      user:
+        name: "{{ansible_user}}"
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/{{ssh_key_filename}}
+        state: present
+        force: no
+
+    - name: generate SSH key "{{ssh_key_filename}}"
+      user:
+        name: admin
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/{{ssh_key_filename}}
+        state: present
+        force: no
+
+    - name: generate SSH key "{{ssh_key_filename}}"
+      user:
+        name: foreman
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: /usr/share/foreman/.ssh/{{ssh_key_filename}}
+        state: present
+        force: no
+
+    - name: generate SSH key id_rsa_foreman_proxy
+      user:
+        name: foreman
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: /usr/share/foreman-proxy/.ssh/id_rsa_foreman_proxy
+        state: present
+        force: no
+
+     
+    
+
+
+

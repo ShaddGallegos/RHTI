@@ -1,0 +1,463 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/status
+  response:
+    body:
+      string: !!python/unicode '{"result":"ok","status":200,"version":"1.23.1","api_version":2}'
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '63'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"f26fab35869f9a602399f2f56dc6b2ef"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=100
+      server:
+      - Apache
+      set-cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0; path=/; secure; HttpOnly; SameSite=Lax
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - 2576eb10-3dcc-4634-aaaa-c627571ad912
+      x-runtime:
+      - '0.097387'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/auth_source_ldaps?per_page=4294967296&search=name%3D%22Example+LDAP%22
+  response:
+    body:
+      string: !!python/unicode "{\n  \"total\": 1,\n  \"subtotal\": 1,\n  \"page\":
+        1,\n  \"per_page\": 4294967296,\n  \"search\": \"name=\\\"Example LDAP\\\"\",\n
+        \ \"sort\": {\n    \"by\": null,\n    \"order\": null\n  },\n  \"results\":
+        [{\"host\":\"ldap.example.com\",\"port\":389,\"account\":\"ansible\",\"base_dn\":\"uid\",\"ldap_filter\":\"(uid=%s)\",\"attr_login\":\"uid\",\"attr_firstname\":\"givenName\",\"attr_lastname\":\"sn\",\"attr_mail\":\"mail\",\"attr_photo\":null,\"onthefly_register\":true,\"usergroup_sync\":true,\"tls\":true,\"server_type\":\"free_ipa\",\"groups_base\":\"cn=groups,cn=accounts,dc=example,dc=com\",\"use_netgroups\":false,\"created_at\":\"2019-11-21
+        11:14:34 UTC\",\"updated_at\":\"2019-11-21 11:14:34 UTC\",\"id\":10,\"type\":\"AuthSourceLdap\",\"name\":\"Example
+        LDAP\",\"locations\":[{\"id\":27,\"name\":\"Test Location\",\"title\":\"Test
+        Location\",\"description\":null}],\"organizations\":[{\"id\":33,\"name\":\"Test
+        Organization\",\"title\":\"Test Organization\",\"description\":\"A test organization\"}]}]\n}\n"
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '885'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"421a06aebadede4445573aa7c6fc476c-gzip"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=99
+      server:
+      - Apache
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - 08d21ea5-65b8-41cd-9c15-92fe017d757d
+      x-runtime:
+      - '0.019222'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/auth_source_ldaps/10
+  response:
+    body:
+      string: !!python/unicode '{"host":"ldap.example.com","port":389,"account":"ansible","base_dn":"uid","ldap_filter":"(uid=%s)","attr_login":"uid","attr_firstname":"givenName","attr_lastname":"sn","attr_mail":"mail","attr_photo":null,"onthefly_register":true,"usergroup_sync":true,"tls":true,"server_type":"free_ipa","groups_base":"cn=groups,cn=accounts,dc=example,dc=com","use_netgroups":false,"created_at":"2019-11-21
+        11:14:34 UTC","updated_at":"2019-11-21 11:14:34 UTC","id":10,"type":"AuthSourceLdap","name":"Example
+        LDAP","external_usergroups":[],"locations":[{"id":27,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":33,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '732'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"1d94f5da14e27785c1355999e0032a29-gzip"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=98
+      server:
+      - Apache
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - 71972828-85ac-44a3-aff1-f7a3e1e4198d
+      x-runtime:
+      - '0.018952'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/locations?per_page=4294967296&search=title%3D%22Test+Location%22
+  response:
+    body:
+      string: !!python/unicode "{\n  \"total\": 3,\n  \"subtotal\": 1,\n  \"page\":
+        1,\n  \"per_page\": 4294967296,\n  \"search\": \"title=\\\"Test Location\\\"\",\n
+        \ \"sort\": {\n    \"by\": null,\n    \"order\": null\n  },\n  \"results\":
+        [{\"ancestry\":null,\"parent_id\":null,\"parent_name\":null,\"created_at\":\"2019-11-21
+        10:27:50 UTC\",\"updated_at\":\"2019-11-21 10:27:50 UTC\",\"id\":27,\"name\":\"Test
+        Location\",\"title\":\"Test Location\",\"description\":null}]\n}\n"
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '385'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"a87349e238041ea1fe3c59accedb8910-gzip"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=97
+      server:
+      - Apache
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - ee61845b-bcde-488e-b3f3-9b648d895259
+      x-runtime:
+      - '0.014188'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/organizations?per_page=4294967296&search=name%3D%22Test+Organization%22
+  response:
+    body:
+      string: !!python/unicode "{\n  \"total\": 3,\n  \"subtotal\": 1,\n  \"page\":
+        1,\n  \"per_page\": 4294967296,\n  \"search\": \"name=\\\"Test Organization\\\"\",\n
+        \ \"sort\": {\n    \"by\": null,\n    \"order\": null\n  },\n  \"results\":
+        [{\"ancestry\":null,\"parent_id\":null,\"parent_name\":null,\"created_at\":\"2019-11-21
+        11:14:33 UTC\",\"updated_at\":\"2019-11-21 11:14:33 UTC\",\"id\":33,\"name\":\"Test
+        Organization\",\"title\":\"Test Organization\",\"description\":\"A test organization\"}]\n}\n"
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '413'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"0075b7214cea960ee806b03deadcf1a9-gzip"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=96
+      server:
+      - Apache
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - 1765d5c6-2eb0-429f-8f67-7d7fc6e1c734
+      x-runtime:
+      - '0.015394'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!python/unicode '{"auth_source_ldap": {"account": "test"}}'
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '41'
+      Content-Type:
+      - application/json
+      Cookie:
+      - _session_id=d20a8da6a835460f736e6d987f872ea0
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: PUT
+    uri: https://centos7-foreman-1-23.yatsu.example.com/api/auth_source_ldaps/10
+  response:
+    body:
+      string: !!python/unicode '{"host":"ldap.example.com","port":389,"account":"test","base_dn":"uid","ldap_filter":"(uid=%s)","attr_login":"uid","attr_firstname":"givenName","attr_lastname":"sn","attr_mail":"mail","attr_photo":null,"onthefly_register":true,"usergroup_sync":true,"tls":true,"server_type":"free_ipa","groups_base":"cn=groups,cn=accounts,dc=example,dc=com","use_netgroups":false,"created_at":"2019-11-21
+        11:14:34 UTC","updated_at":"2019-11-21 11:14:36 UTC","id":10,"type":"AuthSourceLdap","name":"Example
+        LDAP","external_usergroups":[],"locations":[{"id":27,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":33,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      cache-control:
+      - max-age=0, private, must-revalidate
+      connection:
+      - Keep-Alive
+      content-length:
+      - '729'
+      content-security-policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Thu, 21 Nov 2019 11:14:36 GMT
+      etag:
+      - W/"cc0abba53c79464fb3ca9faeb11a4874-gzip"
+      foreman_api_version:
+      - '2'
+      foreman_current_location:
+      - ; ANY
+      foreman_current_organization:
+      - ; ANY
+      foreman_version:
+      - 1.23.1
+      keep-alive:
+      - timeout=5, max=95
+      server:
+      - Apache
+      set-cookie:
+      - request_method=PUT; path=/; secure; HttpOnly; SameSite=Lax
+      status:
+      - 200 OK
+      strict-transport-security:
+      - max-age=631139040; includeSubdomains
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+      x-download-options:
+      - noopen
+      x-frame-options:
+      - sameorigin
+      x-permitted-cross-domain-policies:
+      - none
+      x-powered-by:
+      - Phusion Passenger 4.0.53
+      x-request-id:
+      - e54d19b9-e66d-4e23-9774-94406eae607b
+      x-runtime:
+      - '0.048414'
+      x-xss-protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

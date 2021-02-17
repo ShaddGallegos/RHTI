@@ -1,0 +1,19 @@
+- name: create activation keys
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml  
+  tasks:
+  - name: "Create Foo host collection"
+    theforeman.foreman.katello_host_collection:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ item.host_collection }}"
+      description: "{{ item.description }}"
+      organization: "{{ item.organization | default ('Default Organization') }}"
+      state: present
+    with_items:
+      - "{{ host_collection_vars }}"
+

@@ -1,0 +1,116 @@
+---
+
+# Sapis
+manala_php_sapis_available:
+  - cli
+  - fpm
+  - cgi
+  - phpdbg
+
+# Extensions
+manala_php_extensions_available:
+  ############
+  # Embedded #
+  ############
+  - date
+  - ereg # 5.6 only (deprecated)
+  - filter
+  - hash
+  - libxml
+  - mhash # 5.6 only (deprecated)
+  - openssl
+  - pcntl
+  - pcre
+  - reflection
+  - session
+  - sodium # Starting from 7.2
+  - spl
+  - zlib
+  ##########
+  # Common #
+  ##########
+  - calendar
+  - ctype
+  - exif
+  - fileinfo
+  - ftp
+  - gettext
+  - iconv
+  - pdo
+  - phar
+  - posix
+  - shmop
+  - sockets
+  - sysvmsg
+  - sysvsem
+  - sysvshm
+  - tokenizer
+  #########
+  # Sapis #
+  #########
+  #- opcache
+  #- json
+  #- readline
+
+# Extensions - Pecl
+manala_php_extensions_pecl_available:
+    - amqp
+    - apcu
+    - apcu-bc
+    - ast
+    - ds
+    - gearman
+    - geoip
+    - gmagick
+    - http
+    - igbinary
+    - imagick
+    - mailparse
+    - memcache
+    - memcached
+    - mongo
+    - mongodb
+    - msgpack
+    - oauth
+    - propro
+    - radius
+    - raphf
+    - redis
+    - rrd
+    - sass
+    - smbclient
+    - solr
+    - ssh2
+    - stomp
+    - tideways
+    - uploadprogress
+    - uuid
+    - xcache
+    - xdebug
+    - yac
+    - yaml
+    - zmq
+
+# Applications
+manala_php_applications_patterns:
+  phpcs:
+    source: https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+  phpcbf:
+    source: https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
+  openl10n:
+    source_version: https://github.com/openl10n/openl10n-cli/releases/download/v{version}/openl10n.phar
+  phpunit:
+    source:         https://phar.phpunit.de/phpunit.phar
+    source_version: https://phar.phpunit.de/phpunit-{version}.phar
+  php-cs-fixer:
+    source: http://get.sensiolabs.org/php-cs-fixer.phar
+  couscous:
+    source: http://couscous.io/couscous.phar
+  security-checker:
+    source: http://get.sensiolabs.org/security-checker.phar
+  deptrac:
+    source: http://get.sensiolabs.de/deptrac.phar
+  wp-cli:
+    source: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  drush:
+    source_version: https://github.com/drush-ops/drush/releases/download/{version}/drush.phar

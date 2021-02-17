@@ -1,0 +1,15 @@
+- name: Publish a new content view to {{ item.content_view }}
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "Publish a content view"
+    theforeman.foreman.katello_content_view_version:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      content_view: "{{ content_view }}"
+      organization: "{{ organization | default ('Default Organization') }}"
+      lifecycle_environments: "{{ lifecycle_environments }}"

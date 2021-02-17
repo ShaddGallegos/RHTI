@@ -1,0 +1,30 @@
+{
+ "collection_info": {
+  "namespace": "manala",
+  "name": "roles",
+  "version": "0.1.92",
+  "authors": [
+   "Manala <contact@manala.io>"
+  ],
+  "readme": "README.md",
+  "tags": [],
+  "description": "The flexible, robust, and web oriented toolbox for Ansible",
+  "license": [
+   "MIT"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/manala/ansible-roles",
+  "documentation": "https://github.com/manala/ansible-roles",
+  "homepage": "http://www.manala.io/",
+  "issues": "https://github.com/manala/ansible-roles/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "ad8c83e2c0707be74629651bdaa1e28625d2d04bd8541f728be5bd54374e4dfd",
+  "format": 1
+ },
+ "format": 1
+}

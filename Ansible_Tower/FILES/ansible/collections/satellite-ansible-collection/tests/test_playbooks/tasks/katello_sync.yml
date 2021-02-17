@@ -1,0 +1,24 @@
+---
+- name: "Sync katello repository"
+  vars:
+    organization_name: "Test Organization"
+    product_name: "Test Product"
+  repository_sync:
+    username: "{{ foreman_username }}"
+    password: "{{ foreman_password }}"
+    server_url: "{{ foreman_server_url }}"
+    validate_certs: "{{ foreman_validate_certs }}"
+    organization: "{{ organization_name }}"
+    product: "{{ product_name }}"
+    repository: "{{ repository | default(omit) }}"
+  register: result
+- assert:
+    fail_msg: "Syncing repository failed! (expected_change: True)"
+    that:
+      - result.changed
+- assert:
+    fail_msg: "Syncing repository took longer or shorter than expected!"
+    that:
+      - (( result.task.ended_at | replace(' UTC', '') | to_datetime ) - ( result.task.started_at | replace(' UTC', '') | to_datetime )).total_seconds() >= 2
+  when: result.task
+...

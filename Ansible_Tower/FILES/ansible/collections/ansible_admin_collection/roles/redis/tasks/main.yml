@@ -1,0 +1,20 @@
+---
+
+# Install
+- import_tasks: install.yml
+  tags:
+    - manala_redis
+    - manala_redis.install
+
+# Config
+- import_tasks: config.yml
+  tags:
+    - manala_redis
+    - manala_redis.config
+
+# Services
+- import_tasks: services.yml
+  tags:
+    - manala_redis
+    - manala_redis.services
+    - manala.services

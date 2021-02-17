@@ -1,0 +1,30 @@
+---
+  - name: Install Firewalld
+    yum: name=firewalld state=installed
+
+  - name: Run firewalld now and at boot
+    service: name=firewalld state=started enabled=true
+
+  - name: Enable HTTPS via firewalld
+    firewalld: service=https permanent=true state=enabled
+    notify: restart firewalld
+
+  - name: Enable HTTP via firewalld
+    firewalld: service=http permanent=true state=enabled
+    notify: restart firewalld
+
+  - name: Enable Satellite SSL communication via firewalld
+    firewalld: port=5671/tcp permanent=true state=enabled
+    notify: restart firewalld
+
+  - name: Enable Tomcat via firewalld
+    firewalld: port=8080/tcp permanent=true state=enabled
+    notify: restart firewalld
+
+  - name: Enable Puppet via firewalld
+    firewalld: port=8140/tcp permanent=true state=enabled
+    notify: restart firewalld
+
+  - name: Enable Foreman via firewalld
+    firewalld: port=9090/tcp permanent=true state=enabled
+    notify: restart firewalld

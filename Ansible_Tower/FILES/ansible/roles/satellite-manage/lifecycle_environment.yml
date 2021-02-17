@@ -1,0 +1,20 @@
+- name: Manage Lifecycle Environments
+  hosts: localhost
+  gather_facts: false  
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "ensure Lifecycle Environment is {{ item.state }}"
+    theforeman.foreman.katello_lifecycle_environment:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ item.name }}"
+      label: "{{ item.label }}"
+      organization: "{{ item.organization | default ('Default Organization') }}"
+      prior: "{{ item.prior }}"
+      description: "{{ item.description | default (omit) }}"
+      state: "{{ item.state | default('present') }}"
+    with_items:
+      - "{{ lifecycle_environment_vars }}"

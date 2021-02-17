@@ -1,0 +1,19 @@
+- name: Upload RPMs to a products on satellite
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "upload rpm to product repo"
+    theforeman.foreman.katello_upload:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ item.name }}"
+      src: "{{ item.source }}"
+      repository: "{{ item.repository }}"
+      product: "{{ item.product }}"
+      organization: "{{ item.organization | default ('Default Organization') }}"
+    with_items:
+      - "{{ upload_rpm }}"

@@ -1,0 +1,116 @@
+---
+  - name: Fail if no Red Hat Subscription Manager authentication data is passed to the role
+    fail: msg="You must pass authentication data to this role. See README.md"
+    when: "( rhn_user is not defined or rhn_pass is not defined ) and rhn_activation_key is not defined and rhn_pool_ids is not defined" 
+
+  - name: Fail if OS is not RHEL
+    assert: { that: "ansible_distribution == 'RedHat'" } 
+
+  - name: Fail if OS is not RHEL 6.5 or higher
+    assert: { that: "ansible_distribution_version >= 6.5" } 
+  
+  - name: Check for Katello already installed
+    command: "rpm -q katello"
+    register: katello_installed
+    changed_when: False
+    ignore_errors: true
+
+  - name: Check for puppet in $PATH
+    command: "which puppet"
+    register: puppet_in_path
+    changed_when: False
+    ignore_errors: true
+
+  - fail: msg="Katello cannot be installed when a conflicting version of puppet is installed" 
+    when: "puppet_in_path.rc == 0 and katello_installed.rc == 1 "
+
+  - name: Check for Java in $PATH
+    command: "which java"
+    register: java_in_path
+    changed_when: False
+    ignore_errors: true
+
+  - fail: msg="Katello cannot be installed when a conflicting version of Java is installed" 
+    when: "java_in_path.rc == 0 and katello_installed.rc == 1 "
+  
+  ## http://stopdisablingselinux.com/
+  - name: SELinux is required for Satellite 6
+    shell: "test $(getenforce) == 'Enforcing'" 
+    changed_when: False
+
+  - name: Confirm DNS resolution for localhost
+    command: "ping -c1 localhost"
+    changed_when: False
+
+  - name: Confirm DNS resoultion for short domain name of this host
+    shell: "ping -c1 $(hostname -s)"
+    changed_when: False
+
+  - name: Confirm DNS resolution for fully-qualified domain name of this host
+    shell: "ping -c1 $(hostname -f)"
+    changed_when: False
+
+  ## NOTE: this only works if your version of ansible includes https://github.com/ansible/ansible-modules-core/pull/1204 
+  ## which was merged 2015-08-24. If your version of Ansible is older, you'll need to identify 
+  ## your subscription pool ids and pass those to the role instead. 
+  - name: Enable RHEL subscription via username/password
+    redhat_subscription: 
+      state: present 
+      username: "{{ rhn_user }}"
+      password: "{{ rhn_pass }}"
+      pool: ".*Red Hat (Enterprise Linux|Satellite).*"
+    when: rhn_user is defined and rhn_pass is defined
+
+  - name: Enable RHEL subscription via activation key
+    redhat_subscription: 
+      state: present 
+      activationkey: "{{ rhn_activationkey }}"
+      pool: ".*Red Hat (Enterprise Linux|Satellite).*"
+    when: rhn_activation_key is defined
+
+  - name: Add subs by pool id if your version of Ansible has a buggy redhat_subscription module
+    command: "subscription-manager subscribe --pool={{ item }}"
+    with_items: "{{ rhn_pool_ids | default([])}}"
+     
+  ## FIXME: these two tasks together shouldn't change the end-state, but neither is idempotent
+  - name: Reset enabled yum/rhn distros
+    command: subscription-manager repos --disable "*"
+    ignore_errors: true
+
+  ## Note: Satellite channel is rhel-<rhel version>-server-satellite-<satellite version>-rpms
+  - name: Only enable required yum/rhn distros
+    command: "subscription-manager repos \
+      --enable rhel-{{ ansible_distribution_major_version }}-server-rpms \
+      --enable rhel-server-rhscl-{{ ansible_distribution_major_version }}-rpms \
+      --enable rhel-{{ ansible_distribution_major_version }}-server-satellite-6.1-rpms"
+
+  ## Installs and activates time sync. This is required for Foreman to function
+  - include: timesync-6.yml
+    when: "{{ ansible_distribution_major_version }} == 6"
+
+  - include: timesync-7.yml
+    when: "{{ ansible_distribution_major_version }} == 7"
+  
+  ## Installs and configures firewall- comment out to leave firewall out
+  - include: firewall-6.yml
+    when: "{{ ansible_distribution_major_version }} == 6"
+
+  - include: firewall-7.yml
+    when: "{{ ansible_distribution_major_version }} == 7"
+
+  ## comment this line out to skip recommended but not required packages
+  - include: recommended-packages.yml
+
+  - name: Install Katello
+    yum: name=katello state=installed
+
+  - name: Copy answer file into place
+    copy: src=role-ansible-satellite6-answers.yaml dest=/etc/katello-installer/role-ansible-satellite6-answers.yaml
+    register: copied_answer_file
+
+  - name: Enable answer file
+    lineinfile: "dest=/etc/katello-installer/katello-installer.yaml line=':answer_file: /etc/katello-installer/role-ansible-satellite6-answers.yaml'"
+
+  - name: Run katello installer
+    command: katello-installer 
+    when: copied_answer_file.changed == true

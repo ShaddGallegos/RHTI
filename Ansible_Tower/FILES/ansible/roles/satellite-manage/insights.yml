@@ -1,0 +1,4 @@
+---
+plugin: redhatinsights.insights.insights
+compose:
+  ansible_host: insights_ip_addresses[0]

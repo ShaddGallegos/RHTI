@@ -1,0 +1,6 @@
+---
+# tasks file for vm-reboot
+
+- name: rebootify
+  reboot:
+

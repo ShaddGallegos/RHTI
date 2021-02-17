@@ -1,0 +1,64 @@
+---
+
+# Install
+- import_tasks: install.yml
+  tags:
+    - manala_php
+    - manala_php.install
+
+# Extensions
+- import_tasks: extensions.yml
+  tags:
+    - manala_php
+    - manala_php.extensions
+
+# Configs
+- include_tasks: configs.yml
+  loop: "{{
+    query(
+      'manala.roles.php_sapis',
+      manala_php_sapis|default(manala_php_sapis_default, True),
+      manala_php_sapis_available,
+      wantstate='present',
+      wantmap=true
+    )
+  }}"
+  loop_control:
+    loop_var: __manala_php_sapi
+  tags:
+    - manala_php
+    - manala_php.configs
+
+# Fpm pools
+- import_tasks: fpm_pools.yml
+  when: |
+    'fpm' in query(
+      'manala.roles.php_sapis',
+      manala_php_sapis|default(manala_php_sapis_default, True),
+      manala_php_sapis_available,
+      wantstate='present',
+      wantmap=true
+    )
+  tags:
+    - manala_php
+    - manala_php.fpm_pools
+
+# Blackfire
+- import_tasks: blackfire.yml
+  when: manala_php_blackfire
+  tags:
+    - manala_php
+    - manala_php.blackfire
+
+# Services
+- import_tasks: services.yml
+  tags:
+    - manala_php
+    - manala_php.services
+    - manala.services
+
+# Applications
+- import_tasks: applications.yml
+  tags:
+    - manala_php
+    - manala_php.applications

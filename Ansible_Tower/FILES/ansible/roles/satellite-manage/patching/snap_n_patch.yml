@@ -1,0 +1,61 @@
+---
+- name: create snapshot, patch and reboot, restore if hosts fails to return
+  hosts: all
+  serial: 1
+  tasks:
+  - name: create snapshot
+    vmware_guest_snapshot:
+      datacenter: "{{ datacenter_name }}"
+      folder: "{{ folder }}"
+      name: "{{ inventory_hostname }}"
+      state: present
+      snapshot_name: pre-upgrade
+    connection: local
+    become: false
+
+  - name: upgrade all packages
+    yum: 
+      name: '*' 
+      state: latest
+    
+  - name: check if reboot is required
+    shell: needs-restarting -r
+    failed_when: false
+    changed_when: false
+    register: reboot_required
+    
+  - when: reboot_required.rc != 0
+    block:
+    - name: reboot
+      reboot:
+        
+    - name: remove snapshot
+      vmware_guest_snapshot:  
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder }}"
+        name: "{{ inventory_hostname }}"
+        state: absent
+        snapshot_name: pre-upgrade
+      connection: local
+      become: false
+    
+  rescue:
+  - name: restore snapshot
+    vmware_guest_snapshot:
+      datacenter: "{{ datacenter_name }}"
+      folder: "{{ folder }}"
+      name: "{{ inventory_hostname }}"
+      state: revert
+      snapshot_name: pre-upgrade
+    connection: local
+    become: false
+    
+  - name: power on guest
+    vmware_guest:
+      name: "{{ inventory_hostname }}"
+      state: poweredon
+    connection: local
+    become: false
+    
+  - fail:
+      msg: "{{ inventory_hostname }} failed and was restored from its snapshot"

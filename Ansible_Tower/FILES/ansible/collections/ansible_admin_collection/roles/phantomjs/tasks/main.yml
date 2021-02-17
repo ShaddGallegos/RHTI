@@ -1,0 +1,20 @@
+---
+
+# Install
+- import_tasks: install.yml
+  tags:
+    - manala_phantomjs
+    - manala_phantomjs.install
+
+# Config
+- import_tasks: config.yml
+  tags:
+    - manala_phantomjs
+    - manala_phantomjs.config
+
+# Services
+- import_tasks: services.yml
+  tags:
+    - manala_phantomjs
+    - manala_phantomjs.services
+    - manala.services

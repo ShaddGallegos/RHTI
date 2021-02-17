@@ -1,0 +1,22 @@
+---
+
+- import_tasks: install.yml
+  tags:
+    - manala_telegraf
+    - manala_telegraf.install
+
+- import_tasks: config.yml
+  tags:
+    - manala_telegraf
+    - manala_telegraf.config
+
+- import_tasks: configs.yml
+  tags:
+    - manala_telegraf
+    - manala_telegraf.configs
+
+- import_tasks: services.yml
+  tags:
+    - manala_telegraf
+    - manala_telegraf.services
+    - manala.services

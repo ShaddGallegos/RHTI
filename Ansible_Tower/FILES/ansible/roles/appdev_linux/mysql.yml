@@ -1,0 +1,56 @@
+---
+
+- name: Install MySQL server
+  hosts: all
+  become: yes
+  tasks:
+    - name: install packages (Linuxmint, Ubuntu, Debian)
+      apt: name="{{ item }}" state=present
+      with_items:
+        - python-mysqldb
+        - mysql-server
+      when: ansible_distribution == 'Linuxmint' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: install packages (Fedora, CentOS, Red Hat)
+      yum: name="{{ item }}" state=present
+      with_items:
+        - MySQL-python
+        - mysql
+        - mysql-server
+      when: ansible_distribution == 'Fedora' or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+    - name: start the MySQL service
+      service:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: update mysql root password for all root accounts
+      mysql_user:
+        name: root
+        host: "{{ item }}"
+        password: "{{ mysql_root_password }}"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+        check_implicit_admin: yes
+        priv: "*.*:ALL,GRANT"
+      with_items:
+#        - "{{ ansible_hostname }}"
+        - 127.0.0.1
+        - ::1
+        - localhost
+
+    - name: create mysql database
+      mysql_db:
+        name: "{{ mysql_database_name }}"
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: change mysql default port number
+      lineinfile: dest=/etc/mysql/my.cnf regexp="^port" insertafter="^\[mysqld]" line="port = {{ mysql_server_port }}"
+      notify: restart mysql
+
+  handlers:
+    - name: restart mysql
+      service: name=mysql state=restarted

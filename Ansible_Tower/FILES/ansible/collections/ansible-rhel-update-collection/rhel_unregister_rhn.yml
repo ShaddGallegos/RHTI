@@ -1,0 +1,8 @@
+---
+
+- name: RHN unregister
+  hosts: all
+
+  roles:
+    - role: oatakan.rhn
+      role_action: unregister

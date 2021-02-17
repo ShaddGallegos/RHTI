@@ -1,0 +1,5 @@
+---
+ec2_region: us-east-1
+student_total: 2
+create_login_page: true
+towerinstall: true

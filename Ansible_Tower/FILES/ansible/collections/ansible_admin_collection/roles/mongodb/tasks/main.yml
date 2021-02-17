@@ -1,0 +1,26 @@
+---
+
+# Install
+- import_tasks: install.yml
+  tags:
+    - manala_mongodb
+    - manala_mongodb.install
+
+# Config
+- import_tasks: config.yml
+  tags:
+    - manala_mongodb
+    - manala_mongodb.config
+
+# Users
+- import_tasks: users.yml
+  tags:
+    - manala_mongodb
+    - manala_mongodb.users
+
+# Services
+- import_tasks: services.yml
+  tags:
+    - manala_mongodb
+    - manala_mongodb.services
+    - manala.services

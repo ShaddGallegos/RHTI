@@ -1,0 +1,41 @@
+- name: Sync all repositories
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: Get list of all repositories
+    theforeman.foreman.foreman_search_facts:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      resource: repositories
+    register: repositories
+
+  - name: Kick off repository Sync tasks
+    theforeman.foreman.katello_sync:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      product: "{{ item.product.name }}"
+      repository:  "{{ item.name }}"
+      organization: "{{ item.organization | default ('Default Organization') }}"
+    loop: "{{ repositories.resources }}"
+    when: item.url  # Not all repositories have a URL
+    async: 999999
+    poll: 0
+    register: repo_sync_sleeper
+
+  - name: Wait until all Syncs have finished
+    async_status:
+      jid: "{{ repo_sync_sleeper_item.ansible_job_id }}"
+    loop: "{{ repo_sync_sleeper.results }}"
+    loop_control:
+      loop_var: repo_sync_sleeper_item
+    when: repo_sync_sleeper_item.ansible_job_id is defined  # Skip items that were skipped in the previous task
+    register: async_job_result
+    until: async_job_result.finished
+    retries: 999
+    delay: 10

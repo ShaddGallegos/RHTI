@@ -1,0 +1,411 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-katello-3-14.yatsu.example.com/api/status
+  response:
+    body:
+      string: '{"result":"ok","status":200,"version":"1.24.0","api_version":2}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Length:
+      - '63'
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Fri, 03 Jan 2020 14:53:13 GMT
+      ETag:
+      - W/"53b0d6d0bf9fce118840f03bbd316797"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.24.0
+      Keep-Alive:
+      - timeout=5, max=10000
+      Server:
+      - Apache
+      Set-Cookie:
+      - _session_id=86ab4986210304d217b1297d79233a98; path=/; secure; HttpOnly; SameSite=Lax
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 36aee483-6829-40db-996c-ee844407c56c
+      X-Runtime:
+      - '0.089740'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=86ab4986210304d217b1297d79233a98
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-katello-3-14.yatsu.example.com/katello/api/organizations?search=name%3D%22Test+Organization%22&per_page=4294967296
+  response:
+    body:
+      string: "{\n  \"total\": 2,\n  \"subtotal\": 1,\n  \"page\": 1,\n  \"per_page\"\
+        : 4294967296,\n  \"search\": \"name=\\\"Test Organization\\\"\",\n  \"sort\"\
+        : {\n    \"by\": null,\n    \"order\": null\n  },\n  \"results\": [{\"label\"\
+        :\"Test_Organization\",\"created_at\":\"2020-01-03 13:59:47 UTC\",\"updated_at\"\
+        :\"2020-01-03 14:52:31 UTC\",\"id\":4,\"name\":\"Test Organization\",\"title\"\
+        :\"Test Organization\",\"description\":\"A test organization\"}]\n}\n"
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Fri, 03 Jan 2020 14:53:13 GMT
+      ETag:
+      - W/"e0a898f81b9b53cdb6f6756852f62097-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.24.0
+      Keep-Alive:
+      - timeout=5, max=9999
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 9c02485d-e8df-4ab1-b901-80b10768a787
+      X-Runtime:
+      - '0.026524'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '388'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=86ab4986210304d217b1297d79233a98
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-katello-3-14.yatsu.example.com/katello/api/repository_sets?organization_id=4&search=label%3D%22rhel-7-server-rpms%22&per_page=4294967296
+  response:
+    body:
+      string: '{"total":1666,"subtotal":1,"page":1,"per_page":"4294967296","error":null,"search":"label=\"rhel-7-server-rpms\"","sort":{"by":"name","order":"asc"},"results":[{"enabled":true,"product":{"id":45,"name":"Red
+        Hat Enterprise Linux Server"},"repositories":[{"id":81,"name":"Red Hat Enterprise
+        Linux 7 Server RPMs x86_64 7.2","arch":"x86_64","releasever":"7.2"},{"id":82,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.6","arch":"x86_64","releasever":"7.6"},{"id":83,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.1","arch":"x86_64","releasever":"7.1"},{"id":84,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.0","arch":"x86_64","releasever":"7.0"},{"id":85,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.7","arch":"x86_64","releasever":"7.7"},{"id":86,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.4","arch":"x86_64","releasever":"7.4"},{"id":87,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7Server","arch":"x86_64","releasever":"7Server"},{"id":88,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.3","arch":"x86_64","releasever":"7.3"},{"id":89,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.5","arch":"x86_64","releasever":"7.5"}],"name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","vendor":"Red Hat","label":"rhel-7-server-rpms","id":"2456","type":"yum","gpgUrl":"file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release","contentUrl":"/content/dist/rhel/server/7/$releasever/$basearch/os"}]}
+
+        '
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Fri, 03 Jan 2020 14:53:13 GMT
+      ETag:
+      - W/"ed1b08fdb40034ac6ce572e587f48440-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - 4; Test Organization
+      Foreman_version:
+      - 1.24.0
+      Keep-Alive:
+      - timeout=5, max=9998
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 750c4b80-36ef-4c26-bea9-6c6625df7ef8
+      X-Runtime:
+      - '0.074079'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '1453'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=86ab4986210304d217b1297d79233a98
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-katello-3-14.yatsu.example.com/katello/api/repository_sets/2456?organization_id=4
+  response:
+    body:
+      string: '  {"enabled":true,"product":{"id":45,"name":"Red Hat Enterprise Linux
+        Server"},"repositories":[{"id":81,"name":"Red Hat Enterprise Linux 7 Server
+        RPMs x86_64 7.2","arch":"x86_64","releasever":"7.2"},{"id":82,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.6","arch":"x86_64","releasever":"7.6"},{"id":83,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.1","arch":"x86_64","releasever":"7.1"},{"id":84,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.0","arch":"x86_64","releasever":"7.0"},{"id":85,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.7","arch":"x86_64","releasever":"7.7"},{"id":86,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.4","arch":"x86_64","releasever":"7.4"},{"id":87,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7Server","arch":"x86_64","releasever":"7Server"},{"id":88,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.3","arch":"x86_64","releasever":"7.3"},{"id":89,"name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.5","arch":"x86_64","releasever":"7.5"}],"name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","vendor":"Red Hat","label":"rhel-7-server-rpms","id":"2456","type":"yum","gpgUrl":"file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release","contentUrl":"/content/dist/rhel/server/7/$releasever/$basearch/os"}
+
+        '
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Fri, 03 Jan 2020 14:53:13 GMT
+      ETag:
+      - W/"8c1caf7009d2de1e10d351a3c3572f66-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - 4; Test Organization
+      Foreman_version:
+      - 1.24.0
+      Keep-Alive:
+      - timeout=5, max=9997
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - c34fcc89-98de-4c84-8374-78703c3bafba
+      X-Runtime:
+      - '0.032002'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '1294'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=86ab4986210304d217b1297d79233a98
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://centos7-katello-3-14.yatsu.example.com/katello/api/products/45/repository_sets/2456/available_repositories?organization_id=4
+  response:
+    body:
+      string: '{"total":9,"subtotal":9,"page":null,"per_page":null,"error":null,"search":null,"sort":{"by":null,"order":null},"results":[{"substitutions":{"releasever":"7Server","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7Server/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7Server","pulp_id":"437ff25f-3a71-419a-946a-8580c70152be","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":87},{"substitutions":{"releasever":"7.7","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.7/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.7","pulp_id":"4edc8075-421f-4132-b41e-22e76c7d07c1","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":85},{"substitutions":{"releasever":"7.6","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.6/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.6","pulp_id":"c04edffa-024f-407f-90ed-20015c0c4222","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":82},{"substitutions":{"releasever":"7.5","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.5/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.5","pulp_id":"f2ff417c-e20d-4d93-88b2-dcdd0482e394","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":89},{"substitutions":{"releasever":"7.4","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.4/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.4","pulp_id":"a7b3d40a-37d5-4dd4-9f39-b3bce278b91b","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":86},{"substitutions":{"releasever":"7.3","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.3/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.3","pulp_id":"1be602c1-88e8-4189-a9ca-dfe302f7fc1b","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":88},{"substitutions":{"releasever":"7.2","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.2/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.2","pulp_id":"731377c0-1a71-4b87-b197-4d45fe6d961d","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":81},{"substitutions":{"releasever":"7.1","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.1/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.1","pulp_id":"b0504663-c89e-4af0-b8dd-d69b09a818ff","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":83},{"substitutions":{"releasever":"7.0","basearch":"x86_64"},"path":"/content/dist/rhel/server/7/7.0/x86_64/os","repo_name":"Red
+        Hat Enterprise Linux 7 Server RPMs x86_64 7.0","pulp_id":"16eec2d5-35e9-4e4a-bdcc-23c12cc08ea1","name":"Red
+        Hat Enterprise Linux 7 Server (RPMs)","enabled":true,"promoted":false,"repository_id":84}]}
+
+        '
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Fri, 03 Jan 2020 14:53:13 GMT
+      ETag:
+      - W/"fff99d75c799d82bb99c008c942fca7d-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - 4; Test Organization
+      Foreman_version:
+      - 1.24.0
+      Keep-Alive:
+      - timeout=5, max=9996
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - e7517f0d-23ad-4dd5-a5e5-acef28256f5c
+      X-Runtime:
+      - '0.974369'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '3052'
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,65 @@
+                               WNX0OkkxxxxkkOKXW                          
+                           NKkxol:;;;;;;;;;;;:clx0N                       
+                       WXOdl:;;;;::::::::::::::;;;cxKW                    
+                     W0dc;;:::::;::;:;;:::::::::::;;:o0N                  
+                   W0o;;;;:;::;::;;:;;;::::::::::;;:,';l0W                
+                  Xd:;;::::;;;;:;',::::::;;;::;,,;:;'.,;:O                
+                 Kl;;::::::::;;,;',;;;;,;:;,;,;cc;,,;l;,,dW               
+                Xo;;::;;::;;;:cldl;:ccloxko::lxkkl,:xko;,dW               
+               Wx;;:::::;:,;okkOOkxkOkOOOOOkkOOOOkdxOOk:,O                
+               No,::::;::;,lkOOOOOOOOOOOOOOOOOOOOOOOOOkolK                
+               No,::::::;,ckOOOOOOOOOOOOOOOOOOOOOOOOOOOxo0                
+               Wk;;::::;,lkOOOOOOOOOOOOOOOOOkkkOOkOOOOkkokW               
+                Kl,;,,,;okOOOOOOOOkxddxxxkkkkkkxdxkxdxkkdx0K000X          
+              W0xoodo:,:lllllllloold0XNWWWWWWWWWKxloONWWWWWWWW0kX         
+              KoxOOOOkdooolllcccc;c0MMMMMMMMMXxo0XcoNMMMMMNxoONk0         
+              OoxOOOOOOOOOOOOOOOOkokWMMMMMMMM0;.oOlc0WMMMMK:.l0kK         
+              XxokOOOkkkOOOOOOOOOkxoodxkkkxxkkdoddxddkOOOOkdlkOKW         
+               NOdooooxOOOOOOOOOOOkxoodkkxdodxxxkOOOkkxxxxxdlO            
+                 KolxkOOOOOOOOOOOOOOOkOOOOOOOOOOOOOOOOOOOOOkoxW           
+                 WOoxOOOOOOOOOOOOOOOOOOkxxkOkOOOOOOOOOOOOOOOddN           
+                  NkokOOOOOOOOOOOOOkxdo::okOOOOOOOOOOkOOOOOOddX           
+                   NxokOOOOOOOOOOOOkdool:;;:clllllccldkkOOOkoxW           
+                    XxokOOOOOOOOOOOOOOOOkdl;'......:dkOOOOOxo0            
+                     NOddkOOOOOOOOOOOOOOOOOkxdllclxkOOOOOkdo0W            
+                       XkddkOOOOOOOOOOOOOOOOOkOOOOOOOOOOxdxKW             
+                        WXOddxkOOOOOOOOOOOOOkOOOOOOOOkxdx0W               
+                           N0kxddkkOOOOOOOOOOOOOOOkxddk0N                 
+                             WXocooodddxxkkkkxxddxxk0XW                   
+                          WKOxocdkkxdoooooooclkOKXW                       
+                       WXOdllooccoodxxkkkkkx::oxON                        
+                      XklloddddoolcclllllllcclolloON                      
+                    WOolododoododdodddoooooooddodolo0W                    
+                   NxlooodddddodddooddddddooodooooollxX                   
+                  XdcoooooddddoddddddoddddoddoodooddoloK                  
+                 XdcododddddddooollodddodddddddddooddoloK                 
+                Xdcoooodddddddddl;cddooddddddddddoodddocdN                
+               Ndcoooodddddddddo::oddddoddoddddddodddddockW               
+              Ndcoooodddddddddo::oddddoddddoddddddodddddockW               
+             Xdcoooodddddddddo::oddddoddoddddoddddddodddddockW               
+            Ndcoooodddddddddo::oddddoddddoddddoddddddodddddockW               
+            Ndcoooodddddddddo::oddddoddddoddddodddddddodddddockW               
+           Xdcoooodddddddddo::oddddoddoddddooododddddddodddddockW               
+        _  _  doodddddddodo: _ odddddd   _  _  _  _  _  _  ooookW   _    
+     _ (_)(_) _   oooooodo: (_) dddd  _ (_)(_)(_)(_)(_)(_) oooookW (_)   
+    (_)      (_)    _  _    (_) o  _ (_)   (_)         (_) oooookW (_)   
+    (_)    _  _  _ (_)(_) _ (_) _ (_)      (_) _       (_)_  okW  _(_)   
+    (_)   (_)(_)(_)      (_)(_)(_) _       (_)(_)        (_)  o  (_)     
+    (_)      (_)(_)      (_)(_)   (_) _    (_)            (_)   (_)      
+    (_) _  _ (_)(_) _  _ (_)(_)      (_) _ (_) _  _  _     (_)_(_)       
+       (_)(_)(_)   (_)(_)   (_)         (_)(_)(_)(_)(_)      (_)         
+
+
+[1;37m@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+                              HOSTNAME  ===>  {{ ansible_hostname }} 
+                             IP ADDRESS ===>  {{ ansible_default_ipv4["address"] }} 
+	        --------------------------------------------------------------------
+
+		KERNEL		{{ ansible_kernel }}
+		ARCH		{{ ansible_machine }}
+		MACHINE		{{ ansible_system_vendor }} :: {{ ansible_product_version }}
+		COREs		{{ ansible_processor_cores }}
+
+	        --------------------------------------------------------------------
+[0m

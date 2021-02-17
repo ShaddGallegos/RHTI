@@ -1,0 +1,16 @@
+- name: Promote lifecycle environment data.
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "Promote {{ current_lifecycle_environment }} to {{ promote_lifecycle_environment }}"
+    theforeman.foreman.katello_content_view_version:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      content_view: "{{ content_view }}"
+      organization: "{{ organization | default ('Default Organization') }}"
+      current_lifecycle_environment: "{{ current_lifecycle_environment }}"
+      lifecycle_environments: "{{ promote_lifecycle_environment }}"

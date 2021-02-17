@@ -1,0 +1,100 @@
+---
+- name: PXE Server Setup
+  hosts: Satellite
+  become: true
+  gatather_facts: false 
+
+  vars_prompt:
+    - name: "rhn_username"
+      prompt: "Enter Red Hat Network username"
+    - name: "rhn_password"
+      prompt: "Enter Red Hat Networt password"
+      private: yes
+
+  tasks:
+  - name: Subscribe to RHEL 
+    community.general.redhat_subscription:
+      state: present
+      username: {{ rhn_username }}
+      password: {{ rhn_password }}
+      auto_attach: true
+
+  - name: Disable all RHSM repositories
+    rhsm_repository:
+      name: '*'
+      state: disabled
+  
+  - name: Enable required repositories starting with RedHat, CentOS, or ScientificLinux on OS version 7
+    rhsm_repository:
+      name: 
+      - rhel-7-server-rpms
+      - rhel-7-server-extras-rpms
+      - rhel-7-server-optional-rpms
+      - rhel-7-server-supplementary-rpms
+      - rhel-7-server-ansible-2.9-rpms
+      state: enabled
+      when: (ansible_distribution in ['RedHat', 'CentOS', 'ScientificLinux'] and ansible_distribution_major_version == "7")  
+
+  - name: Enable required repositories starting with RedHat, CentOS, or ScientificLinux on OS version 8
+    rhsm_repository:
+      name: 
+      - rhel-8-for-x86_64-baseos-rpms 
+      - rhel-8-for-x86_64-appstream-rpms
+      - rhel-8-for-x86_64-supplementary-rpms
+      - ansible-2.9-for-rhel-8-x86_64-rpms
+      state: enabled
+      when: (ansible_distribution in ['RedHat', 'CentOS', 'ScientificLinux'] and ansible_distribution_major_version == "8") 
+
+  - name: Upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Enable EPEL Repository on OS version 7
+    yum:
+      name: epel-release
+      state: latest
+      when: ansible_distribution in ['RedHat', 'CentOS', 'ScientificLinux'] and ansible_distribution_major_version == "7")
+
+  - name: Enable EPEL Repository on OS version 8
+    yum:
+      name: epel-release
+      state: latest
+      when: (ansible_distribution in ['RedHat', 'CentOS', 'ScientificLinux'] and ansible_distribution_major_version == "8")
+
+  - name: Install required packages
+    yum:
+      name: "{{ packages }}"
+        - dnsmasq
+        - syslinux
+        - tftp-server
+        - tftp
+        - vsftpd
+        - dhcp
+        - bind
+        - nfs
+        - httpd
+      state: latest
+
+  - name: stat dnsmasq.conf.backup
+    stat: path=/etc/dnsmasq.conf.backup
+    register: dnsmasq_conf_backup
+
+  - name: Move /etc/dnsmasq.conf to /etc/dnsmasq.conf.backup
+    command: mv /etc/dnsmasq.conf /etc/dnsmasq.conf.backup
+    when: dnsmasq_conf_backup.stat.exists == false
+
+
+systemctl start dnsmasq
+systemctl status dnsmasq
+systemctl start vsftpd
+systemctl status vsftpd
+systemctl enable dnsmasq
+systemctl enable vsftpd
+
+firewall-cmd --add-service=ftp --permanent  	#Port 21
+firewall-cmd --add-service=dns --permanent  	#Port 53
+firewall-cmd --add-service=dhcp --permanent  	#Port 67
+firewall-cmd --add-port=69/udp --permanent  	#Port for TFTP
+firewall-cmd --add-port=4011/udp --permanent  #Port for ProxyDHCP
+firewall-cmd --reload  #Apply rules

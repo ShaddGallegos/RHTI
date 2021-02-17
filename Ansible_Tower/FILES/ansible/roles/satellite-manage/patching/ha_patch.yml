@@ -1,0 +1,18 @@
+---
+- name: patching H.A rhel servers
+  hosts: "{{ ha_group | default all }}"
+  serial: 40%
+  tasks:
+  - name: update all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Check for reboot hint.
+    shell: LAST_KERNEL=$(rpm -q --last kernel | awk 'NR==1{sub(/kernel-/,""); print $1}'); CURRENT_KERNEL=$(uname -r); if [ $LAST_KERNEL != $CURRENT_KERNEL ]; then echo 'reboot'; else echo 'no'; fi
+    ignore_errors: true
+    register: reboot_hint
+
+  - name: Reboot the server and wait for it to come back up.
+    reboot:
+    when: reboot_hint.stdout.find("reboot") != -1

@@ -1,0 +1,1616 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/status
+  response:
+    body:
+      string: '{"result":"ok","status":200,"version":"1.23.1","api_version":2}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Length:
+      - '63'
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:28 GMT
+      ETag:
+      - W/"f26fab35869f9a602399f2f56dc6b2ef"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=100
+      Server:
+      - Apache
+      Set-Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e; path=/; secure; HttpOnly; SameSite=Lax
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - c94c5702-8b54-41b4-afb1-df2134aa266b
+      X-Runtime:
+      - '0.125932'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables?per_page=4294967296
+  response:
+    body:
+      string: "{\n  \"total\": 16,\n  \"subtotal\": 16,\n  \"page\": 1,\n  \"per_page\":
+        4294967296,\n  \"search\": null,\n  \"sort\": {\n    \"by\": null,\n    \"order\":
+        null\n  },\n  \"results\": [{\"os_family\":null,\"created_at\":\"2019-12-05
+        19:35:23 UTC\",\"updated_at\":\"2019-12-05 19:35:23 UTC\",\"name\":\"A second
+        partition table\",\"id\":116},{\"os_family\":\"Suse\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:27 UTC\",\"name\":\"AutoYaST
+        entire SCSI disk\",\"id\":97},{\"os_family\":\"Suse\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:27 UTC\",\"name\":\"AutoYaST
+        entire virtual disk\",\"id\":98},{\"os_family\":\"Suse\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:27 UTC\",\"name\":\"AutoYaST
+        LVM\",\"id\":99},{\"os_family\":\"Coreos\",\"created_at\":\"2019-12-05 14:12:04
+        UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"CoreOS default
+        fake\",\"id\":100},{\"os_family\":\"Rancheros\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Empty\",\"id\":101},{\"os_family\":\"Freebsd\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"FreeBSD
+        default fake\",\"id\":102},{\"os_family\":\"Solaris\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Jumpstart
+        default\",\"id\":103},{\"os_family\":\"Solaris\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Jumpstart
+        mirrored\",\"id\":104},{\"os_family\":\"Junos\",\"created_at\":\"2019-12-05
+        14:12:04 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Junos
+        default fake\",\"id\":105},{\"os_family\":\"Redhat\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Kickstart
+        default\",\"id\":106},{\"os_family\":\"Redhat\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Kickstart
+        default thin\",\"id\":107},{\"os_family\":\"NXOS\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"NX-OS
+        default fake\",\"id\":108},{\"os_family\":\"Debian\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Preseed
+        default\",\"id\":109},{\"os_family\":\"Debian\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"Preseed
+        default LVM\",\"id\":110},{\"os_family\":\"Xenserver\",\"created_at\":\"2019-12-05
+        14:12:05 UTC\",\"updated_at\":\"2019-12-05 19:35:28 UTC\",\"name\":\"XenServer
+        default\",\"id\":111}]\n}\n"
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"eeef17365f078d7f94ea38bdb3c3dedf-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=99
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - f4e4836e-d979-4037-803f-86a5d899286f
+      X-Runtime:
+      - '0.021468'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '2367'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/116
+  response:
+    body:
+      string: '{"layout":"zerombr\nclearpart --all --initlabel\nautopart\n","locked":false,"os_family":null,"created_at":"2019-12-05
+        19:35:23 UTC","updated_at":"2019-12-05 19:35:23 UTC","name":"A second partition
+        table","id":116,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"e238fc11491bde8cb7ddaec98e56c5e2-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=98
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 9dceb78e-7720-472b-88fa-6e931587efc7
+      X-Runtime:
+      - '0.018121'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '443'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/97
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: AutoYaST entire SCSI disk\nmodel:
+        Ptable\noses:\n- SLES\n- OpenSUSE\n%>\n  <partitioning  config:type=\"list\">\n    <drive>\n      <device>/dev/sda</device>\n      <use>all</use>\n    </drive>\n  </partitioning>\n","locked":false,"os_family":"Suse","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:27 UTC","name":"AutoYaST entire
+        SCSI disk","id":97,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"bbf1fffcdb3151979f09b0b4cbb567a2-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=97
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 4e6fa2a7-230c-4622-8327-191b8010349b
+      X-Runtime:
+      - '0.018133'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '725'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/98
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: AutoYaST entire virtual disk\nmodel:
+        Ptable\noses:\n- SLES\n- OpenSUSE\n%>\n  <partitioning  config:type=\"list\">\n    <drive>\n      <device>/dev/vda</device>\n      <use>all</use>\n    </drive>\n  </partitioning>\n","locked":false,"os_family":"Suse","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:27 UTC","name":"AutoYaST entire
+        virtual disk","id":98,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"68b5c1093a382dacfb1056776ce45289-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=96
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 68740759-4e13-45f3-a809-8818519a3be6
+      X-Runtime:
+      - '0.018474'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '731'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/99
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: AutoYaST LVM\nmodel: Ptable\noses:\n-
+        SLES\n- OpenSUSE\n%>\n  <partitioning config:type=\"list\">\n    <drive>\n      <device>/dev/sda</device>\n      <initialize
+        config:type=\"boolean\">true</initialize>\n      <partitions config:type=\"list\">\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">ext3</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <mount>/boot</mount>\n          <partition_id
+        config:type=\"integer\">131</partition_id>\n          <partition_nr config:type=\"integer\">1</partition_nr>\n          <size>1G</size>\n          <stripes
+        config:type=\"integer\">1</stripes>\n          <stripesize config:type=\"integer\">4</stripesize>\n          <subvolumes
+        config:type=\"list\"/>\n        </partition>\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <format config:type=\"boolean\">false</format>\n          <lvm_group>vg00</lvm_group>\n          <partition_id
+        config:type=\"integer\">142</partition_id>\n          <partition_nr config:type=\"integer\">2</partition_nr>\n          <size>max</size>\n        </partition>\n      </partitions>\n      <pesize></pesize>\n      <type
+        config:type=\"symbol\">CT_DISK</type>\n      <use>all</use>\n    </drive>\n    <drive>\n      <device>/dev/vg00</device>\n      <initialize
+        config:type=\"boolean\">true</initialize>\n      <partitions config:type=\"list\">\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">ext3</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <lv_name>root</lv_name>\n          <mount>/</mount>\n          <size>4G</size>\n        </partition>\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">swap</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <lv_name>swap</lv_name>\n          <mount>swap</mount>\n          <size>8G</size>\n        </partition>\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">ext3</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <lv_name>usr</lv_name>\n          <mount>/usr</mount>\n          <size>8G</size>\n        </partition>\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">ext3</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <lv_name>tmp</lv_name>\n          <mount>/tmp</mount>\n          <size>4G</size>\n        </partition>\n        <partition>\n          <create
+        config:type=\"boolean\">true</create>\n          <filesystem config:type=\"symbol\">ext3</filesystem>\n          <format
+        config:type=\"boolean\">true</format>\n          <lv_name>var</lv_name>\n          <mount>/var</mount>\n          <size>4G</size>\n        </partition>\n      </partitions>\n      <type
+        config:type=\"symbol\">CT_LVM</type>\n      <use>all</use>\n    </drive>\n  </partitioning>\n","locked":false,"os_family":"Suse","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:27 UTC","name":"AutoYaST LVM","id":99,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"39c5f42c88ef3790db30cebdbb55d4f9-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=95
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - ea95f46a-23ee-41bf-94b6-bf6d8982bd7e
+      X-Runtime:
+      - '0.018532'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '3654'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/100
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: CoreOS default fake\nmodel: Ptable\noses:\n-
+        CoreOS\n%>\n# Not supported with coreos-install\n","locked":false,"os_family":"Coreos","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"CoreOS default
+        fake","id":100,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":1,"name":"Default Organization","title":"Default
+        Organization","description":null},{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"91961bf651a5b9916bb5dcc731887cd9-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=94
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 4fdfa5bb-3ac0-4ed5-b845-ec2f01fefcfa
+      X-Runtime:
+      - '0.018078'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '602'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/101
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Empty\nmodel: Ptable\noses:\n-
+        RancherOS\n-%>\n","locked":false,"os_family":"Rancheros","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Empty","id":101,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"5265d906fde3696fa9b9fc6a8960688a-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=93
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - e4965fe9-0f69-464e-b361-d18c60cf29f4
+      X-Runtime:
+      - '0.018474'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '544'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/102
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: FreeBSD default fake\nmodel: Ptable\noses:\n-
+        FreeBSD\n%>\n# Not supported with zfsinstall\n","locked":false,"os_family":"Freebsd","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"FreeBSD default
+        fake","id":102,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":1,"name":"Default Organization","title":"Default
+        Organization","description":null},{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"54f0f51d128798138b2fd4adb59ac839-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=92
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 4e7336c0-f583-485a-9697-f0d77b12178c
+      X-Runtime:
+      - '0.018929'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '602'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/103
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Jumpstart default\nmodel: Ptable\noses:\n-
+        Solaris\n%>\nfilesys c0t0d0s0 7000 /\nfilesys c0t0d0s1 1000 swap\nfilesys
+        c0t0d0s3 15 unnamed\nfilesys c0t0d0s7 free /tmp2\n","locked":false,"os_family":"Solaris","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Jumpstart default","id":103,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"4c8f55a1951e8b6e54942aceaab6957f-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=91
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 063ee80d-f0ff-44c3-955c-3f9940640f6f
+      X-Runtime:
+      - '0.018975'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '674'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/104
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Jumpstart mirrored\nmodel: Ptable\noses:\n-
+        Solaris\n%>\nfilesys mirror:d10 c1t0d0s0 c1t1d0s0 16000 /\nfilesys mirror:d20
+        c1t0d0s1 c1t1d0s1 8000 swap\nfilesys mirror:d40 c1t0d0s4 c1t1d0s4 free /var/tmp\nmetadb
+        c1t0d0s7 size 8192 count 3\nmetadb c1t1d0s7 size 8192 count 3\n","locked":false,"os_family":"Solaris","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Jumpstart mirrored","id":104,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"5e6f4550cfa2dbf1e5c7352ec53ca8f1-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=90
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 2e9f5e83-c31c-4a46-b2b1-0d456374f3c6
+      X-Runtime:
+      - '0.018451'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '781'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/105
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Junos default fake\nmodel: Ptable\noses:\n-
+        Junos\n%>\n# Not required for Junos ZTP provisioning.\n","locked":false,"os_family":"Junos","created_at":"2019-12-05
+        14:12:04 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Junos default
+        fake","id":105,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":1,"name":"Default Organization","title":"Default
+        Organization","description":null},{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"84776224d50fccb7c3631e7ce7ed4908-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=89
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 8097aeb1-7e36-44c6-9c19-cbe67777e1fd
+      X-Runtime:
+      - '0.018876'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '605'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/106
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Kickstart default\nmodel: Ptable\noses:\n-
+        CentOS\n- Fedora\n- RedHat\n%>\nzerombr\nclearpart --all --initlabel\nautopart
+        <%= host_param(''autopart_options'') %>\n","locked":false,"os_family":"Redhat","created_at":"2019-12-05
+        14:12:05 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Kickstart default","id":106,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"296b9615c561e5e4f20e6d501d6f6cb5-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=88
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - c9a4daf4-24c3-4fc3-a8c5-9a9ea835adc5
+      X-Runtime:
+      - '0.018476'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '667'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/107
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Kickstart default thin\nmodel:
+        Ptable\noses:\n- CentOS\n- Fedora\n- RedHat\n- oVirt\n- RHVH\n%>\nzerombr\nclearpart
+        --all --initlabel\nautopart --type=thinp <%= host_param(''autopart_options'')
+        %>\n","locked":false,"os_family":"Redhat","created_at":"2019-12-05 14:12:05
+        UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Kickstart default thin","id":107,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"f3dd38b1be3c17a23e4d1513e515cd24-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=87
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 3b52cf0c-f061-4d3f-8dbe-faefc55c5f9f
+      X-Runtime:
+      - '0.018601'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '707'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/108
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: NX-OS default fake\nmodel: Ptable\noses:\n-
+        NX-OS\n%>\n# Not required for NX-OS POAP provisioning.\n","locked":false,"os_family":"NXOS","created_at":"2019-12-05
+        14:12:05 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"NX-OS default
+        fake","id":108,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":1,"name":"Default Organization","title":"Default
+        Organization","description":null},{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"187798464565255e0c38ffd55c979c21-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=86
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 74557787-d1ba-4aac-a30e-1b03656f2353
+      X-Runtime:
+      - '0.019275'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '605'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/109
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Preseed default\nmodel: Ptable\noses:\n-
+        Debian\n- Ubuntu\n%>\n<%\n  partitioning_method = host_param(''partitioning-method'')
+        ? host_param(''partitioning-method'') : ''regular''\n  partitioning_recipe
+        = host_param(''partitioning-recipe'') ? host_param(''partitioning-recipe'')
+        : ''atomic''\n  partitioning_expert_recipe = host_param(''partitioning-expert-recipe'')
+        ? host_param(''partitioning-expert-recipe'') : ''''\n  vg_name = host_param(''partitioning-vg-name'')
+        ? host_param(''partitioning-vg-name'') : ''''\n  partitioning_filesystem =
+        host_param(''partitioning-filesystem'') ? host_param(''partitioning-filesystem'')
+        : ''''\n-%>\n\n<% if host_param(''install-disk'') -%>\nd-i partman-auto/disk
+        string <%= host_param(''install-disk'') %>\nd-i grub-installer/bootdev string
+        <%= host_param(''install-disk'') %>\n<% else -%>\n# Use the first detected
+        hard disk\nd-i partman/early_command string \\\n  INSTALL_DISK=\"$(list-devices
+        disk | head -n1)\"; \\\n  debconf-set partman-auto/disk \"$INSTALL_DISK\";
+        \\\n  debconf-set grub-installer/bootdev \"$INSTALL_DISK\"\n<% end -%>\n\n###
+        Partitioning\n# The presently available methods are: \"regular\", \"lvm\"
+        and \"crypto\"\nd-i partman-auto/method string <%= partitioning_method %>\n\n#
+        If one of the disks that are going to be automatically partitioned\n# contains
+        an old LVM configuration, the user will normally receive a\n# warning. This
+        can be preseeded away...\nd-i partman-lvm/device_remove_lvm boolean true\n#
+        The same applies to pre-existing software RAID array:\nd-i partman-md/device_remove_md
+        boolean true\n# And the same goes for the confirmation to write the lvm partitions.\nd-i
+        partman-lvm/confirm boolean true\nd-i partman-lvm/confirm_nooverwrite boolean
+        true\n\n<% if partitioning_method == ''lvm'' -%>\n# For LVM partitioning,
+        you can select how much of the volume group to use\n# for logical volumes.\nd-i
+        partman-auto-lvm/guided_size string max\n<% if vg_name != '''' -%>\nd-i partman-auto-lvm/new_vg_name
+        string <%= vg_name %>\n<% end -%>\n<% end -%>\n\n<% if host_param_true?(''partitioning-allow-noswap'')
+        -%>\nd-i partman-basicfilesystems/no_swap boolean false\n<% end -%>\n\n<%
+        if host_param(''partitioning-disk-label'') -%>\nd-i partman-partitioning/choose_label
+        string <%= host_param(''partitioning-disk-label'') %>\nd-i partman-partitioning/default_label
+        string <%= host_param(''partitioning-disk-label'') %>\n<% end -%>\n\n# You
+        can choose one of the three predefined partitioning recipes:\n# - atomic:
+        all files in one partition\n# - home:   separate /home partition\n# - multi:  separate
+        /home, /var, and /tmp partitions (/usr was removed in jessie)\nd-i partman-auto/choose_recipe
+        select <%= partitioning_recipe %>\n\n<% if partitioning_expert_recipe != ''''
+        -%>\n# Or provide a recipe of your own...\n# If you have a way to get a recipe
+        file into the d-i environment, you can\n# just point at it.\nd-i partman-auto/expert_recipe
+        string \\\n<%= partitioning_expert_recipe.gsub(/(?:\\n\\r?|\\r\\n?)/, \" \\\\\\n\")
+        %>\n\n<% end -%>\n\n# If you just want to change the default filesystem to
+        something\n# else, you can do that without providing a full recipe.\n<% if
+        partitioning_filesystem != '''' -%>\nd-i partman/default_filesystem string
+        <%= partitioning_filesystem %>\n<% end -%>\n\n# This makes partman automatically
+        partition without confirmation, provided\n# that you told it what to do using
+        one of the methods above.\nd-i partman/confirm_write_new_label boolean true\nd-i
+        partman/choose_partition select finish\nd-i partman/confirm boolean true\nd-i
+        partman/confirm_nooverwrite boolean true\n","locked":false,"os_family":"Debian","created_at":"2019-12-05
+        14:12:05 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Preseed default","id":109,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"dad31a7a071291b019781cae2ae65d04-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=85
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 1de1e359-d141-4212-acb0-4d6dcf35b26c
+      X-Runtime:
+      - '0.018711'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '4038'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/110
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: Preseed default LVM\nmodel: Ptable\noses:\n-
+        Debian\n- Ubuntu\n%>\n<%\n  partitioning_method = host_param(''partitioning-method'')
+        ? host_param(''partitioning-method'') : ''lvm''\n  partitioning_recipe = host_param(''partitioning-recipe'')
+        ? host_param(''partitioning-recipe'') : ''multi''\n  partitioning_expert_recipe
+        = host_param(''partitioning-expert-recipe'') ? host_param(''partitioning-expert-recipe'')
+        : ''''\n  vg_name = host_param(''partitioning-vg-name'') ? host_param(''partitioning-vg-name'')
+        : ''vg00''\n  partitioning_filesystem = host_param(''partitioning-filesystem'')
+        ? host_param(''partitioning-filesystem'') : ''''\n  partitioning_crypto_erase
+        = host_param(''partitioning-crypto-erase'') ? host_param(''partitioning-crypto-erase'')
+        : ''false''\n  partitioning_crypto_password = host_param(''partitioning-crypto-password'')
+        ? host_param(''partitioning-crypto-password'') : ''temporarypassword''\n  partitioning_crypto_password_weak
+        = host_param(''partitioning-crypto-password-weak'') ? host_param(''partitioning-crypto-password-weak'')
+        : ''false''\n-%>\n\n<% if host_param(''install-disk'') -%>\nd-i partman-auto/disk
+        string <%= host_param(''install-disk'') %>\nd-i grub-installer/bootdev string
+        <%= host_param(''install-disk'') %>\n<% else -%>\n# Use the first detected
+        hard disk\nd-i partman/early_command string \\\n  INSTALL_DISK=\"$(list-devices
+        disk | head -n1)\"; \\\n  debconf-set partman-auto/disk \"$INSTALL_DISK\";
+        \\\n  debconf-set grub-installer/bootdev \"$INSTALL_DISK\"\n<% end -%>\n\n###
+        Partitioning\n# The presently available methods are: \"regular\", \"lvm\"
+        and \"crypto\"\nd-i partman-auto/method string <%= partitioning_method %>\n\n#
+        If one of the disks that are going to be automatically partitioned\n# contains
+        an old LVM configuration, the user will normally receive a\n# warning. This
+        can be preseeded away...\nd-i partman-lvm/device_remove_lvm boolean true\n#
+        The same applies to pre-existing software RAID array:\nd-i partman-md/device_remove_md
+        boolean true\n# And the same goes for the confirmation to write the lvm partitions.\nd-i
+        partman-lvm/confirm boolean true\nd-i partman-lvm/confirm_nooverwrite boolean
+        true\n\n<% if partitioning_method == ''lvm'' or partitioning_method == ''crypto''
+        -%>\n# For LVM partitioning, you can select how much of the volume group to
+        use\n# for logical volumes.\nd-i partman-auto-lvm/guided_size string max\n<%
+        if partitioning_method == ''crypto'' -%>\nd-i partman-crypto/erase_data boolean
+        <%= partitioning_crypto_erase %>\nd-i partman-crypto/passphrase password <%=
+        partitioning_crypto_password %>\nd-i partman-crypto/passphrase-again password
+        <%= partitioning_crypto_password %>\nd-i partman-crypto/weak_passphrase boolean
+        <%= partitioning_crypto_password_weak %>\n<% end -%>\n<% if vg_name != ''''
+        -%>\nd-i partman-auto-lvm/new_vg_name string <%= vg_name %>\n<% end -%>\n<%
+        end -%>\n\n<% if host_param_true?(''partitioning-allow-noswap'') -%>\nd-i
+        partman-basicfilesystems/no_swap boolean false\n<% end -%>\n\n<% if host_param(''partitioning-disk-label'')
+        -%>\nd-i partman-partitioning/choose_label string <%= host_param(''partitioning-disk-label'')
+        %>\nd-i partman-partitioning/default_label string <%= host_param(''partitioning-disk-label'')
+        %>\n<% end -%>\n\n# You can choose one of the three predefined partitioning
+        recipes:\n# - atomic: all files in one partition\n# - home:   separate /home
+        partition\n# - multi:  separate /home, /var, and /tmp partitions (/usr was
+        removed in jessie)\nd-i partman-auto/choose_recipe select <%= partitioning_recipe
+        %>\n\n<% if partitioning_expert_recipe != '''' -%>\n# Or provide a recipe
+        of your own...\n# If you have a way to get a recipe file into the d-i environment,
+        you can\n# just point at it.\nd-i partman-auto/expert_recipe string \\\n<%=
+        partitioning_expert_recipe.gsub(/(?:\\n\\r?|\\r\\n?)/, \" \\\\\\n\") %>\n\n<%
+        end -%>\n\n# If you just want to change the default filesystem to something\n#
+        else, you can do that without providing a full recipe.\n<% if partitioning_filesystem
+        != '''' -%>\nd-i partman/default_filesystem string <%= partitioning_filesystem
+        %>\n<% end -%>\n\n# This makes partman automatically partition without confirmation,
+        provided\n# that you told it what to do using one of the methods above.\nd-i
+        partman/confirm_write_new_label boolean true\nd-i partman/choose_partition
+        select finish\nd-i partman/confirm boolean true\nd-i partman/confirm_nooverwrite
+        boolean true\n","locked":false,"os_family":"Debian","created_at":"2019-12-05
+        14:12:05 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"Preseed default
+        LVM","id":110,"operatingsystems":[],"locations":[{"id":4,"name":"Test Location","title":"Test
+        Location","description":null}],"organizations":[{"id":1,"name":"Default Organization","title":"Default
+        Organization","description":null},{"id":3,"name":"Test Organization","title":"Test
+        Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"ce0fb25d4c6fd460198fdccb0a8cf75d-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=84
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - 303535de-efa9-468c-9b2b-b139b19c42ca
+      X-Runtime:
+      - '0.018445'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '4864'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/ptables/111
+  response:
+    body:
+      string: '{"layout":"<%#\nkind: ptable\nname: XenServer default\nmodel: Ptable\noses:\n-
+        XenServer\n-%>\n<%\n  gueststorage = host_param(''gueststorage'') || ''yes''\n  primary_disk
+        = host_param(''install-disk'') || ''sda''\n-%>\n  <primary-disk gueststorage=\"<%=
+        gueststorage %>\"><%= primary_disk %></primary-disk>\n","locked":false,"os_family":"Xenserver","created_at":"2019-12-05
+        14:12:05 UTC","updated_at":"2019-12-05 19:35:28 UTC","name":"XenServer default","id":111,"operatingsystems":[],"locations":[{"id":4,"name":"Test
+        Location","title":"Test Location","description":null}],"organizations":[{"id":1,"name":"Default
+        Organization","title":"Default Organization","description":null},{"id":3,"name":"Test
+        Organization","title":"Test Organization","description":"A test organization"}]}'
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"52bb4a9ff43d2139a4ef44daa8081d55-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=83
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - abb39512-f16e-46c4-9863-f0f4a81f5c20
+      X-Runtime:
+      - '0.019107'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '774'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json;version=2
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Cookie:
+      - _session_id=9efaf5a87086ab7f3bf05d0db976e70e
+      User-Agent:
+      - apypie (https://github.com/Apipie/apypie)
+    method: GET
+    uri: https://foreman.example.com/api/locations?search=title%3D%22Test+Location%22&per_page=4294967296
+  response:
+    body:
+      string: "{\n  \"total\": 2,\n  \"subtotal\": 1,\n  \"page\": 1,\n  \"per_page\":
+        4294967296,\n  \"search\": \"title=\\\"Test Location\\\"\",\n  \"sort\": {\n
+        \   \"by\": null,\n    \"order\": null\n  },\n  \"results\": [{\"ancestry\":null,\"parent_id\":null,\"parent_name\":null,\"created_at\":\"2019-12-05
+        18:38:30 UTC\",\"updated_at\":\"2019-12-05 18:38:30 UTC\",\"id\":4,\"name\":\"Test
+        Location\",\"title\":\"Test Location\",\"description\":null}]\n}\n"
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - 'default-src ''self''; child-src ''self''; connect-src ''self'' ws: wss:;
+        img-src ''self'' data: *.gravatar.com; script-src ''unsafe-eval'' ''unsafe-inline''
+        ''self''; style-src ''unsafe-inline'' ''self'''
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 05 Dec 2019 19:35:29 GMT
+      ETag:
+      - W/"b58d7b785a95289160dff5b0cc026c33-gzip"
+      Foreman_api_version:
+      - '2'
+      Foreman_current_location:
+      - ; ANY
+      Foreman_current_organization:
+      - ; ANY
+      Foreman_version:
+      - 1.23.1
+      Keep-Alive:
+      - timeout=5, max=82
+      Server:
+      - Apache
+      Status:
+      - 200 OK
+      Strict-Transport-Security:
+      - max-age=631139040; includeSubdomains
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Powered-By:
+      - Phusion Passenger 4.0.53
+      X-Request-Id:
+      - a6ae2b9b-52aa-4749-8780-849445c0282e
+      X-Runtime:
+      - '0.013009'
+      X-XSS-Protection:
+      - 1; mode=block
+      content-length:
+      - '384'
+    status:
+      code: 200
+      message: OK
+version: 1

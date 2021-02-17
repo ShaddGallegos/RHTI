@@ -1,0 +1,25 @@
+- name: create activation keys
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "Create katello client activation key"
+    theforeman.foreman.katello_activation_key:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ item.key }}"
+      organization: "Default Organization"
+      lifecycle_environment: "{{ item.lifecycle }}"
+      content_view: "{{ item.content_view }}"
+      subscriptions: "{{ item.subscriptions | default(omit) }}"
+      content_overrides: "{{ item.content_overrides | default(omit) }}"
+      host_collections: "{{ item.host_collection | default(omit) }}"
+      auto_attach: False
+      release_version: "{{ item.release }}"
+      service_level: Self-Support
+    with_items:
+      - "{{ activation_key_vars }}"
+

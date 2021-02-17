@@ -1,0 +1,44 @@
+- name: Perform out of band patch
+  hosts: all
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "Change Hosts Lifecycle Environment to Library"
+    theforeman.foreman.foreman_host:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ inventory_hostname }}"
+      content_view: "Default Organization View"
+      lifecycle_environment: Library
+      location: 'Default Location'
+      organization: 'Default Organization'
+    delegate_to: localhost
+
+  - name: Clean yum cache
+    shell: yum clean all
+    warn: false
+    
+  - name: install out of band package
+    yum:
+      name: "{{ package }}"
+      state: latest
+
+  - name: change Hosts Lifecycle Environment back
+    theforeman.foreman.foreman_host:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ inventory_hostname }}"
+      content_view: "{{ foreman_content_facet_attributes.content_view_name }}"
+      lifecycle_environment: "{{ foreman_content_facet_attributes.lifecycle_environment_name }}"
+      location: 'Default Location'
+      organization: 'Default Organization'
+    delegate_to: localhost
+
+  - name: Clean yum cache
+    shell: yum clean all
+    warn: false

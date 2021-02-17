@@ -1,0 +1,11 @@
+[ansiball]
+towerdb.lab ansible_host=10.0.30.50
+tower01.lab ansible_host=10.0.30.51
+tower02.lab ansible_host=10.0.30.52
+tower03.lab ansible_host=10.0.30.53
+
+[tower]
+tower01.lab
+tower02.lab
+tower03.lab
+

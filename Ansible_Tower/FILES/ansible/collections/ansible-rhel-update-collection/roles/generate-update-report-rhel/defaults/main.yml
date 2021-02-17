@@ -1,0 +1,9 @@
+---
+
+sendgrid_to_email_addresses:
+  - "{{ sendgrid_from_email_address }}"
+end_email_with_smtp: yes
+
+smtp_account: ''
+smtp_account_password: ''
+smtp_to_email_addresses: []

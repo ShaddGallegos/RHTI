@@ -1,0 +1,12 @@
+---
+
+- name: services > Services
+  service:
+    name:  "{{ item }}"
+    state: started
+  with_items:
+    - influxdb
+  register: _manala_influxdb_services_output
+  until: _manala_influxdb_services_output is not failed
+  retries: 12
+  delay: 1

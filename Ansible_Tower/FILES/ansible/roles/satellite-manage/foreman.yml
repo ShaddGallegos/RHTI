@@ -1,0 +1,8 @@
+---
+plugin: theforeman.foreman.foreman
+validate_certs: False
+want_params: True
+want_facts: True
+group_prefix: ''
+vars_prefix: ''
+want_hostcollections: True

@@ -1,0 +1,108 @@
+activation_key_vars:
+  - key: rhel5_dev_key
+    lifecycle: RHEL5_DEV
+    content_view: rhel5_content
+    release: 5Server
+    host_collection:
+      - rhel5-servers
+      - rhel5-development
+
+  - key: rhel5_qa_key
+    lifecycle: RHEL5_QA
+    content_view: rhel5_content
+    release: 5Server
+    host_collection:
+      - rhel5-servers
+      - rhel5-qa
+
+  - key: rhel5_prod_key
+    lifecycle: RHEL5_PROD
+    content_view: rhel5_content
+    release: 5Server
+    host_collection:
+      - rhel5-servers
+      - rhel5-production
+
+  - key: rhel6_dev_key
+    lifecycle: RHEL6_DEV
+    content_view: rhel6_content
+    release: 6Server
+    host_collection:
+      - rhel6-servers
+      - rhel6-development
+
+  - key: rhel6_qa_key
+    lifecycle: RHEL6_QA
+    content_view: rhel6_content
+    release: 6Server
+    host_collection:
+      - rhel6-servers
+      - rhel6-qa
+
+  - key: rhel6_prod_key
+    lifecycle: RHEL6_PROD
+    content_view: rhel6_content
+    release: 6Server
+    host_collection:
+      - rhel6-servers
+      - rhel6-production
+    subscriptions:
+      - pool_id: ES0113909
+    unlimited_hosts: true
+
+  - key: rhel7_dev_key
+    lifecycle: RHEL7_DEV
+    content_view: rhel7_content
+    release: 7Server
+    host_collection:
+      - rhel7-servers
+      - rhel7-development
+    subscriptions:
+      - pool_id: ES0113909
+    content_overrides:
+      - label: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+        override: enabled
+      - label: rhel-7-server-optional-rpms
+        override: enabled
+    unlimited_hosts: true
+
+  - key: rhel7_qa_key
+    lifecycle: RHEL7_QA
+    content_view: rhel7_content
+    release: 7Server
+    host_collection:
+      - rhel7-servers
+      - rhel7-qa
+
+  - key: rhel7_prod_key
+    lifecycle: RHEL7_PROD
+    content_view: rhel7_content
+    release: 7Server
+    host_collection:
+      - rhel7-servers
+      - rhel7-production
+
+  - key: rhel8_dev_key
+    lifecycle: RHEL8_DEV
+    content_view: rhel8_content
+    release: 8Server
+    host_collection:
+      - rhel8-servers
+      - rhel8-development
+
+  - key: rhel8_qa_key
+    lifecycle: RHEL8_QA
+    content_view: rhel8_content
+    release: 8Server
+    host_collection:
+      - rhel8-servers
+      - rhel8-qa
+
+  - key: rhel8_prod_key
+    lifecycle: RHEL8_PROD
+    content_view: rhel8_content
+    release: 8Server
+    host_collection:
+       - rhel8-servers
+       - rhel8-production
+

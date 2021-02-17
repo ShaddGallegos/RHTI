@@ -1,0 +1,12 @@
+---
+
+- name: config > Template
+  template:
+    src: "{{ manala_haproxy_config_template }}"
+    dest: "{{ manala_haproxy_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - haproxy reload
+  when: manala_haproxy_config_template is not none

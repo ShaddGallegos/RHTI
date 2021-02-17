@@ -1,0 +1,13 @@
+---
+
+# Install
+- import_tasks: install.yml
+  tags:
+    - manala_logrotate
+    - manala_logrotate.install
+
+# Configs
+- import_tasks: configs.yml
+  tags:
+    - manala_logrotate
+    - manala_logrotate.configs

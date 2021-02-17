@@ -1,0 +1,43 @@
+---
+certs:
+  generate: true
+  deploy: true
+  group: foreman
+katello: true
+foreman: 
+  organizations_enabled: true
+  locations_enabled: true
+  custom_repo: true
+  configure_epel_repo: false
+  configure_scl_repo: false
+  ssl: true
+  server_ssl_cert: /etc/pki/katello/certs/katello-apache.crt
+  server_ssl_key: /etc/pki/katello/private/katello-apache.key
+  server_ssl_ca: /etc/pki/katello/certs/katello-default-ca.crt
+  server_ssl_chain: /etc/pki/katello/certs/katello-default-ca.crt
+capsule:
+  register_in_foreman: true
+  pulp_master: true
+  puppet: true
+  puppetca: true
+
+foreman::plugin::bootdisk: true
+foreman::plugin::discovery: true
+foreman::plugin::hooks: true
+foreman::plugin::tasks: true
+foreman::plugin::chef: false
+foreman::plugin::default_hostgroup: false
+foreman::plugin::puppetdb: false
+foreman::plugin::setup: false
+foreman::plugin::templates: false
+
+# Issue #4244 - Commenting these out due to the seg fault
+# caused on Ruby 1.8.7, the Katello RPM ensures these
+# are installed instead
+#foreman::compute::ec2: true
+#foreman::compute::gce: true
+#foreman::compute::libvirt: true
+#foreman::compute::openstack: false
+#foreman::compute::ovirt: true
+#foreman::compute::rackspace: false
+#foreman::compute::vmware: true

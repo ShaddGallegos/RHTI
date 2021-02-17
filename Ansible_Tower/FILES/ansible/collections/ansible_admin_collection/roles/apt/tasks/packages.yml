@@ -1,0 +1,40 @@
+---
+
+- name: packages > Deb present
+  apt:
+    deb: "{{ item }}"
+  loop: "{{ query(
+      'manala.roles.apt_packages',
+      manala_apt_packages,
+      wantstate='present',
+      wantmap=True,
+      wantdeb=True,
+    )
+  }}"
+
+- name: packages > Packages present
+  apt:
+    name: "{{ query(
+        'manala.roles.apt_packages',
+        manala_apt_packages,
+        wantstate='present',
+        wantmap=True,
+        wantdeb=False,
+      )
+    }}"
+    install_recommends: false
+    update_cache: true
+    cache_valid_time: "{{ manala_apt_cache_valid_time }}"
+
+- name: packages > Packages absent
+  apt:
+    name: "{{ query(
+        'manala.roles.apt_packages',
+        manala_apt_packages,
+        wantstate='absent',
+        wantmap=True,
+      )
+    }}"
+    state: absent
+    purge: true
+    autoremove: true

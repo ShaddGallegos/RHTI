@@ -1,0 +1,27 @@
+- name: Create a new host from Satellite
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/my_sat.eyml
+  tasks:
+  - name: "Build a new server via Satellite"
+    theforeman.foreman.foreman_host:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      name: "{{ vm_name }}"
+      hostgroup: "{{ vm_hostgroup }}"
+      build: true
+      location: 'Default Location'
+      organization: 'Default Organization'
+      state: present
+
+  - name: "Switch a host on"
+    foreman_host_power:
+      username: "{{ sat_user}}"
+      password: "{{ sat_password }}"
+      server_url: "{{ sat_url }}"
+      validate_certs: no
+      hostname: "{{ vm_name }}"
+      state: on

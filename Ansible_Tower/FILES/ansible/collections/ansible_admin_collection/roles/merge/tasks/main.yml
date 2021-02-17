@@ -1,0 +1,7 @@
+---
+
+# Hashes
+- import_tasks: hashes.yml
+  tags:
+    - manala_merge
+    - manala_merge.hashes

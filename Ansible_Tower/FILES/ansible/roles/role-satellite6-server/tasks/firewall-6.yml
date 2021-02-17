@@ -1,0 +1,30 @@
+---
+  - name: Install IPTables
+    yum: name=iptables state=installed
+
+  - name: Run IPTables now and on reboot
+    service: name=iptables state=started enabled=true
+
+  - name: Enable HTTPS via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT"
+    notify: restart iptables
+
+  - name: Enable HTTP via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT"
+    notify: restart iptables
+
+  - name: Enable Satellite SSL communication via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 5671 -j ACCEPT"
+    notify: restart iptables
+
+  - name: Enable Tomcat via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT"
+    notify: restart iptables
+
+  - name: Enable Puppet via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 8140 -j ACCEPT"
+    notify: restart iptables
+
+  - name: Enable Foreman via IPTables
+    lineinfile: dest=/etc/sysconfig/iptables state=present line="-A INPUT -p tcp -m state --state NEW -m tcp --dport 9090 -j ACCEPT"
+    notify: restart iptables
