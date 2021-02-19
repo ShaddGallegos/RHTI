@@ -248,13 +248,24 @@ echo "SET SELINUX TO PERMISSIVE AND DISABLING FIREWALL
       FOR THE INSTALL AND CONFIG, You will have the option 
       to reenable once the system completes "
 echo "*****************************************************************"
-sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 setenforce 0
+sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 service firewalld stop
 chkconfig firewalld off
 sleep 1
 echo " "
 }
+
+ls ~/Downloads/RHTI/DISABLESECURITY &>/dev/null
+if [ $? -eq 0 ]; then
+echo 'Disable Security for install has already been run, Skipping'
+sleep 1
+else
+echo "Disabling Selinux and Firewalld will be disabled for install and you will be queried to enable if you so choose after the install"
+DISABLESECURITY
+sleep 1
+echo " "
+fi
 
 #---------------------
 function SYSREGISTER {
@@ -739,6 +750,7 @@ service restart systemd-hostnamed
 sleep 1
 echo " "
 dnsserver="$DHCP_GW"
+
 # function to get IP address
 function get_ipaddr {
   ip_address=""
@@ -763,6 +775,7 @@ function get_ipaddr {
 # display ip
  echo $ip_address
 }
+
 hostname="${1}"
 for query in "A-IPv4" "AAAA-IPv6"; do
   query_type="$(printf $query | cut -d- -f 1)"
@@ -906,9 +919,9 @@ echo " "
 echo '*******************************************'
 echo 'Settinging Permissions For Services'
 echo '*******************************************'
+foreman-maintain packages unlock
 mv /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb.bak
 yum -q list installed foreman-discovery-image &>/dev/null && echo "foreman-discovery-image is installed" || yum install -y 'foreman-discovery-image' --skip-broken 
-
 usermod -a -G named foreman-proxy
 restorecon -v /etc/rndc.key
 chown -v root:named /etc/rndc.key
@@ -930,13 +943,13 @@ echo " "
 echo '*******************************************'
 echo 'Starting and enabling Satellite services'
 echo '*******************************************'
-foreman-maintain packages unlock
 systemctl enable tftp.service
 systemctl start tftp.service
 systemctl restart dhcpd.service
 systemctl enable named.service
 systemctl start named.service
 systemctl --system daemon-reload
+foreman-maintain packages lock
 
 sudo touch ~/Downloads/RHTI/CONFSAT
 }
@@ -1167,6 +1180,7 @@ read -n1 -t "$COUNTDOWN" -p "$QMESSAGE7 ? Y/N " INPUT
 INPUT=${INPUT:-$RHEL7DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
+source /root/.bashrc
 echo "Red Hat Enterprise Linux 7 Server (Kickstart)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7.9' --name 'Red Hat Enterprise Linux 7 Server (Kickstart)' 
 hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --name 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9'
@@ -2361,7 +2375,6 @@ echo "************"
 echo "GENERALSETUP"
 echo "************"
 GENERALSETUP
-DISABLESECURITY
 fi
 echo " "
 
