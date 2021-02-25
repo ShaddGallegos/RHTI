@@ -900,10 +900,12 @@ satellite-installer --scenario satellite -v \
 --enable-foreman-compute-libvirt \
 --enable-foreman-compute-gce \
 --enable-foreman-compute-ec2 \
---enable-foreman-plugin-discovery \
 --foreman-plugin-tasks-automatic-cleanup true \
 --foreman-proxy-plugin-discovery-install-images true \
+--enable-foreman-plugin-discovery \
 --enable-foreman-plugin-bootdisk \
+--enable-foreman-plugin-remote-execution \
+--enable-foreman-proxy-plugin-remote-execution-ssh \
 --foreman-proxy-dhcp=true \
 --foreman-proxy-dhcp-managed=true \
 --foreman-proxy-dhcp-gateway="$DHCP_GW" \
@@ -934,6 +936,14 @@ ExecStart=/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -user dhcpd -group dhcpd -
 EOF
 
 usermod -a -G dhcpd foreman-proxy
+usermod -a -G named foreman-proxy
+usermod -a -G dhcpd admin
+usermod -a -G named admin
+usermod -a -G libvirt admin
+usermod -a -G qemu admin
+
+
+
 chmod o+rx /etc/dhcp/
 chmod o+r /etc/dhcp/dhcpd.conf
 #chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
@@ -1071,9 +1081,9 @@ echo " "
 echo "*********************************************************"
 echo 'SETTING SATELLITE ENV SETTINGS'
 echo "*********************************************************"
-hammer settings set --name default_download_policy --value immediate
-hammer settings set --name default_redhat_download_policy --value immediate
-hammer settings set --name default_proxy_download_policy --value immediate
+hammer settings set --name default_download_policy --value on_demand
+hammer settings set --name default_redhat_download_policy --value on_demand
+hammer settings set --name default_proxy_download_policy --value on_demand
 hammer settings set --name default_organization --value "$ORG"
 hammer settings set --name default_location --value "$LOC"
 hammer settings set --name discovery_organization --value "$ORG"
@@ -1913,6 +1923,7 @@ sudo touch ~/Downloads/RHTI/DISASSOCIATE_TEMPLATES
 #-------------------------------
 function INSIGHTS {
 #-------------------------------
+satellite-maintain packages unlock
 yum update python-requests -y
 yum install redhat-access-insights -y
 redhat-access-insights --register
