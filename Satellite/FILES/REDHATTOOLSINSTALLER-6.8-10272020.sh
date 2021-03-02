@@ -891,6 +891,9 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dns-forwarders="$DNS" \
 --foreman-proxy-dns-server="$(hostname)" \
 --foreman-proxy-dns-interface="$SAT_INTERFACE" \
+--foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
+--foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" \
+--foreman-proxy-dns-zone "$DOM" \
 --foreman-proxy-dns-listen-on=both \
 --foreman-proxy-dns-provider=nsupdate \
 --foreman-proxy-dns-reverse="$DNS_REV" \
@@ -908,6 +911,8 @@ satellite-installer --scenario satellite -v \
 --enable-foreman-proxy-plugin-remote-execution-ssh \
 --foreman-proxy-dhcp=true \
 --foreman-proxy-dhcp-managed=true \
+--foreman-proxy-dhcp-provider isc \
+--foreman-proxy-dhcp-pxefilename "pxelinux.0" \
 --foreman-proxy-dhcp-gateway="$DHCP_GW" \
 --foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
 --foreman-proxy-dhcp-listen-on="both" \
@@ -941,12 +946,13 @@ usermod -a -G dhcpd admin
 usermod -a -G named admin
 usermod -a -G libvirt admin
 usermod -a -G qemu admin
-
+usermod -a -G dhcpd foreman
+usermod -a -G named foreman
 
 
 chmod o+rx /etc/dhcp/
 chmod o+r /etc/dhcp/dhcpd.conf
-#chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
+chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
 
 echo " "
 echo " " 
@@ -1338,7 +1344,7 @@ echo -ne "\e[8;40;170t"
 echo "**************************************************************************"
 echo "SYNC ALL REPOSITORIES (WAIT FOR THIS TO COMPLETE BEFORE CONTINUING):"
 echo "**************************************************************************"
-for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}' |sort -n ) ; do time hammer repository update --id $i --download-policy immediate ; done 
+for i in $(hammer --csv repository list |grep -i kickstart | awk -F ',' '{print $1}' |sort -n ) ; do time hammer repository update --id $i --download-policy immediate ; done &
 for i in $(hammer --csv repository list --organization $ORG | awk -F, {'print $1'} | grep -vi '^ID' |grep -v -i puppet |grep -v Id |sort -n); do time hammer repository synchronize --id ${i} --organization $ORG; done
 echo " "
 sudo touch ~/Downloads/RHTI/SYNC
