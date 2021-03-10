@@ -1,0 +1,17 @@
+---
+- name: Gather node status
+  hosts: all
+  
+  tasks:
+  - name: Show subscription_status
+    debug:
+      msg: >
+        Subscription Status: {{ foreman.subscription_status_label }}
+  
+  - name: Show Errata Counts
+    debug:
+      msg: >
+        Bug fixes: {{ foreman.content_facet_attributes.errata_counts.bugfix }},
+        Security: {{ foreman.content_facet_attributes.errata_counts.security }},
+        Enhancement: {{ foreman.content_facet_attributes.errata_counts.enhancement }},
+        Total: {{ foreman.content_facet_attributes.errata_counts.total }}

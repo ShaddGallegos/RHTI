@@ -1,0 +1,6 @@
+---
+- name: RHEL_upgrade
+  hosts: all
+
+  roles:
+  - ansible-role-rhel_upgrade
