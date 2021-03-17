@@ -4,18 +4,12 @@ default:
       - Satellite/files/
 
 stages:
-  - build
   - test
 
-build-code-job:
-  stage: build
-  script:
-    - export
-    - ls -al
-
-test-code-job1:
+test-code-job:
   stage: test
   script:
     - sudo yum install expect -y
+    - ls -al
     - chmod +x ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
     - sudo ./Satellite/files/REDHATTOOLSINSTALLER-6.8-10272020.sh
