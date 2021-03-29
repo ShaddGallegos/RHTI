@@ -225,7 +225,7 @@ echo 'what is the FQDN of your eth0 GATEWAY ?'
 read GWFQDN
 echo ''$GWINIP'  '$GWFQDN'' >> /etc/hosts
 ping -c 5 $GWINIP |exit 1
-echo ''DNS2=$GWINIP'' >> /root/.bashrc
+echo ''DNS=$GWINIP'' >> /root/.bashrc
 sudo touch ~/Downloads/RHTI/SETUPHOST
 }
 
@@ -346,7 +346,7 @@ mkdir -p ~/Downloads
 cd ~/Downloads
 yum-config-manager --enable epel
 yum -q list installed wget &>/dev/null && echo "wget is installed" || yum install -y 'wget' --skip-broken
-wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/files/xdialog-2.3.1-13.el7.centos.x86_64.rpm
+wget https://github.com/ShaddGallegos/RHTI/raw/master/Satellite/FILES/xdialog-2.3.1-13.el7.centos.x86_64.rpm
 chmod 777 ~/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm
 cp -fp xdialog-2.3.1-13.el7.centos.x86_64.rpm ~/Downloads
 yum -q list installed xdialog &>/dev/null && echo "xdialog is installed" || yum localinstall -y  ~/Downloads/xdialog-2.3.1-13.el7.centos.x86_64.rpm --skip-broken
@@ -654,6 +654,7 @@ read  ADMIN_PASSWORD
 echo 'ADMIN_PASSWORD='$ADMIN_PASSWORD'' >> /root/.bashrc
 echo " "
 touch ~/Downloads/RHTI/SERVICEUSER
+read -p "Press [Enter] to continue"
 }
 
 #------------------------------
@@ -675,8 +676,6 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
-yum clean all
-rm -rf /var/cache/yum
 yum clean all
 rm -rf /var/cache/yum
 
@@ -856,7 +855,7 @@ sudo touch ~/Downloads/RHTI/INSTALLNSAT
 #-----------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------START OF SAT 6.X CONFIGURE SCRIPT-------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
-
+read -p "Press [Enter] to continue"
 #--------------------------------------
 function CONFSAT {
 #--------------------------------------
@@ -942,17 +941,20 @@ EOF
 
 usermod -a -G dhcpd foreman-proxy
 usermod -a -G named foreman-proxy
+usermod -a -G libvirt foreman-proxy
+usermod -a -G qemu foreman-proxy
 usermod -a -G dhcpd admin
 usermod -a -G named admin
 usermod -a -G libvirt admin
 usermod -a -G qemu admin
 usermod -a -G dhcpd foreman
 usermod -a -G named foreman
+usermod -a -G libvirt foreman
+usermod -a -G qemu foreman
 
-
-chmod o+rx /etc/dhcp/
-chmod o+r /etc/dhcp/dhcpd.conf
-chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
+#chmod o+rx /etc/dhcp/
+#chmod o+r /etc/dhcp/dhcpd.conf
+#chattr +i /etc/dhcp/ /etc/dhcp/dhcpd.conf
 
 echo " "
 echo " " 
@@ -961,6 +963,7 @@ echo 'Starting and enabling Satellite services'
 echo '*******************************************'
 systemctl enable tftp.service
 systemctl start tftp.service
+systemctl enable  dhcpd.service
 systemctl restart dhcpd.service
 systemctl enable named.service
 systemctl start named.service
