@@ -1,0 +1,5 @@
+---
+- name: delete temp files
+  file:
+    path: "{{ playbook_dir }}/.ssh"
+    state: absent

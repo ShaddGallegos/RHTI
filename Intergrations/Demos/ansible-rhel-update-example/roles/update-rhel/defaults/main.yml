@@ -1,0 +1,11 @@
+---
+# packages to upgrade
+update_distro_packages: "*"
+
+# packages to exclude
+update_distro_packages_excludes: []
+
+# reboot if required
+update_reboot_kernel: no
+
+reboot_timeout: 600

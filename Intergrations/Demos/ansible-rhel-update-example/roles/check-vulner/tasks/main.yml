@@ -1,0 +1,17 @@
+---
+
+- name: check vulnerability
+  script: "{{ vulners[vulner] }} -d -n | grep 'vulnerable = ' | cut -d'*' -f2 | tr -d '\n'"
+  register: vulner_info
+  changed_when: false
+  failed_when: vulner_info.stdout not in ['0','1']
+
+- debug:
+    msg: "vulnerable : {{ vulner_result['_' + vulner_info.stdout] }}"
+
+# we assume only one vulnerability in the list for now
+- name: set vulnerability facts
+  set_fact:
+    security_system_vulnerable: "{{ 'true' if (vulner_info.stdout == '1') else 'false' }}"
+    security_system_vulner_list: "{{ [vulner] if (vulner_info.stdout == '1') else [] }}"
+    cacheable: True

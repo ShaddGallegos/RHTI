@@ -1,0 +1,10 @@
+site_name: Ansible-CMDB
+theme: readthedocs
+markdown_extensions:
+    - admonition
+pages:
+    - About: index.md
+    - Installation: installation.md
+    - Usage: usage.md
+    - FAQ: faq.md
+    - Development: dev.md

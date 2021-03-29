@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Report Table for RHEL Updates per Host</title>
+   </head>
+
+   <body>
+      <table border = "1" cellpadding = "5" cellspacing = "5">
+         <tr>
+            <th>RHEL Host</th>
+            <th>OS</th>
+            <th>List of Required Updates/Packages</th>
+         </tr>
+{% for host in play_hosts %}
+{% if hostvars[host].ansible_distribution is defined %}
+         <tr>
+            <td>{{ host }}</td>
+            <td>{{ hostvars[host].ansible_distribution }} {{ hostvars[host].ansible_distribution_version }}</td>
+            <td>
+               <ul>
+{% if hostvars[host].available_updates.results is defined and hostvars[host].available_updates.results|length > 0  %}
+{% for update in hostvars[host].available_updates.results %}
+                  <li>{{ update.name }}-{{ update.version }}</li>
+{% endfor %}
+{% else %}
+                  <li>Compliant</li>
+{% endif %}
+               </ul>
+            </td>
+         </tr>
+{% endif %}
+{% endfor %}
+      </table>
+   </body>
+</html>

@@ -1,0 +1,14 @@
+# tower-workflow-approvals.yml
+#
+# This playbook automates configuring for all common approval gate
+# configuration.
+#
+# See documentation for the `approval-base` for more information on
+# requirements and parameters.
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  roles:
+    - approval-base

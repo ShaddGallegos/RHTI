@@ -1,0 +1,330 @@
+ancestor: 0.8.1
+releases:
+  1.0.0:
+    changes:
+      breaking_changes:
+        - |
+          All modules were renamed to drop the ``foreman_`` and ``katello_`` prefixes.
+          Additionally to the prefix removal, the following modules were further ranamed:
+
+          * katello_upload to content_upload
+          * katello_sync to repository_sync
+          * katello_manifest to subscription_manifest
+          * foreman_search_facts to resource_info
+          * foreman_ptable to partition_table
+          * foreman_model to hardware_model
+          * foreman_environment to puppet_environment
+      release_summary: |
+        This is the first stable release of the ``theforeman.foreman`` collection.
+    modules:
+    - description: Manage Activation Keys
+      name: activation_key
+      namespace: ''
+    - description: Manage Architectures
+      name: architecture
+      namespace: ''
+    - description: Manage LDAP Authentication Sources
+      name: auth_source_ldap
+      namespace: ''
+    - description: Manage Bookmarks
+      name: bookmark
+      namespace: ''
+    - description: Manage Compute Attributes
+      name: compute_attribute
+      namespace: ''
+    - description: Manage Compute Profiles
+      name: compute_profile
+      namespace: ''
+    - description: Manage Compute Resources
+      name: compute_resource
+      namespace: ''
+    - description: Manage (Puppet) Config Groups
+      name: config_group
+      namespace: ''
+    - description: Manage Content Credentials
+      name: content_credential
+      namespace: ''
+    - description: Upload content to a repository
+      name: content_upload
+      namespace: ''
+    - description: Manage Content Views
+      name: content_view
+      namespace: ''
+    - description: Manage Content View Filters
+      name: content_view_filter
+      namespace: ''
+    - description: Manage Content View Versions
+      name: content_view_version
+      namespace: ''
+    - description: Manage Domains
+      name: domain
+      namespace: ''
+    - description: Manage External User Groups
+      name: external_usergroup
+      namespace: ''
+    - description: Manage Global Parameters
+      name: global_parameter
+      namespace: ''
+    - description: Manage Hardware Models
+      name: hardware_model
+      namespace: ''
+    - description: Manage Hosts
+      name: host
+      namespace: ''
+    - description: Manage Host Collections
+      name: host_collection
+      namespace: ''
+    - description: Manage Power State of Hosts
+      name: host_power
+      namespace: ''
+    - description: Manage Hostgroups
+      name: hostgroup
+      namespace: ''
+    - description: Manage Images
+      name: image
+      namespace: ''
+    - description: Manage Installation Media
+      name: installation_medium
+      namespace: ''
+    - description: Manage Job Templates
+      name: job_template
+      namespace: ''
+    - description: Manage Lifecycle Environments
+      name: lifecycle_environment
+      namespace: ''
+    - description: Manage Locations
+      name: location
+      namespace: ''
+    - description: Manage Operating Systems
+      name: operatingsystem
+      namespace: ''
+    - description: Manage Organizations
+      name: organization
+      namespace: ''
+    - description: Manage Default Template Associations To Operating Systems
+      name: os_default_template
+      namespace: ''
+    - description: Manage Partition Table Templates
+      name: partition_table
+      namespace: ''
+    - description: Manage Products
+      name: product
+      namespace: ''
+    - description: Manage Provisioning Templates
+      name: provisioning_template
+      namespace: ''
+    - description: Manage Puppet Environments
+      name: puppet_environment
+      namespace: ''
+    - description: Manage Realms
+      name: realm
+      namespace: ''
+    - description: Interact with a Red Hat Satellite Subscription Manifest
+      name: redhat_manifest
+      namespace: ''
+    - description: Manage Repositories
+      name: repository
+      namespace: ''
+    - description: Enable/disable Repositories in Repository Sets
+      name: repository_set
+      namespace: ''
+    - description: Sync a Repository or Product
+      name: repository_sync
+      namespace: ''
+    - description: Gather information about resources
+      name: resource_info
+      namespace: ''
+    - description: Manage Roles
+      name: role
+      namespace: ''
+    - description: Manage SCAP content
+      name: scap_content
+      namespace: ''
+    - description: Manage SCAP Tailoring Files
+      name: scap_tailoring_file
+      namespace: ''
+    - description: Manage SUSE Customer Center Accounts
+      name: scc_account
+      namespace: ''
+    - description: Subscribe SUSE Customer Center Account Products
+      name: scc_product
+      namespace: ''
+    - description: Manage Settings
+      name: setting
+      namespace: ''
+    - description: Manage Smart Class Parameters
+      name: smart_class_parameter
+      namespace: ''
+    - description: Manage Snapshots
+      name: snapshot
+      namespace: ''
+    - description: Manage Subnets
+      name: subnet
+      namespace: ''
+    - description: Manage Subscription Manifests
+      name: subscription_manifest
+      namespace: ''
+    - description: Manage Sync Plans
+      name: sync_plan
+      namespace: ''
+    - description: Sync Templates from a repository
+      name: templates_import
+      namespace: ''
+    - description: Manage Users
+      name: user
+      namespace: ''
+    - description: Manage User Groups
+      name: usergroup
+      namespace: ''
+    release_date: '2020-06-19'
+  1.0.1:
+    changes:
+      release_summary: |
+        Documentation fixes to reflect the correct module names.
+    release_date: '2020-06-29'
+  1.1.0:
+    changes:
+      bugfixes:
+      - inventory plugin - fix want_params handling (https://github.com/theforeman/foreman-ansible-modules/issues/847)
+      minor_changes:
+      - activation_key - add ``description`` parameter (https://github.com/theforeman/foreman-ansible-modules/issues/915)
+      - callback plugin - add reporter to report logs sent to Foreman (https://github.com/theforeman/foreman-ansible-modules/issues/836)
+      - document return values of modules (https://github.com/theforeman/foreman-ansible-modules/pull/901)
+      - inventory plugin - allow to control batch size when pulling hosts from Foreman
+        (https://github.com/theforeman/foreman-ansible-modules/pull/865)
+      - subnet - Require mask/cidr only on ipv4 (https://github.com/theforeman/foreman-ansible-modules/issues/878)
+    fragments:
+    - 836-add-reporter-to-callback.yaml
+    - 847-want_params-fix.yaml
+    - 865-limit-inventory-per-host.yaml
+    - 878-cidr-only-v4.yaml
+    - 901-document-return-values.yaml
+    - 915-activation_key-description.yaml
+    modules:
+    - description: Manage HTTP Proxies
+      name: http_proxy
+      namespace: ''
+    release_date: '2020-08-17'
+  1.2.0:
+    changes:
+      bugfixes:
+      - image - fix quoting of search values (https://github.com/theforeman/foreman-ansible-modules/issues/927)
+      minor_changes:
+      - compute_resource - added ``caching_enabled`` option for VMware compute resources
+      - domain, host, hostgroup, operatingsystem, subnet - manage parameters in a
+        single API call (https://bugzilla.redhat.com/show_bug.cgi?id=1855008)
+      - host - add ``compute_attributes`` parameter to module (https://bugzilla.redhat.com/show_bug.cgi?id=1871815)
+      - provisioning_template - update list of possible template kinds (https://bugzilla.redhat.com/show_bug.cgi?id=1871978)
+      - repository - update supported parameters (https://github.com/theforeman/foreman-ansible-modules/issues/935)
+    fragments:
+    - 927-image-quoting.yaml
+    - 932-host-add-compute_attributes.yaml
+    - 935-repository-params.yaml
+    - 939-compute_resource-added_caching_enabled.yaml
+    - bz1855008-single_call_parameters.yaml
+    - bz1871978-template_kinds.yaml
+    release_date: '2020-09-03'
+  1.3.0:
+    changes:
+      bugfixes:
+      - content_view - remove CVs from lifecycle environments before deleting them
+        (https://bugzilla.redhat.com/show_bug.cgi?id=1875314)
+      - external_usergroup - support non-LDAP external groups (https://github.com/theforeman/foreman-ansible-modules/issues/956)
+      - host - properly scope image lookups by the compute resource (https://bugzilla.redhat.com/show_bug.cgi?id=1878693)
+      - inventory plugin - include empty parent groups in the inventory (https://github.com/theforeman/foreman-ansible-modules/issues/919)
+      minor_changes:
+      - external_usergroup - rename the ``auth_source_ldap`` parameter to ``auth_source``
+        (``auth_source_ldap`` is still supported via an alias)
+      - server URL and credentials can now also be specified using environment variables
+        (https://github.com/theforeman/foreman-ansible-modules/issues/837)
+      - subnet - add support for external IPAM (https://github.com/theforeman/foreman-ansible-modules/issues/966)
+    fragments:
+    - 837-env-fallback.yaml
+    - 919-include-empty-parent-groups.yml
+    - 956-external_usergroup-non-ldap.yaml
+    - 966-subnet-external_ipam.yaml
+    - bz1875314-content_view-remove.yaml
+    - bz1878693-scope_image_lookups.yaml
+    modules:
+    - description: Get status info
+      name: status_info
+      namespace: ''
+    release_date: '2020-09-22'
+  1.4.0:
+    changes:
+      bugfixes:
+      - Don't try to update an entity, if only parameters that aren't supported by
+        the server are detected as changed. (https://github.com/theforeman/foreman-ansible-modules/issues/975)
+      - allow to pass an empty string when refering to entities, thus unsetting the
+        value (https://github.com/theforeman/foreman-ansible-modules/issues/969)
+      - compute_profile - don't fail when trying to update compute attributes of a
+        profile (https://github.com/theforeman/foreman-ansible-modules/issues/997)
+      - host, hostgroup - support ``None`` as the ``pxe_loader`` (https://github.com/theforeman/foreman-ansible-modules/issues/971)
+      - job_template - don't fail when trying to update template_inputs
+      - os_default_template - document possible template kind choices (https://bugzilla.redhat.com/show_bug.cgi?id=1889952)
+      - smart_class_parameters - don't fail when trying to update override_values
+      minor_changes:
+      - global_parameter - allow to set hidden flag (https://github.com/theforeman/foreman-ansible-modules/issues/1024)
+      - job_template - stricter validation of ``template_inputs`` sub-options
+      - redhat_manifest - allow configuring content access mode (https://github.com/theforeman/foreman-ansible-modules/issues/820)
+      - subnet - verify the server has the ``remote_execution`` plugin when specifying
+        ``remote_execution_proxies``
+      - the ``apypie`` library is vendored inside the collection, so users only have
+        to install ``requests`` manually now.
+    fragments:
+    - 820-redhat_manifest-sca.yaml
+    - 969-allow-unset-entity.yml
+    - 971-pxe_loader-none.yaml
+    - 975-filter-update-payload.yml
+    - 997-compute_profile-update.yaml
+    - bz1889952-os_default_template-kind.yaml
+    - global_parameter-hidden_values.yaml
+    - job_template-template_inputs-validation.yaml
+    - rex-proxy-subnet-check.yaml
+    - venored_apypie.yaml
+    modules:
+    - description: Invoke Remote Execution Jobs
+      name: job_invocation
+      namespace: ''
+    - description: Manage Smart Proxies
+      name: smart_proxy
+      namespace: ''
+    release_date: '2020-10-21'
+  1.5.0:
+    changes:
+      bugfixes:
+      - content_upload - Fix upload of files bigger than 2MB in Pulp3-based setups
+        (https://github.com/theforeman/foreman-ansible-modules/issues/1043)
+      - job_invocation - properly submit ``ssh``, ``recurrence``, ``scheduling`` and
+        ``concurrency_control`` to the server
+      - repository - don't emit a false warning about ``organization_id`` not being
+        supported by the server (https://github.com/theforeman/foreman-ansible-modules/issues/1055)
+      - repository_set, repository - clarify documentation which module should be
+        used for Red Hat Repositories (https://github.com/theforeman/foreman-ansible-modules/issues/1059)
+      minor_changes:
+      - content_upload - use ``to_native`` to decode RPM headers if needed (RPM 4.15+
+        returns strings)
+      - content_view_version - provide examples how to obtain detailed information
+        about content view versions (https://bugzilla.redhat.com/show_bug.cgi?id=1868145)
+      - content_view_version_cleanup - new role for cleaning up unused content view
+        versions (https://github.com/theforeman/foreman-ansible-modules/issues/497)
+      - host - allow management of interfaces (https://github.com/theforeman/foreman-ansible-modules/issues/757)
+      - inventory plugin - add support for the Report API present in Foreman 1.24
+        and later
+      - inventory plugin - allow to compose the ``inventory_hostname`` (https://github.com/theforeman/foreman-ansible-modules/issues/1070)
+      - manifest - new role for easier handling of subscription manifest workflows
+      - subnet - add new ``externalipam_group`` parameter
+      - update vendored ``apypie`` to 0.3.2
+    fragments:
+    - 1043-chunked_content_upload.yml
+    - 1059-repository_set-docs.yml
+    - 1062-warnings.yml
+    - 1070-compose_inventory_hostname.yml
+    - 757-host_interfaces.yml
+    - bz1868145-cv_version_examples.yml
+    - content_upload-decode-old-rpm.yml
+    - inventory_plugin_report_api.yml
+    - subnet-externalipam_group.yml
+    - theforeman.foreman.content_view_version_cleanup_role.yml
+    - theforeman.foreman.manifest_role.yml
+    release_date: '2020-12-03'

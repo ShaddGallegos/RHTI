@@ -1,0 +1,7 @@
+---
+- name: Check that the approval gate name has been specified
+  fail:
+    msg: The `approval_gate_name` variable must be defined.
+  when: approval_gate_name is undefined
+- include_tasks: approval-gate-config.yml
+  delegate_to: localhost

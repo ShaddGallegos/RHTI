@@ -1,0 +1,14 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Invoke role insights-client-role
+      import_role:
+        name: insights-client-role
+
+    - name: Un-register from RHSM
+      redhat_subscription:
+        state: absent
+      when: ansible_distribution == "RedHat"

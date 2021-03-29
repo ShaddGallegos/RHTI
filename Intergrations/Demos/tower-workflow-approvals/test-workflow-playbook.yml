@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  tasks:
+    - set_stats:
+        data:
+          some_state: very important value

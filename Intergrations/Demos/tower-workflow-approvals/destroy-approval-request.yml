@@ -1,0 +1,19 @@
+# destroy-approval-request.yml
+#
+# This playbook automates steps to be taken when an approver either approves
+# or denies a request that are needed to destroy the request job template
+# itself.
+#
+# It should not be directly executed as it is automatically configured to run
+# within each approval job template.
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Wait for the approval job to finish
+      command: tower-cli job wait {{ approval_job_id }} --format json
+      changed_when: False
+    - name: Destroy the approval job template
+      command: tower-cli job_template delete {{ approval_job_template_id }} --format json

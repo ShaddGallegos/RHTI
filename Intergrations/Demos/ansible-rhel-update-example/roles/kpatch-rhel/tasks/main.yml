@@ -1,0 +1,34 @@
+---
+
+- name: show current kernel version
+  debug:
+    msg: "{{ ansible_kernel }}"
+
+- name: install kpatch
+  yum:
+    name: "kpatch-patch = {{ ansible_kernel }}"
+    state: latest
+  register: kpatch_patch_install
+
+- name: ensure kpatch service is enabled and started
+  service:
+    name: kpatch
+    state: started
+    enabled: yes
+
+- name: wait for patch to be applied
+  shell: |
+    loaded_patch=$(kpatch list | grep "{{ ansible_kernel }}" | cut -d' ' -f1)
+    kpatch list | grep ${loaded_patch} | grep "\[enabled\]" | cut -d' ' -f1
+  register: kpatch_patch_status
+  until: kpatch_patch_status is success
+  delay: 5
+  retries: 300
+
+- name: set enabled kpatch
+  set_fact:
+    enabled_kpatch: "{{ kpatch_patch_status.stdout }}"
+    cacheable: True
+
+- debug:
+    msg: "{{ enabled_kpatch }}"

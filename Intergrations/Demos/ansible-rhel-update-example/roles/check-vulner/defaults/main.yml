@@ -1,0 +1,10 @@
+---
+
+vulner: cve_2019_11135
+
+vulners:
+  cve_2019_11135: cve-2019-11135--2019-11-12-1735.sh
+
+vulner_result:
+  _0: 'no'
+  _1: 'yes'

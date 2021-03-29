@@ -1,0 +1,15 @@
+---
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-1
+filters:
+  tag:Demo: smart_mgmt
+hostnames:
+  - tag:Name
+compose:
+  ansible_host: public_ip_address
+keyed_groups:
+  - prefix: cloud
+    key: placement
+  - prefix: tag
+    key: tags | lower

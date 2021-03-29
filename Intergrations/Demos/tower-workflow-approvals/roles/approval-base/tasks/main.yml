@@ -1,0 +1,3 @@
+---
+- include_tasks: approval-base.yml
+  delegate_to: localhost

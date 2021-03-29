@@ -1,0 +1,15 @@
+# create-approval-gate.yml
+#
+# This playbook automates configuring Tower for an individual workflow
+# approval gate.
+#
+# See documentation for the `approval-gate-config` role for more
+# information on requirements and parameters.
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  roles:
+    - approval-base
+    - approval-gate-config

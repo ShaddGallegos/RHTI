@@ -1,0 +1,45 @@
+# approval.yml
+#
+# This playbook automates steps to be taken when an approver either approves
+# or denies a request to pass through an approval gate.
+#
+# It should not be directly executed as it is automatically configured to run
+# for each approval request job template that is created by the approval gates
+# themselves.
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Get configuration of the job template that launched this approval
+      command: >
+        tower-cli job_template get "{{ tower_job_template_id }}"
+        --format json
+      register: approval_job_template_info
+      changed_when: False
+    - set_fact:
+        approval_job_template_extra_vars: "{{ (approval_job_template_info.stdout | from_json).extra_vars | from_json | to_yaml }}"
+    - name: Launch next workflow if approved
+      command: >
+        tower-cli workflow_job launch
+        --format json
+        --workflow-job-template "{{ next_workflow_template }}"
+        --extra-vars "{{ approval_job_template_extra_vars }}"
+      when: approved | bool
+    - name: Notify approver of action
+      debug:
+        msg: request by {{ requester.username }} to continue through the {{ approval_gate_name }} gate has been {{ approved | ternary('approved', 'denied') }}
+    - name: notify requester of action
+      debug:
+        msg: your request to continue through the {{ approval_gate_name }} gate has been {{ approved | ternary('approved', 'denied') }}
+    - name: Launch a job to destroy this approval job template
+      command: >
+        tower-cli job launch
+        --format json
+        --job-template "Destroy Approval Request"
+        --extra-vars "{{ extra_vars | to_yaml }}"
+      vars:
+        extra_vars:
+          approval_job_template_id: "{{ tower_job_template_id }}"
+          approval_job_id: "{{ tower_job_id }}"
