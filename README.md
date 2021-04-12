@@ -337,11 +337,11 @@ Ansible Collections
 
  * Greg Sowell
    * [Networking and Zabbix](https://github.com/gregsowell)
-     [Network and Telco BLOG](http://gregsowell.com)
-     [AD integration post](http://gregsowell.com/?p=6443)
-     [CI/CD demo](http://gregsowell.com/?p=6676)
-     [SNOW ordering servers via Tower](http://gregsowell.com/?p=6542)
-     [All Gregs Ansible blog posts](https://gregsowell.com/?cat=49)
+   * [Network and Telco BLOG](http://gregsowell.com)
+   * [AD integration post](http://gregsowell.com/?p=6443)
+   * [CI/CD demo](http://gregsowell.com/?p=6676)
+   * [SNOW ordering servers via Tower](http://gregsowell.com/?p=6542)
+   * [All Gregs Ansible blog posts](https://gregsowell.com/?cat=49)
 
 
 more to come 
