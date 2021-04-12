@@ -882,20 +882,19 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-tftp=true \
 --foreman-proxy-tftp-managed=true \
 --foreman-proxy-tftp-listen-on=both \
---foreman-proxy-tftp-servername="$(hostname)" \
+--foreman-proxy-tftp-servername="$INTERNALIP" \
 --foreman-proxy-dns=true \
 --foreman-proxy-dns-managed=true \
 --foreman-proxy-dns-forwarders="$DNS" \
 --foreman-proxy-dns-server="$(hostname)" \
 --foreman-proxy-dns-interface="$SAT_INTERFACE" \
---foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
---foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" \
 --foreman-proxy-dns-zone "$DOM" \
 --foreman-proxy-dns-listen-on=both \
 --foreman-proxy-dns-provider=nsupdate \
 --foreman-proxy-dns-reverse="$DNS_REV" \
 --foreman-proxy-dns-zone="$DOM" \
---enable-foreman-proxy-plugin-dhcp-remote-isc \
+--foreman-proxy-keyfile=/etc/rndc.key \
+--foreman-proxy-dns-ttl=86400 \
 --enable-foreman-compute-vmware \
 --enable-foreman-compute-libvirt \
 --enable-foreman-compute-gce \
@@ -915,8 +914,11 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dhcp-listen-on="both" \
 --foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
 --foreman-proxy-dhcp-range="$DHCP_RANGE" \
+--enable-foreman-proxy-plugin-dhcp-remote-isc \
 --foreman-proxy-dhcp-server="$INTERNALIP" 
 
+#--foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
+#--foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" \
 
 echo " "
 echo " " 
