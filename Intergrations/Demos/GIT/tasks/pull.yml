@@ -1,0 +1,15 @@
+---
+- include_tasks: unpack.yml
+
+- name: set repo path
+  set_fact:
+    git_repo_path: "{{ git_url | regex_search('/(.+).git') | regex_replace('.git', '') }}"
+
+- name: git clone
+  git:
+   repo: "{{ git_url }}"
+   dest: "{{ playbook_dir }}/{{ git_repo_path }}"
+   accept_hostkey: yes
+   key_file: "{{ git_temp_file.path }}"
+
+- include_tasks: cleanup_keys.yml

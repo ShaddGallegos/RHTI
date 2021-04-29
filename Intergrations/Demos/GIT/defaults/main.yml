@@ -1,0 +1,8 @@
+---
+git_url: ''
+git_key: ''
+git_branch: 'master'
+git_msg: 'update files with ansible'
+git_remove_local: false
+git_username: ansible_git
+git_email: ansible_git@ansible.com 

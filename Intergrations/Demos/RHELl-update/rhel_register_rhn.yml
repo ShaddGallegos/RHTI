@@ -1,0 +1,40 @@
+---
+
+- name: RHN register
+  hosts: all
+
+  pre_tasks:
+
+    - name: set repos for 7.x
+      set_fact:
+        repo_channels:
+          - rhel-7-server-rpms
+          - rhel-7-server-rh-common-rpms
+          - rhel-7-server-extras-rpms
+          - rhel-7-server-aus-optional-rpms
+          - rhel-7-server-optional-rpms
+          - rhel-7-server-supplementary-rpms
+          - rhel-7-server-ansible-2-rpms
+          - rhel-7-server-ansible-2-rpms
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 7
+
+    - name: set repos for 8.x
+      set_fact:
+        repo_channels:
+          - rhel-8-for-x86_64-baseos-rpms
+          - rhel-8-for-x86_64-supplementary-rpms
+          - rhel-8-for-x86_64-appstream-rpms
+          - rhel-8-for-x86_64-highavailability-rpms
+          - ansible-2.8-for-rhel-8-x86_64-rpms
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 8
+
+  tasks:
+    - block:
+        - include_role:
+            name: oatakan.rhn
+
+      rescue:
+        - include_role:
+            name: oatakan.rhn
+          vars:
+            role_action: unregister

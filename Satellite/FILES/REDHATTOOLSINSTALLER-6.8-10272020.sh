@@ -1,7 +1,7 @@
 #!/bin/bash
 #Red Hat tools installer – for RHEL 7.X
 #POC/Demo
-#This Script is for setting up a basic Satellite 6.8 on RHEL 7 or Ansible Tower 6.8.1 on RHEL 7
+#This Script is for setting up a basic SATELLITE 6.9 on RHEL 7 or Ansible Tower 6.9 on RHEL 7
 
 echo -ne "\e[8;40;170t"
 
@@ -25,15 +25,15 @@ echo -ne "\e[8;40;170t"
 #Set domain
 #Check all requirements have been met
 #Check FQDN
-#Verify repositories for Satellite 6.8
-#Install Satellite 6.8
-#Configure Satellite 6.8
-#Satellite 6.8 configure Satellite base
-#Satellite 6.8 internal DNS configuration
-#Satellite 6.8 DHCP configuration (optional)
-#Satellite 6.8 TFTP configuration
-#Satellite 6.8 task and cleanup configuration
-#Satellite 6.8 cloud management option configuration
+#Verify repositories for SATELLITE 6.9
+#Install SATELLITE 6.9
+#Configure SATELLITE 6.9
+#SATELLITE 6.9 configure Satellite base
+#SATELLITE 6.9 internal DNS configuration
+#SATELLITE 6.9 DHCP configuration (optional)
+#SATELLITE 6.9 TFTP configuration
+#SATELLITE 6.9 task and cleanup configuration
+#SATELLITE 6.9 cloud management option configuration
 #Start and enable Satellite services
 #Configure Satellite cache
 #Verify DHCP is wanted for new systems (default is enabled)
@@ -61,7 +61,7 @@ echo -ne "\e[8;40;170t"
 #Create a RHEL hostgroups
 #
 #                                              **************************
-#                                              Satellite 6.8 REQUIREMENTS
+#                                              SATELLITE 6.9 REQUIREMENTS
 #                                              **************************
 #                                    Hardware Requirements
 #                                        32  GB Ram
@@ -95,7 +95,7 @@ echo -ne "\e[8;40;170t"
 #           cd ~/Downloads
 #
 #           Run the script
-#           sh REDHATTOOLSINSTALLER-6.8.sh"
+#           sh REDHATTOOLSINSTALLER-6.9.sh"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------ Functions ------------------------------------------------------
@@ -411,7 +411,7 @@ echo " "
 echo "************************************************************************************************************************************"
 echo "
                                               **************************
-                                              Satellite 6.8 REQUIREMENTS
+                                              SATELLITE 6.9 REQUIREMENTS
                                               **************************
                                     Hardware Requirements
                                         32  GB Ram
@@ -427,6 +427,7 @@ echo "
                                     2 etthernet ports
                                         eth0 internal for provisioning
                                         eth1 external for syncing to cdn
+                                        FWD and REV Resolution must work before running script
 
                                     The Server
                                         Basic system or System with GUI
@@ -445,7 +446,7 @@ echo "
            cd ~/Downloads
 
            Run the script
-           sh REDHATTOOLSINSTALLER-6.8.sh"
+           sh REDHATTOOLSINSTALLER-6.9.sh"
 echo " "
 echo "************************************************************************************************************************************"
 read -p "Press [Enter] to continue"
@@ -463,7 +464,7 @@ echo " "
 echo " "
 echo "
 
-                                              P.O.C Satellite 6.8 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
+                                              P.O.C SATELLITE 6.9 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
                                                    THIS SCRIPT CONTAINS NO CONFIDENTIAL INFORMATION
 
                                            This script is designed to set up a basic standalone Satellite 6.X system
@@ -660,7 +661,7 @@ touch ~/Downloads/RHTI/SERVICEUSER
 function INSTALLREPOS {
 #------------------------------
 echo "******************************************************************"
-echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.8"
+echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.9"
 echo "******************************************************************"
 echo -ne "\e[8;40;170t"
 source /root/.bashrc
@@ -671,7 +672,7 @@ echo "**************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.8-rpms \
+--enable=rhel-7-server-satellite-6.9-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
@@ -799,12 +800,12 @@ echo -ne "\e[8;40;170t"
 source /root/.bashrc
 echo " "
 echo "*********************************************************"
-echo "VERIFING REPOS FOR Satellite 6.8"
+echo "VERIFING REPOS FOR SATELLITE 6.9"
 echo "*********************************************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.8-rpms \
+--enable=rhel-7-server-satellite-6.9-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
 --enable=rhel-7-server-ansible-2.9-rpms 
@@ -1134,7 +1135,7 @@ QMESSAGE7="Would you like to enable and sync RHEL 7 Content
 This will enable:
  Red Hat Enterprise Linux 7 Server (Kickstart)
  Red Hat Enterprise Linux 7 Server
- Red Hat Satellite Tools 6.8 (for RHEL 7 Server)
+ Red Hat Satellite Tools 6.9 (for RHEL 7 Server)
  Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server
  Red Hat Enterprise Linux 7 Server - Extras
  Red Hat Enterprise Linux 7 Server - Optional
@@ -1151,13 +1152,13 @@ Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
 Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)
+Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
 "
 
 QMESSAGEJBOSS="Would you like to download JBoss Enterprise Application Platform 7 (RHEL 7 Server) content"
 QMESSAGEVIRTAGENT="Would you like to download Red Hat Virtualization 4 Management Agents for RHEL 7 content"
-QMESSAGESAT65="Would you like to download Red Hat Satellite 6.8 (for RHEL 7 Server) content"
-QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.8 (for RHEL 7 Server) content"
+QMESSAGESAT65="Would you like to download Red Hat Satellite 6.9 (for RHEL 7 Server) content"
+QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.9 (for RHEL 7 Server) content"
 QMESSAGEOSC="Would you like to download Red Hat OpenShift Container Platform 3.10 content"
 QMESSAGECEPH="Would you like to download Red Hat Ceph Storage Tools 3.0 for Red Hat Enterprise Linux 7 Server content"
 QMESSAGESNC="Would you like to download Red Hat Storage Native Client for RHEL 7 content"
@@ -1213,8 +1214,8 @@ echo "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
 echo "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
-echo "'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)'
+echo "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)'
 echo "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
@@ -1258,8 +1259,8 @@ echo "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
-echo "Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 (RPMs)' 
+echo "Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)' 
 echo "Red Hat Storage Native Client for RHEL 8 (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Storage Native Client for RHEL 8 (RPMs)'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
@@ -1463,8 +1464,8 @@ echo 'Adding Red Hat Enterprise Linux 7 Server '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server Kickstart '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9'
-echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 7 Server'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.8 for RHEL 7 Server RPMs x86_64'
+echo 'Adding Red Hat Satellite Tools 6.9 for RHEL 7 Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.9 for RHEL 7 Server RPMs x86_64'
 echo 'Adding Red Hat Software Collections'
 hammer content-view add-repository --organization $ORG --name 'RHEL_7.9_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Supplementary'
@@ -1502,8 +1503,8 @@ echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS '
 hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.3'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary '
 hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.3'
-echo 'Adding Red Hat Satellite Tools 6.8 for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.8 for RHEL 8 x86_64 RPMs x86_64'
+echo 'Adding Red Hat Satellite Tools 6.9 for RHEL 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 RPMs x86_64'
 echo 'Adding Red Hat EPEL for RHEL 8'
 hammer content-view add-repository --organization $ORG --name 'RHEL_8.3_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
 sleep 1
@@ -1621,7 +1622,7 @@ do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8
 --organization $ORG; done
 sleep 1
 for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |awk -F ',' '{print $2}' |grep Satellite_6); \
-do hammer activation-key add-host-collection --name $i --host-collection='Satellite_6.8-RHEL_7.9_x86_64' \
+do hammer activation-key add-host-collection --name $i --host-collection='Satellite_6.9-RHEL_7.9_x86_64' \
 --organization $ORG; done
 sleep 1
 sudo touch ~/Downloads/RHTI/KEYSTOHOST
@@ -2254,7 +2255,7 @@ fi
 function dMainMenu {
 #-----------------------
 $DIALOG --stdout --title "Red Hat P.O.C. Tools - RHEL 7.X" --menu "********** Menu ********* \n Please choose [1 -> 4]?" 30 90 10 \
-1 "Satellite 6.8 INSTALL" \
+1 "SATELLITE 6.9 INSTALL" \
 2 "ANSIBLE TOWER 3.6.4 INSTALL" \
 3 "SATELLITE POST INSTALL CLEANUP" \
 4 "EXIT"
@@ -2307,7 +2308,7 @@ RC=$?
 [[ $RC -ne 0 ]] && break
 Flag=$(cat $TmpFi)
 case $Flag in
-1) dMsgBx "Satellite 6.8 INSTALL" \
+1) dMsgBx "SATELLITE 6.9 INSTALL" \
 sleep 1
 #SCRIPT
 echo " "

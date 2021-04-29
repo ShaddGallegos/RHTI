@@ -1,0 +1,70 @@
+---
+- name: create new cloud server
+  hosts: localhost
+  gather_facts: no
+  vars:
+    start_idx: 0
+    count: 1
+    aws_region: undef
+    vpc_id: undef
+    subnet_id: undef
+    guid: undef
+    userid: undef
+
+  tasks:
+  - name: set name
+    set_fact: 
+      vm_name: "{{ PREFIX }}"
+
+  - name: create firewall policy
+    ec2_group:
+      name: "{{ guid }}-demo-ssh"
+      description: "Allow SSH from anywhere"
+      region: "{{ aws_region }}"
+      vpc_id: "{{ vpc_id }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: 0.0.0.0/0
+        rule_desc: "allow all on port 22"
+
+  - name: create ec2 instance
+    ec2:
+      key_name: "{{ guid }}-demo"
+      instance_type: "{{ ec2_size | default('t2.micro') }}"
+      image: "{{ ec2_ami | default('ami-6871a115') }}"
+      region: "{{ aws_region }}"
+      wait: yes
+      group: "{{ guid }}-demo-ssh"
+      vpc_subnet_id: "{{ subnet_id }}"
+      assign_public_ip: yes
+      exact_count: 1
+      user_data: "{{ ec2_user_data | default ('') }}"
+      count_tag:
+        Name: "{{ vm_name }}-{{item}}"
+      instance_tags:
+        Name: "{{ vm_name }}-{{ item }}"
+        Group: "{{ server_type }}"
+        Platform: linux
+        Owner: "{{ OWNER | default('ansible')}}"
+        Demo: smart_mgmt
+        Contact: "{{ userid }}"
+        AlwaysUp: 'False'
+    register: ec2_out
+    loop: "{{ range(start_idx | int, (count | int)) | list }}"
+
+  - name: create inventory
+    add_host:
+      name: "{{ item.tagged_instances.0.tags.Name }}"
+      ansible_host: "{{ item.tagged_instances.0.public_ip }}"
+      groups: servers
+    loop: "{{ ec2_out.results }}"
+
+- name: test connectivity
+  hosts: servers
+  gather_facts: no
+
+  tasks:
+  - wait_for_connection:
+  - setup:

@@ -1,0 +1,5 @@
+- name: install RHEL updates
+  hosts: all
+
+  roles:
+    - update-rhel

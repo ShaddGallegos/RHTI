@@ -1,0 +1,19 @@
+- name: check RHEL updates
+  hosts: all
+
+  tasks:
+    - name: check for available updates
+      yum:
+        list: updates
+      become: yes
+      register: available_updates
+
+- name: generate report
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: generate html report
+      include_role:
+        name: generate-update-report-rhel
+      run_once: yes

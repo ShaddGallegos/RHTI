@@ -1,0 +1,5 @@
+- name: check vulnerability on RHEL
+  hosts: all
+  become: yes
+  roles:
+    - check-vulner

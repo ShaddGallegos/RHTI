@@ -1,3 +1,0 @@
----
-- name: run compliance scan
-  command: insights-client --compliance

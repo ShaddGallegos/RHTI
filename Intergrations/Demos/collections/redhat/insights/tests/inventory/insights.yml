@@ -1,0 +1,9 @@
+---
+plugin: redhat.insights.insights
+get_patches: yes
+groups:
+  patching: insights_patching.enabled
+  stale: insights_patching.stale
+  bug_patch: insights_patching.rhba_count > 0
+  security_patch: insights_patching.rhsa_count > 0
+  enhancement_patch: insights_patching.rhea_count > 0

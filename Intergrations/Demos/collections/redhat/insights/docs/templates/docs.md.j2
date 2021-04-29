@@ -1,0 +1,38 @@
+{% if docs.name is defined %}{{ docs.name }}{% else %}{{ docs.module }}{% endif %} - {{ docs.short_description }}
+====================================
+- [Synopsis](Synopsis)
+- [Requirements](Requirements)
+- [Parameters](Parameters)
+- [Examples](Examples)
+
+## Synopsis
+{{ docs.description | to_nice_yaml}}
+## Requirements
+{{ docs.requirements | default('') | to_nice_yaml }}
+## Parameters
+
+<table>
+<tr>
+<th> Parameter </th>
+<th> Choices/Defaults </th>
+<th> Configuration </th>
+<th> Comments </th>
+</tr>
+{% for option in docs.options %}
+<tr>
+<td><b>{{ option }}</b></br>
+{% if docs.options[option]['required'] is defined and docs.options[option]['required'] %}<p style="color:red;font-size:75%">required</p>{% endif %}</td>
+<td>{% if docs.options[option]['choices'] is defined %}<b>Choices:</b><br>
+{{ docs.options[option]['choices'] | to_nice_yaml }}{% endif %}{% if docs.options[option]['default'] is defined %}<b>Default:</b><br> 
+{{ docs.options[option]['default'] }}{% endif %}</td>
+<td>{% if docs.options[option]['env'] is defined %}<b>env:</b><br>
+{{ docs.options[option]['env'] | to_nice_yaml }}{% endif %}</td>
+<td> {{ docs.options[option]['description'] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+## Examples
+```
+{{ examples }}
+```

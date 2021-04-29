@@ -1,0 +1,80 @@
+---
+#
+#     Copyright 2018,2017 Red Hat, Inc
+#
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
+#
+- name: Install 'insights-client'
+  yum:
+    name: insights-client
+  become: true
+  notify: Run insights-client
+
+- name: Set Insights Configuration Values
+  insights_config:
+    username: "{{ redhat_portal_username | default(omit) }}"
+    password: "{{ redhat_portal_password | default(omit) }}"
+    auto_config: "{{ auto_config | default(omit) }}"
+    authmethod: "{{ authmethod | default(omit) }}"
+    display_name: "{{ insights_display_name | default(omit) }}"
+    proxy: "{{ insights_proxy | default(omit) }}"
+  become: true
+  notify: Run insights-client
+
+- name: Register Insights Client
+  insights_register:
+    state: present
+  become: true
+  
+- name: Change permissions of Insights Config directory so that Insights System ID can be read
+  file:
+    path: /etc/insights-client
+    mode: og=rx
+  become: true
+
+- name: Change permissions of machine_id file so that Insights System ID can be read
+  file:
+    path: /etc/insights-client/machine-id
+    mode: og=r
+  become: true
+  notify: Run insights-client
+
+- name: Create directory for ansible custom facts
+  file:
+    state: directory
+    recurse: true
+    path: /etc/ansible/facts.d
+  become: true
+
+- name: Install custom insights fact
+  copy:
+    src: insights.fact
+    dest: /etc/ansible/facts.d
+    mode: a+x
+  become: true
+  notify: Run insights-client
+
+- name: Deploy Custom Tags
+  copy:
+    dest: /etc/insights-client/tags.yaml
+    content: "{{ insights_tags | to_nice_yaml }}"
+    mode: og=r
+  when: insights_tags is defined
+  notify: Run insights-client
+
+- name: Remove Tags
+  file:
+    path: /etc/insights-client/tags.yaml
+    state: absent
+  when: insights_tags is not defined
+  notify: Run insights-client

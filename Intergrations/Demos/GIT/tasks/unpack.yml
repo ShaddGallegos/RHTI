@@ -1,0 +1,15 @@
+---
+- name: create direcotry
+  file:
+    path: "{{ playbook_dir }}/.ssh"
+    state: directory
+
+- name: create temp file
+  tempfile:
+    path: "{{ playbook_dir }}/.ssh"
+  register: git_temp_file
+
+- name: copy key to temp file
+  copy:
+    content: "{{ git_key }}"
+    dest: "{{ git_temp_file.path }}"

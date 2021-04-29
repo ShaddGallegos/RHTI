@@ -1,0 +1,45 @@
+[dev]
+debian.dev.local dtap=dev
+centos.dev.local dtap=dev
+
+[db]
+db[01:03].prod.local dtap=prod
+
+[prod]
+eek.electricmonk.nl
+zoltar.electricmonk.nl comment="Trés Load balancer"
+jib.electricmonk.nl comment="Workstation"
+
+[prod:children]
+db
+
+[prod:vars]
+dtap=prod
+# This appears to be allowed, but is undocumented
+json_like_vars=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+[virtual]
+debian.dev.local
+centos.dev.local
+
+[uat]
+app.uat.local dtap=uat
+
+[solaris]
+sol_host
+
+[openbsd]
+openbsd.dev.local
+
+[windows]
+win2k8r2.local
+win.dev.local
+
+[openvz]
+openvz.debian.local
+
+[test]
+facter.test.local ansible_host=192.168.56.7
+custfact.test.local ansible_host=192.168.56.7  abc: [1, 2, 3]
+onlyinhosts.test.local
+çyrillic.test.local

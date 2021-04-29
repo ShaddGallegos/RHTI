@@ -1,0 +1,16 @@
+---
+- hosts: "{{ HOSTS is defined | ternary(HOSTS, PREFIX|default('')+'*') }}"
+  connection: local
+  gather_facts: no
+  vars:
+    login: &login
+      server_url: "https://{{ lookup('env', 'FOREMAN_SERVER') }}"
+      username: "{{ lookup('env', 'FOREMAN_USER') }}"
+      password: "{{ lookup('env', 'FOREMAN_PASSWORD') }}"
+      validate_certs: no
+      organization: undef
+
+  tasks:
+  - name: server info
+    debug:
+      msg: "This server will be destroyed. ID: {{ instance_id }}"

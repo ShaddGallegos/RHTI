@@ -1,0 +1,8 @@
+---
+- hosts: all
+  collections:
+    - redhatinsights.insights
+    
+  tasks:
+    - include_role: 
+        name: insights_client

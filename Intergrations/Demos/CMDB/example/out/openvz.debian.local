@@ -1,0 +1,235 @@
+
+
+{
+  "ansible_facts": {
+    "ansible_all_ipv4_addresses": [
+      "10.0.4.8"
+    ],
+    "ansible_all_ipv6_addresses": [
+      
+    ],
+    "ansible_architecture": "x86_64",
+    "ansible_bios_date": "NA",
+    "ansible_bios_version": "NA",
+    "ansible_cmdline": {
+      "quiet": true
+    },
+    "ansible_date_time": {
+      "date": "2016-02-01",
+      "day": "01",
+      "epoch": "1454362393",
+      "hour": "15",
+      "iso8601": "2016-02-01T21:33:13Z",
+      "iso8601_basic": "20160201T153313941831",
+      "iso8601_basic_short": "20160201T153313",
+      "iso8601_micro": "2016-02-01T21:33:13.941910Z",
+      "minute": "33",
+      "month": "02",
+      "second": "13",
+      "time": "15:33:13",
+      "tz": "CST",
+      "tz_offset": "-0600",
+      "weekday": "Monday",
+      "weekday_number": "1",
+      "weeknumber": "05",
+      "year": "2016"
+    },
+    "ansible_default_ipv4": {
+      "address": "10.0.4.8",
+      "alias": "venet0:0",
+      "broadcast": "10.0.4.8",
+      "interface": "venet0",
+      "macaddress": "",
+      "mtu": 1500,
+      "netmask": "255.255.255.255",
+      "network": "10.0.4.8",
+      "type": "unknown"
+    },
+    "ansible_default_ipv6": {
+      "address": "::1",
+      "interface": "venet0",
+      "macaddress": "00:00:00:00:00:00",
+      "mtu": 16436,
+      "prefix": "128",
+      "scope": "host",
+      "type": "loopback"
+    },
+    "ansible_devices": {
+      
+    },
+    "ansible_distribution": "Debian",
+    "ansible_distribution_major_version": "7",
+    "ansible_distribution_release": "wheezy",
+    "ansible_distribution_version": "7.8",
+    "ansible_dns": {
+      "nameservers": [
+        "8.8.8.8"
+      ],
+      "search": [
+        "local"
+      ]
+    },
+    "ansible_domain": "openvz.debian.local",
+    "ansible_env": {
+      "HOME": "\/root",
+      "LANG": "en_US.UTF-8",
+      "LANGUAGE": "en_US.UTF-8",
+      "LC_ALL": "en_US.UTF-8",
+      "LC_MESSAGES": "en_US.UTF-8",
+      "LOGNAME": "root",
+      "MAIL": "\/var\/mail\/root",
+      "PATH": "\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin:\/usr\/bin\/X11",
+      "PWD": "\/root",
+      "SHELL": "\/bin\/bash",
+      "SHLVL": "1",
+      "SSH_CLIENT": "10.0.0.1  42562 22",
+      "SSH_CONNECTION": "10.0.0.1 12432 10.0.4.8 22",
+      "USER": "root",
+      "XDG_SESSION_COOKIE": "3940bc301a95021r04cb01ef0350981204a908e098b0c020821e023195ae",
+      "_": "\/bin\/sh"
+    },
+    "ansible_fips": false,
+    "ansible_form_factor": "NA",
+    "ansible_fqdn": "openvz.debian.local",
+    "ansible_hostname": "openvz",
+    "ansible_interfaces": [
+      "lo",
+      "venet0_0",
+      "venet0"
+    ],
+    "ansible_kernel": "2.6.32-19-pve",
+    "ansible_lo": {
+      "active": true,
+      "device": "lo",
+      "ipv4": {
+        "address": "127.0.0.1",
+        "broadcast": "host",
+        "netmask": "255.0.0.0",
+        "network": "127.0.0.0"
+      },
+      "ipv6": [
+        {
+          "address": "::1",
+          "prefix": "128",
+          "scope": "host"
+        }
+      ],
+      "mtu": 16436,
+      "promisc": false,
+      "type": "loopback"
+    },
+    "ansible_local": {
+    },
+    "ansible_lsb": {
+      "codename": "wheezy",
+      "description": "Debian GNU\/Linux 7.8 (wheezy)",
+      "id": "Debian",
+      "major_release": "7",
+      "release": "7.8"
+    },
+    "ansible_lvm": {
+      "lvs": {
+        
+      },
+      "vgs": {
+        
+      }
+    },
+    "ansible_machine": "x86_64",
+    "ansible_machine_id": "074d624c295e0bcb014e9a70315710f1",
+    "ansible_memfree_mb": 6840,
+    "ansible_memory_mb": {
+      "nocache": {
+        "free": null,
+        "used": null
+      },
+      "real": {
+        "free": 6840,
+        "total": 8192,
+        "used": 1352
+      },
+      "swap": {
+        "cached": null,
+        "free": 390,
+        "total": 512,
+        "used": 122
+      }
+    },
+    "ansible_memtotal_mb": 8192,
+    "ansible_mounts": [
+      {
+        "device": "\/dev\/simfs",
+        "fstype": "simfs",
+        "mount": "\/",
+        "options": "rw,relatime",
+        "size_available": 38382993408,
+        "size_total": 42949672960,
+        "uuid": "NA"
+      }
+    ],
+    "ansible_nodename": "test",
+    "ansible_os_family": "Debian",
+    "ansible_pkg_mgr": "apt",
+    "ansible_processor": [
+      "GenuineIntel",
+      "Intel(R) Xeon(R) CPU           W3520  @ 2.67GHz",
+      "GenuineIntel",
+      "Intel(R) Xeon(R) CPU           W3520  @ 2.67GHz",
+      "GenuineIntel",
+      "Intel(R) Xeon(R) CPU           W3520  @ 2.67GHz",
+      "GenuineIntel",
+      "Intel(R) Xeon(R) CPU           W3520  @ 2.67GHz"
+    ],
+    "ansible_processor_cores": 4,
+    "ansible_processor_count": 1,
+    "ansible_processor_threads_per_core": 2,
+    "ansible_processor_vcpus": 8,
+    "ansible_product_name": "NA",
+    "ansible_product_serial": "NA",
+    "ansible_product_uuid": "NA",
+    "ansible_product_version": "NA",
+    "ansible_python_version": "2.7.3",
+    "ansible_selinux": false,
+    "ansible_service_mgr": "init",
+    "ansible_ssh_host_key_dsa_public": "",
+    "ansible_ssh_host_key_rsa_public": "",
+    "ansible_swapfree_mb": 390,
+    "ansible_swaptotal_mb": 512,
+    "ansible_system": "Linux",
+    "ansible_system_vendor": "NA",
+    "ansible_uptime_seconds": 14878160,
+    "ansible_user_dir": "\/root",
+    "ansible_user_gecos": "root",
+    "ansible_user_gid": 0,
+    "ansible_user_id": "root",
+    "ansible_user_shell": "\/bin\/bash",
+    "ansible_user_uid": 0,
+    "ansible_userspace_architecture": "x86_64",
+    "ansible_userspace_bits": "64",
+    "ansible_venet0": {
+      "active": true,
+      "device": "venet0",
+      "ipv4": {
+        "address": "127.0.0.2",
+        "broadcast": "host",
+        "netmask": "255.255.255.255",
+        "network": "127.0.0.2"
+      },
+      "mtu": 1500,
+      "promisc": false
+    },
+    "ansible_venet0_0": {
+      "ipv4": {
+        "address": "10.0.4.8",
+        "broadcast": "10.0.4.8",
+        "netmask": "255.255.255.255",
+        "network": "10.0.4.8"
+      }
+    },
+    "ansible_virtualization_role": "guest",
+    "ansible_virtualization_type": "openvz",
+    "module_setup": true
+  },
+  "changed": false
+}
+
