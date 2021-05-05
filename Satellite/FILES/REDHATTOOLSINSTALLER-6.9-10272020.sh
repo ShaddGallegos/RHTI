@@ -101,72 +101,30 @@ echo -ne "\e[8;40;170t"
 #------------------------------------------------------ Functions ------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
 
-#-------------------------
-function CHECKONLINE {
-#-------------------------
-if [ -t 0 ]; then
-  reset
-fi
-echo 'REDHAT TOOLS INSTALLER – FOR RHEL 7.X'
-wget -q --tries=10 --timeout=20 --spider http://redhat.com
-if [[ $? -eq 0 ]]; then
-echo "Online: Continuing to Install"
-else
-echo "Offline"
-echo "This script requires access to the network to run please fix your settings and try again"
-sleep 1
-exit 1
-fi
-reset
-if [ "$(whoami)" != "root" ]
-then
-echo "This script must be run as root - if you do not have the credentials please contact your administrator"
-exitch
-#Store the background process id in a temp file to use in err_handler
-echo $(jobs -p) > "${VAR_FILE}"
-spin[0]="|"
-spin[1]="/"
-spin[2]="--"
-spin[3]="\\"
+##-------------------------
+#function CHECKONLINE {
+##-------------------------
+#if [ -t 0 ]; then
+#  reset
+#fi
+#echo 'REDHAT TOOLS INSTALLER – FOR RHEL 7.X'
+#wget -q --tries=10 --timeout=20 --spider http://redhat.com
+#if [[ $? -eq 0 ]]; then
+#echo "Online: Continuing to Install"
+#else
+#echo "Offline"
+#echo "This script requires access to the network to run please fix your #settings and try again"
+#sleep 3
+#exit 1
+#fi
+#  reset
+#if [ "$(whoami)" != "root" ]
+#then
+#echo "This script must be run as root - if you do not have the credentials #please contact your administrator"
+#exit
+#}
 
-# Loop while the process is still running
-while kill -0 $pid 2>/dev/null
-do
-	for i in "${spin[@]}"
-	do
-		if kill -0 $pid 2>/dev/null; then #Check that the process is running to prevent a full 4 character cycle on error
-			# Display the spinner in 1/4 states
-			echo -ne "\b\b\b${Bold}[${Green}$i${Reset}${Bold}]" >&3
-			sleep .5 # time between each state
-		else #process has ended, stop next loop from finishing iteration
-			break
-		fi
-	done
-done
-# Check if background process failed once complete
-if wait $pid; then # Exit 0
-	echo -ne "\b\b\b${Bold}[${Green}-done-${Reset}${Bold}]" >&3
-else # Any other exit
-	false
-fi
-}
 
-function SECHO {
-# Use first arg $1 to determine if echo skips a line (yes/no)
-# Second arg $2 is the message
-case $1 in
-	# No preceeding blank line
-	[Nn])
-		echo -ne "\n${2}" | tee -a /dev/fd/3
-		echo # add new line after in log only
-		;;
-	# Preceeding blank line
-	[Yy]|*)
-		echo -ne "\n\n${2}" | tee -a /dev/fd/3
-		echo # add new line after in log only
-		;;
-esac
-}
 
 #-------------------------
 function SETUPHOST {
