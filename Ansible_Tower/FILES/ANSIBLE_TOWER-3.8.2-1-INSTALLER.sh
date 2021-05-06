@@ -41,9 +41,12 @@ echo "
                            it is a KVM or physical-Tower will require atleast 1 node with:
 
                                   Min Storage 35GB
-                                  Directorys Recommended
-                                    di Connection to the internet so the installer can download the required packages
-                                      eth0 internal Provisioning network
+                                  Directorys recommended for a P.O.C.
+                                  / 
+                                  /boot
+                                  /swap
+                                  Connection to the internet so the installer can download the required packages
+                                      eth0 internal (Provisioning network)
                                       eth1 external"
 echo " "
 echo " "
@@ -66,7 +69,7 @@ echo "
                         6. This install was tested with:
                            * RHEL_7.x in a KVM environment.
                            * Ansible Tower 3.8.2-1
-                             https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el7.tar.gz
+                             https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el7.tar.gz (will auto download)
                            * Red Hat subscriber channels:
                                 rhel-7-server-ansible-2.9-rpms
                                 rhel-7-server-extras-rpms
@@ -75,7 +78,7 @@ echo "
                                 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
                           * RHEL_8.x in a KVM environment.
-                          * Ansible Tower 3.8.2-1 https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el8.tar.gz
+                          * Ansible Tower 3.8.2-1 https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-latest.el8.tar.gz (will auto download)
                           * Red Hat subscriber channels:
                                 ansible-2.9-for-rhel-8-x86_64-rpms
                                 rhel-8-for-x86_64-appstream-rpms
