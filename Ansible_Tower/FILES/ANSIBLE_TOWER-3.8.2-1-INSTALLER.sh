@@ -142,8 +142,8 @@ echo " "
 #-------------------------------
 function ANSIBLESECURITY {
 #-------------------------------
-mkdir /root/Downloads
-cd /root/Downloads
+mkdir ~/Downloads
+cd ~/Downloads
 echo "***************************************************************************"
 echo "SET SELINUX TO PERMISSIVE FOR THE INSTALL AND CONFIG OF Ansible Tower 3.8.2-1"
 echo "***************************************************************************"
@@ -259,10 +259,10 @@ yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || 
 yum -q list installed bash-completion-extras &>/dev/null && echo "bash-completion-extras is installed" || yum install -y bash-completion-extras --skip-broken --noplugins
 yum -q list installed dconf &>/dev/null && echo "dconf is installed" || yum install -y dconf* --skip-broken --noplugins
 yum -q list installed git &>/dev/null && echo "git is installed" || yum install -y git --skip-broken --noplugins --best --allowerasing
-mkdir -p /root/Downloads/git 
-cd /root/Downloads/git
+mkdir -p ~/Downloads/git 
+cd ~/Downloads/git
 git clone https://github.com/ansible/product-demos.git
-cd /root/Downloads
+cd ~/Downloads
 yum-config-manager --disable epel
 echo " "
 echo " "
@@ -297,8 +297,8 @@ yum -q list installed platform-python-pip &>/dev/null && echo "platform-python-p
 yum -q list installed dconf &>/dev/null && echo "dconf" || dnf install -y dconf* --skip-broken --noplugins --best --allowerasing
 yum -q list installed dnf-utils &>/dev/null && echo "dnf-utils is installed" || dnf install -y dnf-utils --skip-broken --noplugins --best --allowerasing
 yum -q list installed git &>/dev/null && echo "git is installed" || dnf install -y git --skip-broken --noplugins --best --allowerasing
-mkdir -p /root/Downloads/git 
-cd /root/Downloads
+mkdir -p ~/Downloads/git 
+cd ~/Downloads
 yum-config-manager --disable epel
 echo " "
 echo " "
@@ -354,12 +354,12 @@ then
 echo '****************************************************************'
 echo 'Getting, Expanding, and installing Ansible Tower 3.8.2-1 for RHEL7'
 echo '****************************************************************'
-mkdir /root/Downloads
-cd /root/Downloads
+mkdir ~/Downloads
+cd ~/Downloads
 wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.8.2-1.tar.gz
-tar -zxvf /root/Downloads/ansible-tower-setup-bundle-3.8.2-1.tar.gz 
-cd /root/Downloads/ansible-tower-setup-bundle-3.8.2-1
-dnf localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/bundle/el7/repos/ansible-tower-dependencies/*.rpm  --best --allowerasing
+tar -zxvf ~/Downloads/ansible-tower-setup-bundle-3.8.2-1.tar.gz 
+cd ~/Downloads/ansible-tower-setup-bundle-3.8.2-1
+dnf localinstall -y --skip-broken ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/bundle/el7/repos/ansible-tower-dependencies/*.rpm  --best --allowerasing
 sleep 2
 echo " "
 echo " " 
@@ -367,12 +367,12 @@ cd
 echo 'What would you like your default Ansible Tower user "admin" password to be?'
 read ADMINPASSWORD
 export $ADMINPASSWORD
-sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
-sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
-sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
+sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
+sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
+sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
 echo " "
 echo " "
-cd /root/Downloads/ansible-tower-setup-bundle-3.8.2-1
+cd ~/Downloads/ansible-tower-setup-bundle-3.8.2-1
 sh setup.sh
 sleep 5
 echo " "
@@ -382,24 +382,24 @@ then
 echo '****************************************************************'
 echo 'Getting, Expanding, and installing Ansible Tower 3.8.2-1 for RHEL8'
 echo '****************************************************************'
-mkdir /root/Downloads
-cd /root/Downloads
+mkdir ~/Downloads
+cd ~/Downloads
 wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.8.2-1.tar.gz
-tar -zxvf /root/Downloads/ansible-tower-setup-bundle-3.8.2-1.tar.gz 
-cd /root/Downloads/ansible-tower-setup-bundle-3.8.2-1
-dnf localinstall -y --skip-broken /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/bundle/el8/repos/ansible-tower-dependencies/*.rpm --best --allowerasing
+tar -zxvf ~/Downloads/ansible-tower-setup-bundle-3.8.2-1.tar.gz 
+cd ~/Downloads/ansible-tower-setup-bundle-3.8.2-1
+dnf localinstall -y --skip-broken ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/bundle/el8/repos/ansible-tower-dependencies/*.rpm --best --allowerasing
 sleep 2
 echo " "
 echo " "
 echo 'What would you like your default Ansible Tower user "admin" password to be?'
 read ADMINPASSWORD
 export $ADMINPASSWORD
-sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory 
-sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
-sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
+sed -i 's/admin_password='"''"'/admin_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory 
+sed -i 's/pg_password='"''"'/pg_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
+sed -i 's/rabbitmq_password='"''"'/rabbitmq_password='"'"$ADMINPASSWORD"'"'/g' ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/inventory
 echo " "
 echo " "
-cd /root/Downloads/ansible-tower-setup-bundle-3.8.2-1/
+cd ~/Downloads/ansible-tower-setup-bundle-3.8.2-1/
 sh setup.sh
 sleep 5
 echo " "
@@ -481,9 +481,9 @@ ANSIBLESECURITY
 #ADMINUSERS
 ANSIBLESYSTEMREPOS
 ANSIBLELINUXUPGRADE
-CloudRequirements
+#CloudRequirements
 ANSIBLEINSTALLTOWER
-ANSIBLESELINUX
-ANSIBLEFIREWALL
+#ANSIBLESELINUX
+#ANSIBLEFIREWALL
 
 fi
