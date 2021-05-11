@@ -40,9 +40,13 @@ echo "
                         2. Hardware requirement depends, however whether 
                            it is a KVM or physical-Tower will require atleast 1 node with:
 
-                                  Min Storage 35GB
-                                  Directorys Recommended
-                                    di Connection to the internet so the installer can download the required packages
+                                 Min Storage 35GB
+                                 Directorys Recommended
+                                  /
+                                  /boot
+                                  /swap
+                                    
+                                 Connection to the internet so the installer can download the required packages
                                       eth0 internal Provisioning network
                                       eth1 external"
 echo " "
