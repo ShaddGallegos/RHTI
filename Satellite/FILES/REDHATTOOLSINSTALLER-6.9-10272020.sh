@@ -859,10 +859,9 @@ satellite-installer --scenario satellite -v \
 --enable-foreman-proxy-plugin-dhcp-remote-isc \
 --foreman-proxy-dhcp-server="$INTERNALIP" \
 --enable-foreman-plugin-rh-cloud \
---foreman-proxy-plugin-remote-execution-ssh-install-key true
-
-#--foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
-#--foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" \
+--foreman-proxy-plugin-remote-execution-ssh-install-key true \
+--foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
+--foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" 
 
 echo " "
 echo " " 
@@ -1314,10 +1313,27 @@ echo "**************************************************************************
 echo "CREATE THE FIRST OR PRIMARY SUBNET TO CONNECT THE NODES TO THE SATELLITE:"
 echo "**************************************************************************"
 echo " "
-hammer subnet create --name $SUBNET_NAME --network $INTERNALNETWORK --mask $SUBNET_MASK --gateway $DHCP_GW \
---dns-primary $DNS --dns-secondary $DNS2 --ipam 'Internal DB' --from $SUBNET_IPAM_BEGIN --to $SUBNET_IPAM_END \
---tftp-id 1 --dhcp-id 1 --domain-ids 1 --organizations $ORG --locations "$LOC" --domains $DOM --tftp $(hostname) \
- --dhcp $(hostname) --discovery-id 1 --dns $(hostname)
+hammer subnet create \
+--boot-mode 'Static' \
+--description 'First Subnet Created for Provisioning and Management' \
+--discovery-id 1 \
+--dns $HNAME \
+--dns-primary $SAT_IP \
+--dns-secondary $DNS \
+--domain-ids 1 \
+--from 10.168.1.101 \
+--gateway $DHCP_GW \
+--ipam 'Internal DB' \
+--location $LOC \
+--mask $SUBNET_MASK \
+--name $SUBNET_NAME \
+--network $SUBNET \
+--network-type 'IPv4' \
+--organization $ORG \
+--prefix $PREFIX \
+--remote-execution-proxy-ids 1 \
+--tftp $HNAME \
+--to 10.168.255.254
 sudo touch ~/Downloads/RHTI/CREATESUBNET
 }
 
@@ -1760,7 +1776,7 @@ function SATDONE {
 hammer template build-pxe-default
 foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true --trace
 foreman-rake katello:delete_orphaned_content --trace
-foreman-rake katello:reimport
+#foreman-rake katello:reimport
 foreman-rake apipie:cache:index --trace
 
 echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! READY TO REBOOT'
@@ -1875,8 +1891,8 @@ function INSIGHTS {
 #-------------------------------
 satellite-maintain packages unlock
 yum update python-requests -y
-yum install redhat-access-insights -y
-redhat-access-insights --register
+yum install insights-client -y
+insights-client --register
 sudo touch ~/Downloads/RHTI/INSIGHTS
 satellite-maintain packages lock
 }
