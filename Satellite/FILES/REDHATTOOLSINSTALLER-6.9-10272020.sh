@@ -1191,9 +1191,9 @@ INPUT=${INPUT:-$RHEL8DEFAULTVALUE}
 if [ "$INPUT" = "y" -o "$INPUT" = "Y" ] ;then
 echo -e "\n$YMESSAGE\n"
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.3'
-hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.3'
-time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.3' 2>/dev/null
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4'
+hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4'
+time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4' 2>/dev/null
 echo "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
