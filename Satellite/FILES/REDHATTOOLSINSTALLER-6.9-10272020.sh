@@ -1,13 +1,8 @@
 #!/bin/bash
-#Red Hat tools installer – for RHEL 7.X
-#POC/Demo
-#This Script is for setting up a basic SATELLITE 6.9 on RHEL 7 or Ansible Tower 6.9 on RHEL 7
-
 echo -ne "\e[8;40;170t"
-
-# Hammer referance to assist in modifing the script can be found at 
-# https://www.gitbook.com/book/abradshaw/getting-started-with-satellite-6-command-line/details
-
+#Red Hat tools installer – for RHEL 7.x
+#POC/Demo
+#This Script is for setting up a basic SATELLITE 6.10 on RHEL 7 or Ansible Tower 6.10 on RHEL 7
 
 #What this script does in cronalogical order
 #Verify the server can get to the internet
@@ -25,15 +20,15 @@ echo -ne "\e[8;40;170t"
 #Set domain
 #Check all requirements have been met
 #Check FQDN
-#Verify repositories for SATELLITE 6.9
-#Install SATELLITE 6.9
-#Configure SATELLITE 6.9
-#SATELLITE 6.9 configure Satellite base
-#SATELLITE 6.9 internal DNS configuration
-#SATELLITE 6.9 DHCP configuration (optional)
-#SATELLITE 6.9 TFTP configuration
-#SATELLITE 6.9 task and cleanup configuration
-#SATELLITE 6.9 cloud management option configuration
+#Verify repositories for SATELLITE 6.10
+#Install SATELLITE 6.10
+#Configure SATELLITE 6.10
+#SATELLITE 6.10 configure Satellite base
+#SATELLITE 6.10 internal DNS configuration
+#SATELLITE 6.10 DHCP configuration (optional)
+#SATELLITE 6.10 TFTP configuration
+#SATELLITE 6.10 task and cleanup configuration
+#SATELLITE 6.10 cloud management option configuration
 #Start and enable Satellite services
 #Configure Satellite cache
 #Verify DHCP is wanted for new systems (default is enabled)
@@ -61,7 +56,7 @@ echo -ne "\e[8;40;170t"
 #Create a RHEL hostgroups
 #
 #                                              **************************
-#                                              SATELLITE 6.9 REQUIREMENTS
+#                                              SATELLITE 6.10 REQUIREMENTS
 #                                              **************************
 #                                    Hardware Requirements
 #                                        32  GB Ram
@@ -95,7 +90,7 @@ echo -ne "\e[8;40;170t"
 #           cd ~/Downloads
 #
 #           Run the script
-#           sh REDHATTOOLSINSTALLER-6.9.sh"
+#           sh REDHATTOOLSINSTALLER-6.10.sh"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------ Functions ------------------------------------------------------
@@ -295,6 +290,7 @@ yum -q list installed dialog &>/dev/null && echo "dialog is installed" || yum in
 yum -q list installed rhel-system-roles &>/dev/null && echo "rhel-system-roles is installed" || yum install 'rhel-system-roles' -y --skip-broken
 yum -q list installed rubygem-builder &>/dev/null && echo "rubygem-builder is installed" || yum  install -y 'rubygem-builder' --skip-broken
 yum -q list installed libvirt-client &>/dev/null && echo "libvirt-client is installed" || yum  install -y 'libvirt-client' --skip-broken
+yum -q list installed cloud-init &>/dev/null && echo "cloud-initis installed" || yum  install -y 'cloud-init' --skip-broken
 yum-config-manager --disable epel
 sudo touch ~/Downloads/RHTI/INSTALLERPACKAGES
 echo " "
@@ -352,7 +348,7 @@ echo " "
 echo "************************************************************************************************************************************"
 echo "
                                               **************************
-                                              SATELLITE 6.9 REQUIREMENTS
+                                              SATELLITE 6.10 REQUIREMENTS
                                               **************************
                                     Hardware Requirements
                                         32  GB Ram
@@ -387,7 +383,7 @@ echo "
            cd ~/Downloads
 
            Run the script
-           sh REDHATTOOLSINSTALLER-6.9.sh"
+           sh REDHATTOOLSINSTALLER-6.10.sh"
 echo " "
 echo "************************************************************************************************************************************"
 read -p "Press [Enter] to continue"
@@ -405,7 +401,7 @@ echo " "
 echo " "
 echo "
 
-                                              P.O.C SATELLITE 6.9 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
+                                              P.O.C SATELLITE 6.10 ONLY, RHEL 7.X KVM, or RHEL 7 Physical Host 
                                                    THIS SCRIPT CONTAINS NO CONFIDENTIAL INFORMATION
 
                                            This script is designed to set up a basic standalone Satellite 6.X system
@@ -463,78 +459,7 @@ echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
 echo " "
 subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 1
-echo " "
-else
-echo "*******************************************************************"
-echo "System is registered with Red Hat or Red Hat Satellite, Continuing!"
-echo "*******************************************************************"
-echo " "
-echo "*******************************************************************"
-echo 'Verifying that the system is attached to a Satellite Subscription'
-echo "*******************************************************************"
-echo 'Checking your Satellite subscription status this may take a moment'
-subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 1
-fi
-sudo touch ~/Downloads/RHTI/SATREGISTER
-}
-
-#-------------------------------
-function VARIABLES1 {
-#-------------------------------
-reset 
-YMESSAGE="Adding to /root/.bashrc vars"
-NMESSAGE="Skipping"
-FMESSAGE="PLEASE ENTER Y or N"
-COUNTDOWN=10
-DEFAULTVALUE=n
-HNAME=$(hostname -f)
-SHNAME=$(hostname -s)
-DOM="$(hostname -d)"
-echo "*********************************************************"
-echo "COLLECT VARIABLES FOR SAT 6.X"
-echo "*********************************************************"
-export INTERNAL=$(ip -o link | head -n 2 | tail -n 1 | awk '{print $2}' | sed s/:// )
-export EXTERNAL=$(ip route show | sed -e 's/^default via [0-9.]* dev \(\w\+\).*/\1/' | head -1)
-export INTERNALIP=$(ifconfig "$INTERNAL" | grep "inet" | awk -F ' ' '{print $2}' |grep -v f |awk -F . '{print $1"."$2"."$3"."$4}')
-export INTERNALSUBMASK=$(ifconfig "$INTERNAL" |grep netmask |awk -F " " {'print $4'})
-export INTERNALGATEWAY=$(ip route list type unicast dev $(ip -o link | head -n 2 | tail -n 1 | awk '{print $2;}' | sed s/:$//) |awk -F " " '{print $7}')
-echo " "
-echo "*********************************************************"
-echo "ORGANIZATION"
-echo "*********************************************************"
-echo 'What is the name of your Organization?'
-read ORG
-echo 'ORG='$ORG'' >> /root/.bashrc
-echo " "
-echo "*********************************************************"
-echo "LOCATION OF YOUR SATELLITE"
-echo "*********************************************************"
-echo 'What is the location of your Satellite server. Example DENVER'
-read LOC
-echo 'LOC='$LOC'' >> /root/.bashrc
-echo " "
-echo "*********************************************************"
-echo "SETTING DOMAIN"
-echo "*********************************************************"
-echo 'DOM='$(hostname -d)'' >> /root/.bashrc
-echo " "$(hostname -d)''
-echo " "
-echo "*********************************************************"
-echo "NAME OF FIRST SUBNET"
-echo "*********************************************************"
-echo 'What would you like to call your first subnet for systems you are regestering to satellite?'
-read  SUBNET
-echo 'SUBNET_NAME='$SUBNET'' >> /root/.bashrc
-echo " "
-echo "*********************************************************"
-echo "NODE PASSWORD"
-echo "*********************************************************"
-echo 'PROVISIONED HOST PASSWORD'
-echo 'Please enter the default password you would like to use for root for your newly provisioned nodes'
-read PASSWORD
-for i in $(echo "$PASSWORD" | openssl passwd -apr1 -stdin); do echo NODEPASS=$i >> /root/.bashrc ; done
+sleep 1￼
 echo " "
 echo "*********************************************************"
 echo "GATHERING VARIABLES SPECIFIC TO THIS SYSTEM, NO INPUT REQUIRED"
@@ -602,24 +527,22 @@ touch ~/Downloads/RHTI/SERVICEUSER
 function INSTALLREPOS {
 #------------------------------
 echo "******************************************************************"
-echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.9"
+echo "STANDBY WHILE WE SET REPOS FOR INSTALLING AND UPDATING SATELLITE 6.10"
 echo "******************************************************************"
 echo -ne "\e[8;40;170t"
 source /root/.bashrc
-subscription-manager repos --disable "*"
 echo "**************************"
 echo "ENABLE REPOS"
 echo "**************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.9-rpms \
+--enable=rhel-7-server-satellite-6.10-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
+--enable=rhel-7-server-ansible-2.9-rpms \
 yum clean all
 rm -rf /var/cache/yum
-
 echo " "
 sudo touch ~/Downloads/RHTI/INSTALLREPOS
 }
@@ -627,21 +550,16 @@ sudo touch ~/Downloads/RHTI/INSTALLREPOS
 #------------------------------
 function INSTALLDEPS {
 #------------------------------
-echo "************************************************************************"
-echo "INSTALLING DEPENDENCIES AND UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
-echo "************************************************************************"
+echo "***********************************************"
+echo "UPDATING FOR SATELLITE OPERATING ENVIRONMENT"
+echo "***********************************************"
 echo -ne "\e[8;40;170t"
 sleep 1
-yum -q list installed kernel-devel &>/dev/null && echo "kernel-devel is installed" || yum install -y 'kernel-devel' --skip-broken
-yum -q list installed kernel-doc &>/dev/null && echo "kernel-doc is installed" || yum install -y 'kernel-doc' --skip-broken
-yum -q list installed kernel-headers &>/dev/null && echo "kernel-headers is installed" || yum install -y 'kernel-headers' --skip-broken
+
 echo " "
 echo "*********************************************************"
 echo "UPGRADING OS"
 echo "*********************************************************"
- yum-config-manager --disable epel
- subscription-manager repos --disable=rhel-7-server-extras-rpms --disable=rhel-7-server-optional-rpms
- yum clean all ; rm -rf /var/cache/yum
  yum upgrade -y --skip-broken
  sudo touch ~/Downloads/RHTI/INSTALLDEPS
 }
@@ -741,15 +659,17 @@ echo -ne "\e[8;40;170t"
 source /root/.bashrc
 echo " "
 echo "*********************************************************"
-echo "VERIFING REPOS FOR SATELLITE 6.9"
+echo "VERIFING REPOS FOR SATELLITE 6.10"
 echo "*********************************************************"
 subscription-manager repos --disable "*"
 yum-config-manager --disable epel
 subscription-manager repos --enable=rhel-7-server-rpms \
---enable=rhel-7-server-satellite-6.9-rpms \
+--enable=rhel-7-server-satellite-6.10-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms 
+--enable=rhel-7-server-ansible-2.9-rpms \
+--enable=rhel-7-server-extras-rpms \
+--enable=rhel-7-server-optional-rpms
 yum clean all
 rm -rf /var/cache/yum
 sleep 1
@@ -758,29 +678,65 @@ echo "*********************************************************"
 echo "INSTALLING SATELLITE COMPONENTS"
 echo "*********************************************************"
 echo "INSTALLING SATELLITE"
-yum -q list installed bind &>/dev/null && echo "bind is installed" || yum install -y 'bind' --skip-broken
-yum -q list installed bind-utils &>/dev/null && echo "bind-utils is installed" || yum install -y 'bind-utils' --skip-broken
-yum -q list installed dhcp &>/dev/null && echo "dhcp is installed" || yum install -y 'dhcp' --skip-broken
-yum -q list installed tftp &>/dev/null && echo "tftp is installed" || yum install 'tftp' -y --skip-broken
-yum -q list installed tftp-server &>/dev/null && echo "tftp-server is installed" || yum install 'tftp-server' -y --skip-broken
-yum -q list installed nfs-utils &>/dev/null && echo "nfs-utils is installed" || yum install 'nfs-utils' -y --skip-broken
-yum -q list installed syslinux &>/dev/null && echo "syslinux is installed" || yum install 'syslinux' -y --skip-broken
-yum -q list installed rh-mongodb34-syspaths &>/dev/null && echo "rh-mongodb34-syspaths is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
-yum -q list installed rh-mongodb34 &>/dev/null && echo "rh-mongodb34 is installed" || yum install -y 'rh-mongodb34' --skip-broken 
-yum -q list installed rubygem-bundler &>/dev/null && echo "rubygem-bundler is installed" || yum install -y 'rubygem-bundler' --skip-broken 
-yum -q list installed hivex &>/dev/null && echo "hivex is installed" || yum install -y 'hivex' --skip-broken 
-yum -q list installed scrub &>/dev/null && echo "scrub is installed" || yum install -y 'scrub' --skip-broken 
-yum -q list installed libguestfs-tools-c &>/dev/null && echo "libguestfs-tools-c is installed" || yum install -y 'libguestfs-tools-c' --skip-broken 
-yum -q list installed perl-hivex &>/dev/null && echo "perl-hivex is installed" || yum install -y 'perl-hivex' --skip-broken 
-yum -q list installed libguestfs &>/dev/null && echo "libguestfs is installed" || yum install -y 'libguestfs' --skip-broken 
-yum -q list installed hexedit &>/dev/null && echo "hexedit is installed" || yum install -y 'hexedit' --skip-broken 
-yum -q list installed smart_proxy &>/dev/null && echo "smart_proxy is installed" || yum install -y '*smart_proxy*' --skip-broken 
-yum -q list installed foreman &>/dev/null && echo "foreman is installed" || yum install -y 'foreman' --skip-broken 
-yum -q list installed grub2-efi-x64 &>/dev/null && echo "grub2-efi-x64 is installed" || yum install -y 'grub2-efi-x64' --skip-broken 
-yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken
+yum -q list installed 'kernel-tools' &>/dev/null && echo "'kernel-tools' is installed" || yum install -y 'kernel-tools' --skip-broken 
+yum -q list installed 'kernel-tools-libs' &>/dev/null && echo "'kernel-tools-libs' is installed" || yum install -y 'kernel-tools-libs' --skip-broken 
+yum -q list installed 'kernel-devel' &>/dev/null && echo "'kernel-devel' is installed" || yum install -y 'kernel-devel' --skip-broken 
+yum -q list installed 'kernel-doc' &>/dev/null && echo "'kernel-doc' is installed" || yum install -y 'kernel-doc' --skip-broken 
+yum -q list installed 'kernel-headers' &>/dev/null && echo "'kernel-headers' is installed" || yum install -y 'kernel-headers' --skip-broken 
+yum -q list installed 'ansible-collection-redhat-satellite' &>/dev/null && echo "'ansible-collection-redhat-satellite' is installed" || yum install -y 'ansible-collection-redhat-satellite' --skip-broken 
+yum -q list installed 'bind' &>/dev/null && echo "'bind' is installed" || yum install -y 'bind' --skip-broken 
+yum -q list installed 'bind-utils' &>/dev/null && echo "'bind-utils' is installed" || yum install -y 'bind-utils' --skip-broken 
+yum -q list installed 'dhcp' &>/dev/null && echo "'dhcp' is installed" || yum install -y 'dhcp' --skip-broken 
+yum -q list installed 'foreman' &>/dev/null && echo "'foreman' is installed" || yum install -y 'foreman' --skip-broken 
+reset
+yum -q list installed 'foreman-journald' &>/dev/null && echo "'foreman-journald' is installed" || yum install -y 'foreman-journald' --skip-broken 
+yum -q list installed 'foreman-proxy-journald' &>/dev/null && echo "'foreman-proxy-journald' is installed" || yum install -y 'foreman-proxy-journald' --skip-broken 
+yum -q list installed 'foreman-telemetry' &>/dev/null && echo "'foreman-telemetry' is installed" || yum install -y 'foreman-telemetry' --skip-broken 
+yum -q list installed 'grub2-efi-x64' &>/dev/null && echo "'grub2-efi-x64' is installed" || yum install -y 'grub2-efi-x64' --skip-broken 
+yum -q list installed 'hexedit' &>/dev/null && echo "'hexedit' is installed" || yum install -y 'hexedit' --skip-broken 
+yum -q list installed 'hivex' &>/dev/null && echo "'hivex' is installed" || yum install -y 'hivex' --skip-broken 
+yum -q list installed 'keycloak-httpd-client-install' &>/dev/null && echo "'keycloak-httpd-client-install' is installed" || yum install -y 'keycloak-httpd-client-install' --skip-broken 
+yum -q list installed 'libguestfs' &>/dev/null && echo "'libguestfs' is installed" || yum install -y 'libguestfs' --skip-broken 
+yum -q list installed 'libguestfs-tools-c' &>/dev/null && echo "'libguestfs-tools-c' is installed" || yum install -y 'libguestfs-tools-c' --skip-broken 
+yum -q list installed 'livecd-tools' &>/dev/null && echo "'livecd-tools is installed'" || yum install -y 'livecd-tools' --skip-broken 
+reset
+yum -q list installed 'ruby193-mod_passenger40' &>/dev/null && echo "'ruby193-mod_passenger40' is installed" || yum install -y 'ruby193-mod_passenger40' --skip-broken 
+yum -q list installed 'nfs-utils' &>/dev/null && echo "'nfs-utils' is installed" || yum install 'nfs-utils' -y --skip-broken 
+yum -q list installed 'pcp-mmvstatsd' &>/dev/null && echo "'pcp-mmvstatsd' is installed" || yum install -y 'pcp-mmvstatsd' --skip-broken 
+yum -q list installed 'perl-hivex' &>/dev/null && echo "'perl-hivex' is installed" || yum install -y 'perl-hivex' --skip-broken 
+yum -q list installed 'python2-keycloak-httpd-client-install' &>/dev/null && echo "'python2-keycloak-httpd-client-install' is installed" || yum install -y 'python2-keycloak-httpd-client-install' --skip-broken 
+yum -q list installed 'python3-receptor-satellite' &>/dev/null && echo "'python3-receptor-satellite' is installed" || yum install -y 'python3-receptor-satellite' --skip-broken 
+yum -q list installed 'qpid-dispatch-tools' &>/dev/null && echo "'qpid-dispatch-tools' is installed" || yum install -y 'qpid-dispatch-tools' --skip-broken 
+yum -q list installed 'rh-mongodb34' &>/dev/null && echo "'rh-mongodb34' is installed" || yum install -y 'rh-mongodb34' --skip-broken 
+yum -q list installed 'rh-mongodb34-syspaths' &>/dev/null && echo "'rh-mongodb34-syspaths' is installed" || yum install -y 'rh-mongodb34-syspaths' --skip-broken 
+reset
+yum -q list installed 'rhel8-kickstart-setup' &>/dev/null && echo "'rhel8-kickstart-setup' is installed" || yum install -y 'rhel8-kickstart-setup' --skip-broken 
+yum -q list installed 'rubygem-bundler' &>/dev/null && echo "'rubygem-bundler' is installed" || yum install -y 'rubygem-bundler' --skip-broken 
+yum -q list installed 'rubygem-facter' &>/dev/null && echo "'rubygem-facter' is installed" || yum install -y 'rubygem-facter' --skip-broken 
+yum -q list installed 'rubygem-fast_gettext' &>/dev/null && echo "'rubygem-fast_gettext' is installed" || yum install -y 'rubygem-fast_gettext' --skip-broken 
+yum -q list installed 'rubygem-foreman_scap_client' &>/dev/null && echo "'rubygem-foreman_scap_client' is installed" || yum install -y 'rubygem-foreman_scap_client' --skip-broken 
+yum -q list installed 'rubygem-oauth' &>/dev/null && echo "'rubygem-oauth' is installed" || yum install -y 'rubygem-oauth' --skip-broken 
+yum -q list installed 'scrub' &>/dev/null && echo "'scrub' is installed" || yum install -y 'scrub' --skip-broken 
+yum -q list installed 'syslinux' &>/dev/null && echo "'syslinux' is installed" || yum install 'syslinux' -y --skip-broken 
+yum -q list installed 'tfm-rubygem-coffee-rails' &>/dev/null && echo "'tfm-rubygem-coffee-rails' is installed" || yum install -y 'tfm-rubygem-coffee-rails' --skip-broken 
+yum -q list installed 'tfm-rubygem-foreman_kubevirt' &>/dev/null && echo "'tfm-rubygem-foreman_kubevirt' is installed" || yum install -y 'tfm-rubygem-foreman_kubevirt' --skip-broken 
+reset
+yum -q list installed 'tfm-rubygem-foreman_leapp' &>/dev/null && echo "'tfm-rubygem-foreman_leapp' is installed" || yum install -y 'tfm-rubygem-foreman_leapp' --skip-broken 
+yum -q list installed 'tfm-rubygem-foreman_remote_execution-cockpit' &>/dev/null && echo "'tfm-rubygem-foreman_remote_execution-cockpit' is installed" || yum install -y 'tfm-rubygem-foreman_remote_execution-cockpit' --skip-broken 
+yum -q list installed 'tfm-rubygem-hammer_cli_foreman_kubevirt' &>/dev/null && echo "'tfm-rubygem-hammer_cli_foreman_kubevirt' is installed" || yum install -y 'tfm-rubygem-hammer_cli_foreman_kubevirt' --skip-broken 
+yum -q list installed 'tfm-rubygem-hammer_cli_foreman_leapp' &>/dev/null && echo "'tfm-rubygem-hammer_cli_foreman_leapp' is installed" || yum install -y 'tfm-rubygem-hammer_cli_foreman_leapp' --skip-broken 
+yum -q list installed 'tfm-rubygem-jgrep' &>/dev/null && echo "'tfm-rubygem-jgrep' is installed" || yum install -y 'tfm-rubygem-jgrep' --skip-broken 
+yum -q list installed 'tfm-rubygem-net-ssh-krb' &>/dev/null && echo "'tfm-rubygem-net-ssh-krb' is installed" || yum install -y 'tfm-rubygem-net-ssh-krb' --skip-broken 
+yum -q list installed 'tfm-rubygem-ovirt_provision_plugin' &>/dev/null && echo "'tfm-rubygem-ovirt_provision_plugin' is installed" || yum install -y 'tfm-rubygem-ovirt_provision_plugin' --skip-broken 
+yum -q list installed 'tftp' &>/dev/null && echo "'tftp' is installed" || yum install 'tftp' -y --skip-broken 
+yum -q list installed 'tftp-server' &>/dev/null && echo "'tftp-server' is installed" || yum install 'tftp-server' -y --skip-broken 
+yum -q list installed 'smart_proxy' &>/dev/null && echo "'smart_proxy' is installed" || yum install -y '*smart_proxy*' --skip-broken 
+
 rpm -e --nodeps postgresql-9.2.24-4.el7_8.x86_64
-rpm -e --nodeps infoblox 
+rpm -e --nodeps infoblox
+yum -q list installed satellite &>/dev/null && echo "satellite is installed" || yum install -y 'satellite' --skip-broken 
 yum upgrade -y
+
 
 cat > /usr/share/foreman-proxy/bundler.d/dhcp_remote_isc.rb << EOF
 group :dhcp_remote_isc do
@@ -789,7 +745,8 @@ end
 gem 'smart_proxy_dhcp_remote_isc'
 EOF
 
-
+echo '' >> /etc/cloud/cloud.cfg
+echo 'datasource_list: ["NoCloud", "ConfigDrive"]' >> /etc/cloud/cloud.cfg
 sudo touch ~/Downloads/RHTI/INSTALLNSAT
 }
 
@@ -816,52 +773,56 @@ echo "*****************************"
 source /root/.bashrc
 foreman-maintain packages unlock 
 satellite-installer --scenario satellite -v \
---foreman-initial-admin-username="$ADMIN" \
---foreman-initial-admin-password="$ADMIN_PASSWORD" \
---foreman-initial-organization="$ORG" \
---foreman-initial-location "$LOC" \
---foreman-proxy-puppetca=true \
 --foreman-proxy-tftp=true \
+--foreman-proxy-tftp-servername="$INTERNALIP" \
 --foreman-proxy-tftp-managed=true \
 --foreman-proxy-tftp-listen-on=both \
---foreman-proxy-tftp-servername="$INTERNALIP" \
---foreman-proxy-dns=true \
---foreman-proxy-dns-managed=true \
---foreman-proxy-dns-forwarders="$DNS" \
---foreman-proxy-dns-server="$(hostname)" \
---foreman-proxy-dns-interface="$SAT_INTERFACE" \
---foreman-proxy-dns-zone "$DOM" \
---foreman-proxy-dns-listen-on=both \
---foreman-proxy-dns-provider=nsupdate \
---foreman-proxy-dns-reverse="$DNS_REV" \
---foreman-proxy-dns-zone="$DOM" \
+--foreman-proxy-puppetca=true \
+--foreman-proxy-plugin-remote-execution-ssh-install-key true \
 --foreman-proxy-keyfile=/etc/rndc.key \
+--foreman-proxy-dns=true \
+--foreman-proxy-dns-zone="$DOM" \
 --foreman-proxy-dns-ttl=86400 \
+--foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" \
+--foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
+--foreman-proxy-dns-server="$(hostname)" \
+--foreman-proxy-dns-reverse="$DNS_REV" \
+--foreman-proxy-dns-provider=nsupdate \
+--foreman-proxy-dns-managed=true \
+--foreman-proxy-dns-listen-on=both \
+--foreman-proxy-dns-interface="$SAT_INTERFACE" \
+--foreman-proxy-dns-forwarders="$DNS" \
+--foreman-proxy-dhcp=true \
+--foreman-proxy-dhcp-server="$INTERNALIP" \
+--foreman-proxy-dhcp-range="$DHCP_RANGE" \
+--foreman-proxy-dhcp-pxefilename "pxelinux.0" \
+--foreman-proxy-dhcp-provider isc \
+--foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
+--foreman-proxy-dhcp-managed=true \
+--foreman-proxy-dhcp-listen-on="both" \
+--foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
+--foreman-proxy-dhcp-gateway="$DHCP_GW" \
+--foreman-plugin-tasks-automatic-cleanup true \
+--foreman-initial-organization="$ORG" \
+--foreman-initial-location "$LOC" \
+--foreman-initial-admin-username="$ADMIN" \
+--foreman-initial-admin-password="$ADMIN_PASSWORD" \
+--enable-foreman-proxy-plugin-remote-execution-ssh \
+--enable-foreman-proxy-plugin-ansible \
+--enable-foreman-plugin-rh-cloud \
+--enable-foreman-plugin-remote-execution \
+--enable-foreman-plugin-bootdisk \
 --enable-foreman-compute-vmware \
 --enable-foreman-compute-libvirt \
 --enable-foreman-compute-gce \
---enable-foreman-compute-ec2 \
---foreman-plugin-tasks-automatic-cleanup true \
---foreman-proxy-plugin-discovery-install-images true \
---enable-foreman-plugin-discovery \
---enable-foreman-plugin-bootdisk \
---enable-foreman-plugin-remote-execution \
---enable-foreman-proxy-plugin-remote-execution-ssh \
---foreman-proxy-dhcp=true \
---foreman-proxy-dhcp-managed=true \
---foreman-proxy-dhcp-provider isc \
---foreman-proxy-dhcp-pxefilename "pxelinux.0" \
---foreman-proxy-dhcp-gateway="$DHCP_GW" \
---foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
---foreman-proxy-dhcp-listen-on="both" \
---foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
---foreman-proxy-dhcp-range="$DHCP_RANGE" \
---enable-foreman-proxy-plugin-dhcp-remote-isc \
---foreman-proxy-dhcp-server="$INTERNALIP" \
---enable-foreman-plugin-rh-cloud \
---foreman-proxy-plugin-remote-execution-ssh-install-key true \
---foreman-proxy-dns-tsig-keytab "/etc/foreman-proxy/dns.keytab" \
---foreman-proxy-dns-tsig-principal "foremanproxy/"$(hostname)"@"$DOM"" 
+--enable-foreman-compute-ec2 
+
+source /root/.bashrc
+foreman-maintain packages unlock 
+satellite-installer --scenario satellite -v \
+--foreman-proxy-plugin-discovery-install-images false \
+--no-enable-foreman-proxy-plugin-discovery \
+--no-enable-foreman-plugin-discovery 
 
 echo " "
 echo " " 
@@ -914,6 +875,9 @@ systemctl enable named.service
 systemctl start named.service
 systemctl --system daemon-reload
 foreman-maintain packages lock
+
+--enable-foreman-plugin-discovery
+
 
 sudo touch ~/Downloads/RHTI/CONFSAT
 }
@@ -1046,10 +1010,13 @@ hammer settings set --name query_local_nameservers --value true
 hammer settings set --name discovery_location --value "$LOC"
 hammer settings set --name content_view_solve_dependencies --value true
 hammer settings set --name remote_execution_by_default --value true
-hammer settings set --name ansible_ssh_private_key_file --value /root/.ssh/id_rsa
+#hammer settings set --name ansible_ssh_private_key_file --value /root/.ssh/id_rsa
 hammer settings set --name unregister_delete_host --value true
 hammer settings set --name default_puppet_environment --value production
 hammer settings set --name ansible_verbosity --value "Level 3(-vvv)"
+hammer settings set --name=remote_execution_fallback_proxy --value=true
+hammer settings set --name=remote_execution_global_proxy --value=true
+
 echo " "
 echo "*********************************************************"
 echo 'TUNING THE SATELLITE FOR MEDIUM '
@@ -1079,7 +1046,7 @@ QMESSAGE7="Would you like to enable and sync RHEL 7 Content
 This will enable:
  Red Hat Enterprise Linux 7 Server (Kickstart)
  Red Hat Enterprise Linux 7 Server
- Red Hat Satellite Tools 6.9 (for RHEL 7 Server)
+ Red Hat Satellite Tools 6.10 (for RHEL 7 Server)
  Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server
  Red Hat Enterprise Linux 7 Server - Extras
  Red Hat Enterprise Linux 7 Server - Optional
@@ -1095,13 +1062,13 @@ Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
 Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)
 Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
-Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
+Red Hat Satellite Tools 6.10 for RHEL 8 x86_64 (RPMs)
 "
 
 QMESSAGEJBOSS="Would you like to download JBoss Enterprise Application Platform 7 (RHEL 7 Server) content"
 QMESSAGEVIRTAGENT="Would you like to download Red Hat Virtualization 4 Management Agents for RHEL 7 content"
-QMESSAGESAT65="Would you like to download Red Hat Satellite 6.9 (for RHEL 7 Server) content"
-QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.9 (for RHEL 7 Server) content"
+QMESSAGESAT65="Would you like to download Red Hat Satellite 6.10 (for RHEL 7 Server) content"
+QMESSAGECAP65="Would you like to download Red Hat Satellite Capsule 6.10 (for RHEL 7 Server) content"
 QMESSAGEOSC="Would you like to download Red Hat OpenShift Container Platform 3.10 content"
 QMESSAGECEPH="Would you like to download Red Hat Ceph Storage Tools 3.0 for Red Hat Enterprise Linux 7 Server content"
 QMESSAGESNC="Would you like to download Red Hat Storage Native Client for RHEL 7 content"
@@ -1155,8 +1122,8 @@ echo "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Enterprise Linux 7 Server - Optional (RPMs)'
 echo "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Enterprise Linux 7 Server - Extras (RPMs)'
-echo "Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)'
+echo "Red Hat Satellite Tools 6.10 (for RHEL 7 Server) (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux Server' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.10 (for RHEL 7 Server) (RPMs)'
 echo "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Software Collections (for RHEL Server)' --basearch='x86_64' --releasever='7Server' --name 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7Server -O /root/RPM-GPG-KEY-EPEL-7Server
@@ -1195,13 +1162,13 @@ hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise
 hammer repository update --download-policy immediate --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4'
 time hammer repository synchronize --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4' 2>/dev/null
 echo "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.4' --name 'Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.4' --name 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)'
 echo "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.3' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
-echo "Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)"
-hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)' 
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --releasever='8.4' --name 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)'
+echo "Red Hat Satellite Tools 6.10 for RHEL 8 x86_64 (RPMs)"
+hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Satellite Tools 6.10 for RHEL 8 x86_64 (RPMs)' 
 echo "Red Hat Storage Native Client for RHEL 8 (RPMs)"
 hammer repository-set enable --organization "$ORG" --product 'Red Hat Enterprise Linux for x86_64' --basearch='x86_64' --name 'Red Hat Storage Native Client for RHEL 8 (RPMs)'
 wget -q https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8 -O /root/RPM-GPG-KEY-EPEL-8
@@ -1320,7 +1287,7 @@ hammer subnet create \
 --dns $HNAME \
 --dns-primary $SAT_IP \
 --dns-secondary $DNS \
---domain-ids 1 \
+--domains $DOM \
 --from 10.168.1.101 \
 --gateway $DHCP_GW \
 --ipam 'Internal DB' \
@@ -1333,6 +1300,7 @@ hammer subnet create \
 --prefix $PREFIX \
 --remote-execution-proxy-ids 1 \
 --tftp $HNAME \
+--from 10.168.129.1 \
 --to 10.168.255.254
 sudo touch ~/Downloads/RHTI/CREATESUBNET
 }
@@ -1420,8 +1388,8 @@ echo 'Adding Red Hat Enterprise Linux 7 Server '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server RPMs x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server Kickstart '
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9'
-echo 'Adding Red Hat Satellite Tools 6.9 for RHEL 7 Server'
-hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.9 for RHEL 7 Server RPMs x86_64'
+echo 'Adding Red Hat Satellite Tools 6.10 for RHEL 7 Server'
+hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Enterprise Linux Server' --repository 'Red Hat Satellite Tools 6.10 for RHEL 7 Server RPMs x86_64'
 echo 'Adding Red Hat Software Collections'
 hammer content-view add-repository --organization $ORG --name 'RHEL_7_x86_64' --product 'Red Hat Software Collections for RHEL Server' --repository 'Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server x86_64 7Server'
 echo 'Adding Red Hat Enterprise Linux 7 Server - Supplementary'
@@ -1449,18 +1417,18 @@ function CONTENTVIEWS8 {
 #-------------------------------
 echo " "
 echo 'RHEL_8_x86_64'
-hammer content-view create --organization $ORG --name 'RHEL_8_x86_64' --label RHEL_8-3_x86_64 --description 'RHEL 8.3'
+hammer content-view create --organization $ORG --name 'RHEL_8_x86_64' --label RHEL_8-3_x86_64 --description 'RHEL 8.4'
 echo " "
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - AppStream'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.3'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.4'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.3'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - BaseOS '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.3'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs 8.4'
 echo 'Adding Red Hat Enterprise Linux 8 for x86_64 - Supplementary '
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.3'
-echo 'Adding Red Hat Satellite Tools 6.9 for RHEL 8'
-hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 RPMs x86_64'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Enterprise Linux 8 for x86_64 - Supplementary RPMs 8.4'
+echo 'Adding Red Hat Satellite Tools 6.10 for RHEL 8'
+hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Red Hat Satellite Tools 6.10 for RHEL 8 x86_64 RPMs x86_64'
 echo 'Adding Red Hat EPEL for RHEL 8'
 hammer content-view add-repository --organization $ORG --name 'RHEL_8_x86_64' --product 'Red Hat Enterprise Linux for x86_64' --repository 'Extra Packages for Enterprise Linux 8'
 sleep 1
@@ -1570,16 +1538,13 @@ echo "*********************************************************"
 echo "Associate each activation key to host collection:"
 echo "*********************************************************"
 for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F ',' '{print $2}' | grep RHEL_7); \
-do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' \
---organization $ORG; done
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_7_x86_64' --organization $ORG; done
 sleep 1
 for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |grep -v '-' |awk -F ',' '{print $2}' | grep RHEL_8); \
-do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' \
---organization $ORG; done
+do hammer activation-key add-host-collection --name $i --host-collection='RHEL_8_x86_64' --organization $ORG; done
 sleep 1
 for i in $(hammer --csv activation-key list --organization $ORG |grep -v ID |awk -F ',' '{print $2}' |grep Satellite_6); \
-do hammer activation-key add-host-collection --name $i --host-collection='Satellite_6.9-RHEL_7_x86_64' \
---organization $ORG; done
+do hammer activation-key add-host-collection --name $i --host-collection='Satellite_6.10-RHEL_7_x86_64' --organization $ORG; done
 sleep 1
 sudo touch ~/Downloads/RHTI/KEYSTOHOST
 }
@@ -1618,7 +1583,7 @@ echo "*********************************************************"
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.9/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.9 Kickstart" --operatingsystems="RedHat 7.9"
 
 #RHEL 8 
-hammer medium create --path=http://repos/REDHAT/Library/content/dist/rhel8/8.3/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.3 Kickstart" --operatingsystems="RedHat-8.3"
+hammer medium create --path=http://repos/REDHAT/Library/content/dist/rhel8/8.4/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.4 Kickstart" --operatingsystems="RedHat-8.4"
 sudo touch ~/Downloads/RHTI/MEDIUM
 }
 
@@ -1775,9 +1740,12 @@ function SATDONE {
 #-------------------------------
 hammer template build-pxe-default
 foreman-rake foreman_tasks:cleanup TASK_SEARCH='label = Actions::Katello::Repository::Sync' STATES='paused,pending,stopped' VERBOSE=true --trace
-foreman-rake katello:delete_orphaned_content --trace
+foreman-rake katello:delete_orphaned_content
+foreman-rake foreman_tasks:cleanup TASK_SEARCH='' TASK_DAYS=20
+foreman-rake apipie:cache rake task
+
 #foreman-rake katello:reimport
-foreman-rake apipie:cache:index --trace
+#foreman-rake apipie:cache:index --trace
 
 echo 'YOU HAVE NOW COMPLETED INSTALLING SATELLITE! READY TO REBOOT'
 read -p "Press [Enter] to continue"
@@ -2088,6 +2056,9 @@ yum -q list installed yum-utils &>/dev/null && echo "yum-utils is installed" || 
 yum -q list installed dialog &>/dev/null && echo "dialog is installed" || yum localinstall -y dialog --skip-broken --noplugins
 yum -q list installed bash-completion-extras &>/dev/null && echo "bash-completion-extras" || yum install -y bash-completion-extras --skip-broken --noplugins
 yum -q list installed dconf &>/dev/null && echo "dconf" || yum install -y dconf* --skip-broken --noplugins
+yum -q list installed pxe-bootimgs &>/dev/null && echo "pxe-bootimgs" || yum install -y pxe-bootimgs --skip-broken --noplugins
+
+
 yum-config-manager --disable epel
 echo " "
 fi
@@ -2211,7 +2182,7 @@ fi
 function dMainMenu {
 #-----------------------
 $DIALOG --stdout --title "Red Hat P.O.C. Tools - RHEL 7.X" --menu "********** Menu ********* \n Please choose [1 -> 4]?" 30 90 10 \
-1 "SATELLITE 6.9 INSTALL" \
+1 "SATELLITE 6.10 INSTALL" \
 2 "ANSIBLE TOWER 3.6.4 INSTALL" \
 3 "SATELLITE POST INSTALL CLEANUP" \
 4 "EXIT"
@@ -2264,7 +2235,7 @@ RC=$?
 [[ $RC -ne 0 ]] && break
 Flag=$(cat $TmpFi)
 case $Flag in
-1) dMsgBx "SATELLITE 6.9 INSTALL" \
+1) dMsgBx "SATELLITE 6.10 INSTALL" \
 sleep 1
 #SCRIPT
 echo " "
