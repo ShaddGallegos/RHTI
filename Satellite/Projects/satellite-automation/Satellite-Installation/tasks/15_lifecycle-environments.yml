@@ -1,0 +1,22 @@
+---
+- name: configure lifecycle environments
+  redhat.satellite.lifecycle_environment:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    validate_certs: false
+    server_url: "{{ satellite_server_url }}"
+    organization: "{{ satellite_organization }}"
+    name: "{{ lifecycle_environment.name }}"
+    prior: "{{ lifecycle_environment.prior }}"
+    description: "{{ lifecycle_environment.description | default(omit) }}"
+  loop_control:
+    loop_var: lifecycle_environment
+  loop: "{{ satellite_lifecycle_environments }}"
+  delegate_to: "{{ delegate_host }}"
+
+
+- name: Promote Composite content views through environments
+  include_tasks: cv_promotions.yml
+  loop_control:
+    loop_var: lifecycle_environments
+  loop: "{{ satellite_lifecycle_environments }}"

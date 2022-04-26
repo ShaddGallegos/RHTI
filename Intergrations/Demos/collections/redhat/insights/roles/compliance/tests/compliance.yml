@@ -1,7 +1,0 @@
----
-- hosts: all
-  
-  tasks:
-  - name: insights compliance
-    import_role:
-      name: redhat.insights.compliance

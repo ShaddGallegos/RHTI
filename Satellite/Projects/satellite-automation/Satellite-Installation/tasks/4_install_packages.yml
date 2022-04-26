@@ -1,0 +1,9 @@
+- name: install | get package facts
+  package_facts:
+    manager: auto
+
+- name: install | install satellite package
+  package:
+    name: "{{ satellite_packages }}"
+    state: present
+  when: "'satellite' not in ansible_facts.packages"

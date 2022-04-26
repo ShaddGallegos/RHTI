@@ -1,0 +1,35 @@
+---
+# TASKS
+- name: Patch yum-clean-metadata
+  command: yum clean all
+  args:
+    warn: no
+
+- name: Remove unneeded packages
+  package:
+    name: iwl7265-firmware
+    state: absent
+
+- name: Check if update is required
+  shell: yum -q check-update > /dev/null
+  register: patch_lvl
+  failed_when: patch_lvl.rc not in [100,0]
+  become: yes
+
+- name:
+  block:
+  - name: Patch the system
+    package:
+      name: "*"
+      state: latest
+
+  - name: Reboot on new kernel
+    reboot:
+
+  - name: Wait 600 seconds for target connection to become reachable/usable
+    wait_for_connection:
+
+  when: patch_lvl.rc == 100
+
+- name: Refreshing Ansible facts
+  setup:

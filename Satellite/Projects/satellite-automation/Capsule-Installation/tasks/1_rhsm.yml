@@ -1,0 +1,53 @@
+- name: Ensure that there's a line for the short  satellite hostname and full satellite hostname
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ satellite_ip }}  {{ satellite_fqdn }} {{ satellite_short }}"
+    state: present
+
+- name: Ensure that there's a line for the capsule server on satellite in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ capsule_ip }}  {{ capsule_fqdn }} {{ capsule_short }}"
+    state: present
+  delegate_to: "{{ satellite_fqdn }}"
+
+- name: RHSM Subscribe | check if {{ satellite_fqdn }} ins in rhsm.conf
+  command: grep {{ satellite_fqdn }} /etc/rhsm/rhsm.conf
+  register: checkrhsm
+  check_mode: no
+  ignore_errors: yes
+  changed_when: no
+
+- name: RHSM Subscribe | remove old subscription
+  redhat_subscription:
+    state: absent
+  when: checkrhsm.rc != 0
+
+- name: RHSM Subscribe | remove old rpms from Satellite 6
+  yum:
+    name:
+      - katello-ca-consumer-*.noarch
+    state: absent
+  when: checkrhsm.rc != 0
+
+- name: Katello-ca RPM
+  get_url:
+    url: https://{{ satellite_fqdn }}/pub/katello-ca-consumer-latest.noarch.rpm
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    dest: /tmp/katello-ca-consumer-latest.noarch.rpm
+    validate_certs: no
+
+- name: Install local Katello-ca RPM
+  package:
+    name:  /tmp/katello-ca-consumer-latest.noarch.rpm
+    state: present
+  when: checkrhsm.rc != 0
+
+- name: Using an Activation Key for register to  {{ satellite_fqdn }}
+  redhat_subscription:
+    state: present
+    activationkey: "{{ capsule_ak }}"
+    org_id: "{{ satellite_org }}"
+    pool: '^(Red Hat Satellite Infrastructure Subscription)$'
+  when: checkrhsm.rc != 0

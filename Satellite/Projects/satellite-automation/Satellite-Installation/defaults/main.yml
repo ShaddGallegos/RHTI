@@ -1,0 +1,408 @@
+satellite_admin_username: "admin"
+satellite_admin_password: "{{ lookup('file', 'SATELLITE_PASSWORD') }}"
+satellite_organization: "EXAMPLE"
+satellite_location: "EXAMPLE"
+satellite_hostname: "sat6.example.com"
+satellite_rhn_activation_key: "Satellite-AK"
+satellite_server_url: "https://{{ ansible_fqdn }}"
+satellite_data_disk: /dev/vdb
+satellite_vg_name: sat_vg01
+satellite_rhn_org:
+satellite_rhn_username: "example-satellite"
+satellite_rhn_password: "{{ lookup('file', 'RHN_PASSWORD') }}"
+satellite_manifest_uuid: "{{ lookup('file', 'MANIFEST_UUID') }}"
+satellite_deployment_version: "6.10"
+satellite_server_basearch: "x86_64"
+satellite_lifecycle: "Dev"
+satellite_email: 'admin@example.com'
+satellite_tuning: "medium"
+satellite_CSR: "false"
+## Only Change this if satellite csr is true
+satellite_country: "US"
+satellite_state: "FL"
+satellite_city: "LOST"
+satellite_company: "Example LLC"
+satellite_organizational_unit: "EXAMPLE"
+## Only use vars for RHV deployment
+rhvm_username:
+rhvm_password:
+rhvm_hostname:
+rhv_template:
+rhv_cluster:
+rhv_description:
+rhv_storage_domain:
+rhv_vm_memory:
+rhv_vm_cpu:
+rhv_vm_timezone:
+rhv_vm_ssh_key:
+rhv_vm_network:
+rhv_vm_ipaddress:
+rhv_vm_netmask:
+rhv_vm_gateway:
+rhv_vm_root_password:
+rhv_vm_os:
+
+
+# Required Firewalls ports for satellite
+satellite_ports:
+  - port: 53/tcp
+  - port: 53/udp
+  - port: 443/tcp
+  - port: 80/tcp
+  - port: 5646/tcp
+  - port: 5910-5930/tcp
+  - port: 8000/tcp
+  - port: 8140/tcp
+  - port: 8443/tcp
+  - port: 9090/tcp
+
+# satellite install role options:
+satellite_options: >-
+  --foreman-initial-admin-password "{{ satellite_admin_password }}"
+  --foreman-initial-organization  "{{ satellite_organization }}"
+  --foreman-initial-location  "{{ satellite_location }}"
+  --foreman-proxy-dns-managed false
+  --foreman-proxy-dns false
+  --foreman-proxy-dhcp false
+  --foreman-proxy-dhcp-managed false
+  --foreman-proxy-tftp false
+  --foreman-proxy-tftp-managed false
+  --foreman-proxy-puppetca true
+  --enable-foreman-plugin-discovery
+  --foreman-plugin-tasks-automatic-cleanup true
+
+# Basic Settings
+satellite_settings:
+   - name: "default_download_policy"
+     value: "immediate"
+   - name: "default_redhat_download_policy"
+     value: "immediate"
+   - name: "default_proxy_download_policy"
+     value: "immediate"
+   - name: "errata_status_installable"
+     value: "true"
+   - name: "administrator"
+     value: "{{ satellite_email }}"
+   - name: "db_pending_seed"
+     value: "false"
+   - name: "entries_per_page"
+     value: "100"
+   - name: "host_power_status"
+     value: "false"
+   - name: "remote_execution_by_default"
+     value: "true"
+   - name: "login_text"
+     value: "I've read & consent to terms in IS user agreement."
+
+##LVM Configuration
+satellite_req_dirs:
+   - mount_point: /var/lib/pulp
+     lv_name: pulp
+     lv_size: 500g
+   - mount_point: /var/opt/rh/rh-postgresql12
+     lv_name: rhpostgresql12
+     lv_size: 20g
+
+satellite_lifecycle_environments:
+   - name: Dev
+     description: 'Devlopment'
+     prior: 'Library'
+   - name: Test
+     description: 'dont test in prod'
+     prior: 'Dev'
+   - name: Prod
+     description: 'Production'
+     prior: 'Test'
+
+satellite_repos:
+
+   - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
+     label: rhel-7-server-rpms
+     repos:
+       - releasever: "7Server"
+         basearch: "{{ satellite_server_basearch }}"
+
+   - name: "Red Hat Satellite Tools 6.10 (for RHEL 7 Server) (RPMs)"
+     label: rhel-7-server-satellite-tools-6.7-rpms
+     all: "true"
+
+   - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
+     label: rhel-server-rhscl-7-rpms
+     repos:
+       - releasever: "7Server"
+         basearch: "{{ satellite_server_basearch }}"
+
+   - name: "Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server"
+     label: rhel-server-rhscl-7-rpms
+     repos:
+       - releasever: "7.9"
+         basearch: "{{ satellite_server_basearch }}"
+
+   - name: "Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)"
+     label: rhel-7-server-satellite-maintenance-6-rpms
+     all: "true"
+
+   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+     label: rhel-7-server-ansible-2.9-rpms
+     all: "true"
+
+   - name: "Red Hat Enterprise Linux 7 Server - Extras RPMs"
+     label: rhel-7-server-extras-rpms
+     all: "true"
+
+   - name: "Red Hat Enterprise Linux 7 Server - Optional RPMs"
+     label: rhel-7-server-optional-rpms
+     repos:
+       - releasever: "7Server"
+         basearch: "{{ satellite_server_basearch }}"
+
+   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+     label: rhel-8-for-x86_64-baseos-rpms
+     repos:
+       - releasever: "8"
+     all: false
+
+   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+     label: rhel-8-for-x86_64-appstream-rpms
+     repos:
+       - releasever: "8"
+     all: false
+
+   - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
+     label: rhel-8-for-x86_64-supplementary-rpms
+     repos:
+       - releasever: "8"
+     all: false
+
+   - name: "Red Hat Satellite Tools 6.10 for RHEL 8 x86_64 (RPMs)"
+     label: satellite-tools-6.10-for-rhel-8-x86_64-rpms
+     all: "true"
+
+   - name: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 (RPMs)"
+     label: ansible-2.9-for-rhel-8-x86_64-rpms
+     all: "true"
+
+   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+     label: rhel-7-server-ansible-2.9-rpms
+     all: "true"
+
+   - name: "Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)"
+     label: ansible-2-for-rhel-8-x86_64-rpms
+     all: "true"
+
+   - name: "Red Hat Ansible Engine 2 RPMs for Red Hat Enterprise Linux 7 Server"
+     label: rhel-7-server-ansible-2-rpms
+     all: "true"
+
+   - name: "Red Hat Satellite 6.10 for RHEL 7 Server RPMs x86_64"
+     product: "Red Hat Satellite"
+     label: rhel-7-server-satellite-6.10-rpms
+     all: "true"
+   - name: "Red Hat Satellite Capsule 6.10 for RHEL 7 Server RPMs"
+     product: "Red Hat Satellite Capsule"
+     label: rhel-7-server-satellite-capsule-6.10-rpms
+     all: "true"
+
+satellite_content_views:
+  - name: cv_epel_rhel7
+    repos:
+      - repo: "Extra Packages for Enterprise Linux 7 Repository"
+        repo_url: "http://download.fedoraproject.org/pub/epel/7/x86_64"
+        product: "Extra Packages for Enterprise Linux"
+        content_credential: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7"
+        content_credential_name: "RPM-GPG-KEY-EPEL-7"
+
+  - name: cv_epel_rhel8
+    repos:
+      - repo: "Extra Packages for Enterprise Linux 8 Repository"
+        repo_url: "http://download.fedoraproject.org/pub/epel/8/Everything/x86_64"
+        product: "Extra Packages for Enterprise Linux"
+        content_credential: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
+        content_credential_name: "RPM-GPG-KEY-EPEL-8"
+
+  - name: cv-epel-rhel8-modular
+    repos:
+      - repo: "Extra Packages for Enterprise Linux 8 Modular Repository"
+        repo_url: "http://download.fedoraproject.org/pub/epel/8/Modular/x86_64"
+        product: "Extra Packages for Enterprise Linux"
+        content_credential: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
+        content_credential_name: "RPM-GPG-KEY-EPEL-8"
+
+  - name: cv_rhel7
+    repos:
+      - repo: "Red Hat Enterprise Linux 7 Server (RPMs)"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: "x86_64"
+        releasever: "7Server"
+      - repo: "Red Hat Enterprise Linux 7 Server - Extras RPMs"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: "x86_64"
+      - repo: "Red Hat Enterprise Linux 7 Server - Optional RPMs"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: "x86_64"
+        releasever: "7Server"
+  - name: cv_rhel8
+    repos:
+      - repo: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+        product: "Red Hat Enterprise Linux for x86_64"
+        releasever: "8"
+      - repo: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+        product: "Red Hat Enterprise Linux for x86_64"
+        releasever: "8"
+  - name: cv_sat
+    repos:
+      # yamllint disable-line rule:line-length
+      - repo: "Red Hat Satellite Maintenance 6 for RHEL 7 Server RPMs"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: x86_64
+      - repo: "Red Hat Satellite 6.7 (for RHEL 7 Server) (RPMs)"
+        product: "Red Hat Satellite"
+        basearch: x86_64
+      - repo: "Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: x86_64
+  - name: cv_capsule
+    repos:
+      # yamllint disable-line rule:line-length
+      - repo: "Red Hat Satellite Maintenance 6 for RHEL 7 Server RPMs"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: x86_64
+      - repo: "Red Hat Satellite Capsule 6.7 for RHEL 7 Server RPMs"
+        product: "Red Hat Satellite Capsule"
+        basearch: x86_64
+      - repo: "Red Hat Satellite Tools 6.7 (for RHEL 7 Server) (RPMs)"
+        product: "Red Hat Enterprise Linux Server"
+        basearch: x86_64
+
+  - name: cv_ansible
+    repos:
+      - repo: "Red Hat Ansible Engine 2 RPMs for Red Hat Enterprise Linux 7 Server"
+        product: "Red Hat Ansible Engine"
+        basearch: x86_64
+      - repo: "Red Hat Ansible Engine 2.8 RPMs for Red Hat Enterprise Linux 7 Server"
+        product: "Red Hat Ansible Engine"
+        basearch: x86_64
+      - repo: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+        product: "Red Hat Ansible Engine"
+        basearch: x86_64
+      - repo: "Red Hat Ansible Engine 2.8 for RHEL 8 x86_64 RPMs"
+        product: "Red Hat Ansible Engine"
+      - repo: "Red Hat Ansible Engine 2.9 for RHEL 8 x86_64 RPMs"
+        product: "Red Hat Ansible Engine"
+
+
+satellite_composite_content_views:
+  - name: CCV_RHEL7
+    description: rhel 7 packages
+    auto_publish: false
+    component_content_views:
+            - name: cv_rhel7
+            - name: cv_epel_rhel7
+  - name: CCV_RHEL8
+    description: rhel 8 packages
+    auto_publish: false
+    component_content_views:
+            - name: cv_rhel8
+            - name: cv_epel_rhel8
+  - name: CCV_SATELLITE
+    description: Satellite packages
+    auto_publish: false
+    component_content_views:
+            - name: cv_rhel7
+            - name: cv_sat
+  - name: CCV_CAPSULE
+    description: Satellite Capsule packages
+    auto_publish: false
+    component_content_views:
+            - name: cv_rhel7
+            - name: cv_capsule
+            - name: cv_ansible
+
+
+satellite_host_collections:
+   - name: CAPSULE
+     description: "Capsule servers"
+
+satellite_activation_keys:
+   - name: AK_RHEL7
+     lifecycle_environment: "{{ satellite_lifecycle }}"
+     content_view: CCV_RHEL7
+     auto_attach: true
+
+   - name: AK_CAPSULE
+     lifecycle_environment: "{{ satellite_lifecycle }}"
+     content_view: CCV_CAPSULE
+     auto_attach: true
+     host_collections: "CAPSULE"
+
+   - name: AK_RHEL8
+     lifecycle_environment: "{{ satellite_lifecycle }}"
+     content_view: CCV_RHEL8
+     auto_attach: true
+
+   - name: AK_SAT
+     lifecycle_environment: "{{ satellite_lifecycle }}"
+     content_view: CCV_SATELLITE
+     auto_attach: true
+
+satellite_content_credential:
+   - name: RPM-GPG-KEY-EPEL-7
+     content: "-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+mQINBFKuaIQBEAC1UphXwMqCAarPUH/ZsOFslabeTVO2pDk5YnO96f+rgZB7xArB
+OSeQk7B90iqSJ85/c72OAn4OXYvT63gfCeXpJs5M7emXkPsNQWWSju99lW+AqSNm
+jYWhmRlLRGl0OO7gIwj776dIXvcMNFlzSPj00N2xAqjMbjlnV2n2abAE5gq6VpqP
+vFXVyfrVa/ualogDVmf6h2t4Rdpifq8qTHsHFU3xpCz+T6/dGWKGQ42ZQfTaLnDM
+jToAsmY0AyevkIbX6iZVtzGvanYpPcWW4X0RDPcpqfFNZk643xI4lsZ+Y2Er9Yu5
+S/8x0ly+tmmIokaE0wwbdUu740YTZjCesroYWiRg5zuQ2xfKxJoV5E+Eh+tYwGDJ
+n6HfWhRgnudRRwvuJ45ztYVtKulKw8QQpd2STWrcQQDJaRWmnMooX/PATTjCBExB
+9dkz38Druvk7IkHMtsIqlkAOQMdsX1d3Tov6BE2XDjIG0zFxLduJGbVwc/6rIc95
+T055j36Ez0HrjxdpTGOOHxRqMK5m9flFbaxxtDnS7w77WqzW7HjFrD0VeTx2vnjj
+GqchHEQpfDpFOzb8LTFhgYidyRNUflQY35WLOzLNV+pV3eQ3Jg11UFwelSNLqfQf
+uFRGc+zcwkNjHh5yPvm9odR1BIfqJ6sKGPGbtPNXo7ERMRypWyRz0zi0twARAQAB
+tChGZWRvcmEgRVBFTCAoNykgPGVwZWxAZmVkb3JhcHJvamVjdC5vcmc+iQI4BBMB
+AgAiBQJSrmiEAhsPBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRBqL66iNSxk
+5cfGD/4spqpsTjtDM7qpytKLHKruZtvuWiqt5RfvT9ww9GUUFMZ4ZZGX4nUXg49q
+ixDLayWR8ddG/s5kyOi3C0uX/6inzaYyRg+Bh70brqKUK14F1BrrPi29eaKfG+Gu
+MFtXdBG2a7OtPmw3yuKmq9Epv6B0mP6E5KSdvSRSqJWtGcA6wRS/wDzXJENHp5re
+9Ism3CYydpy0GLRA5wo4fPB5uLdUhLEUDvh2KK//fMjja3o0L+SNz8N0aDZyn5Ax
+CU9RB3EHcTecFgoy5umRj99BZrebR1NO+4gBrivIfdvD4fJNfNBHXwhSH9ACGCNv
+HnXVjHQF9iHWApKkRIeh8Fr2n5dtfJEF7SEX8GbX7FbsWo29kXMrVgNqHNyDnfAB
+VoPubgQdtJZJkVZAkaHrMu8AytwT62Q4eNqmJI1aWbZQNI5jWYqc6RKuCK6/F99q
+thFT9gJO17+yRuL6Uv2/vgzVR1RGdwVLKwlUjGPAjYflpCQwWMAASxiv9uPyYPHc
+ErSrbRG0wjIfAR3vus1OSOx3xZHZpXFfmQTsDP7zVROLzV98R3JwFAxJ4/xqeON4
+vCPFU6OsT3lWQ8w7il5ohY95wmujfr6lk89kEzJdOTzcn7DBbUru33CQMGKZ3Evt
+RjsC7FDbL017qxS+ZVA/HGkyfiu4cpgV8VUnbql5eAZ+1Ll6Dw==
+=hdPa
+-----END PGP PUBLIC KEY BLOCK-----"
+
+   - name: RPM-GPG-KEY-EPEL-8
+     content: "-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQINBFz3zvsBEADJOIIWllGudxnpvJnkxQz2CtoWI7godVnoclrdl83kVjqSQp+2
+dgxuG5mUiADUfYHaRQzxKw8efuQnwxzU9kZ70ngCxtmbQWGmUmfSThiapOz00018
++eo5MFabd2vdiGo1y+51m2sRDpN8qdCaqXko65cyMuLXrojJHIuvRA/x7iqOrRfy
+a8x3OxC4PEgl5pgDnP8pVK0lLYncDEQCN76D9ubhZQWhISF/zJI+e806V71hzfyL
+/Mt3mQm/li+lRKU25Usk9dWaf4NH/wZHMIPAkVJ4uD4H/uS49wqWnyiTYGT7hUbi
+ecF7crhLCmlRzvJR8mkRP6/4T/F3tNDPWZeDNEDVFUkTFHNU6/h2+O398MNY/fOh
+yKaNK3nnE0g6QJ1dOH31lXHARlpFOtWt3VmZU0JnWLeYdvap4Eff9qTWZJhI7Cq0
+Wm8DgLUpXgNlkmquvE7P2W5EAr2E5AqKQoDbfw/GiWdRvHWKeNGMRLnGI3QuoX3U
+pAlXD7v13VdZxNydvpeypbf/AfRyrHRKhkUj3cU1pYkM3DNZE77C5JUe6/0nxbt4
+ETUZBTgLgYJGP8c7PbkVnO6I/KgL1jw+7MW6Az8Ox+RXZLyGMVmbW/TMc8haJfKL
+MoUo3TVk8nPiUhoOC0/kI7j9ilFrBxBU5dUtF4ITAWc8xnG6jJs/IsvRpQARAQAB
+tChGZWRvcmEgRVBFTCAoOCkgPGVwZWxAZmVkb3JhcHJvamVjdC5vcmc+iQI4BBMB
+AgAiBQJc9877AhsPBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRAh6kWrL4bW
+oWagD/4xnLWws34GByVDQkjprk0fX7Iyhpm/U7BsIHKspHLL+Y46vAAGY/9vMvdE
+0fcr9Ek2Zp7zE1RWmSCzzzUgTG6BFoTG1H4Fho/7Z8BXK/jybowXSZfqXnTOfhSF
+alwDdwlSJvfYNV9MbyvbxN8qZRU1z7PEWZrIzFDDToFRk0R71zHpnPTNIJ5/YXTw
+NqU9OxII8hMQj4ufF11040AJQZ7br3rzerlyBOB+Jd1zSPVrAPpeMyJppWFHSDAI
+WK6x+am13VIInXtqB/Cz4GBHLFK5d2/IYspVw47Solj8jiFEtnAq6+1Aq5WH3iB4
+bE2e6z00DSF93frwOyWN7WmPIoc2QsNRJhgfJC+isGQAwwq8xAbHEBeuyMG8GZjz
+xohg0H4bOSEujVLTjH1xbAG4DnhWO/1VXLX+LXELycO8ZQTcjj/4AQKuo4wvMPrv
+9A169oETG+VwQlNd74VBPGCvhnzwGXNbTK/KH1+WRH0YSb+41flB3NKhMSU6dGI0
+SGtIxDSHhVVNmx2/6XiT9U/znrZsG5Kw8nIbbFz+9MGUUWgJMsd1Zl9R8gz7V9fp
+n7L7y5LhJ8HOCMsY/Z7/7HUs+t/A1MI4g7Q5g5UuSZdgi0zxukiWuCkLeAiAP4y7
+zKK4OjJ644NDcWCHa36znwVmkz3ixL8Q0auR15Oqq2BjR/fyog==
+=84m8
+-----END PGP PUBLIC KEY BLOCK-----"

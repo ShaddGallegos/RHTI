@@ -1,0 +1,23 @@
+---
+- name: repo sync | get all repositories
+  redhat.satellite.resource_info:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_server_url }}"
+    resource: products
+    params:
+      organization_id: 1
+  register: repositories
+
+- debug:
+    msg: "{{ repositories }}"
+
+- name: repo sync | Kick off repository sync tasks
+  redhat.satellite.repository_sync:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_server_url }}"
+    product: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+  loop: "{{ repositories.resources }}"
+  when: item.repository_count != 0

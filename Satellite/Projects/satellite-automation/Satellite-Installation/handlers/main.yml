@@ -1,0 +1,21 @@
+- name: run_installer
+  command: >-
+    satellite-installer --scenario satellite
+    --foreman-initial-admin-username "{{ satellite_admin_username }}"
+    {{ satellite_options }}
+  register: installer_output
+
+- name:
+  debug:
+    var: installer_output
+
+- name: handler - publish content views
+  redhat.satellite.content_view_version:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_server_url }}"
+    content_view: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+    lifecycle_environments:
+      - Library
+  with_items: "{{ satellite_content_views }}"

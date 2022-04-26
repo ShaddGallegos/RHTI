@@ -1,0 +1,12 @@
+---
+- name: Promote Composite content views through environments
+  redhat.satellite.content_view_version:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_server_url }}"
+    content_view: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+    current_lifecycle_environment: "{{ lifecycle_environments.prior }}"
+    lifecycle_environments:
+      - "{{ lifecycle_environments.name }}"
+  with_items: "{{ satellite_composite_content_views }}"

@@ -1,0 +1,13 @@
+---
+
+- name: "publish content view version {{ content_view }} to the library"
+  satellite.redhat.content_view_version:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    validate_certs: false
+    server_url: "{{ satellite_server_url }}"
+    organization: "{{ satellite_organization }}"
+    content_view: "{{ content_view }}"
+    lifecycle_environments:
+      - Library
+  delegate_to: "{{ delegate_host }}"

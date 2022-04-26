@@ -1,0 +1,19 @@
+- name: enabling repos | checking pulp directory is owned by apache
+  file:
+    path: /var/lib/pulp
+    owner: apache
+    group: apache
+    mode: '0755'
+
+- name: enable repos | RHEL repositories
+  redhat.satellite.repository_set:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_server_url }}"
+    organization: "{{ satellite_organization }}"
+    label: "{{ item.label }}"
+    repositories: "{{ item.repos | default(omit) }}"
+    all_repositories: "{{ item.all | default(omit) }}"
+    state: enabled
+  with_items:
+    - "{{ satellite_repos }}"

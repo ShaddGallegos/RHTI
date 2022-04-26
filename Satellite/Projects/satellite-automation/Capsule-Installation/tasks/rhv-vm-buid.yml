@@ -1,0 +1,66 @@
+---
+- name: Grab Ovirt Token
+  run_once: True
+  ovirt_auth:
+    url: "https://{{ rhv_hostname }}/ovirt-engine/api"
+    username: "{{ rhvm_username }}"
+    password: "{{ rhvm_password }}"
+    insecure: True
+
+- name: Deploy VMs from template
+  register: vm_created
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    cluster: "{{ rhv_cluster }}"
+    template: "{{ rhv_template }}"
+    name: "{{ inventory_hostname }}"
+    description: "Red Hat Satellite"
+    state: present
+    clone: true
+    high_availability: false
+    storage_domain: "{{ rhv_storage_domain }}"
+    memory: "{{ rhv_vm_memory }}GiB"
+    cpu_cores: "{{ rhv_vm_cpu }}"
+    cpu_sockets: 1
+    type: server
+    timeout: 600
+    operating_system: "{{ rhv_vm_os }}"
+    nics:
+      - name: eth0
+        profile_name: ovirtmgmt
+
+  - name: Generate VM disks (disk2)
+    ovirt_disk:
+      auth: "{{ ovirt_auth }}"
+      name: "{{ inventory_hostname }}_disk"
+      size: GiB
+      storage_domain: "{{ rhv_vm_disk_size }}VM"
+      format: cow
+      interface: virtio
+      vm_name: "{{ inventory_hostname }}"
+
+  - name: Pause for 1 minute to build VM
+    pause:
+      minutes: 1
+
+- name: Configure VM
+  register: vm_created
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    cluster: "{{ rhv_cluster }}"
+    template: "{{ rhv_template }}"
+    name: "{{ inventory_hostname }}"
+    state: running
+    cloud_init:
+      timezone: "{{ rhv_vm_timezone }}"
+      host_name: "{{ inventory_hostname }}"
+      user_name: root
+      root_password: "{{ rhv_vm_root_password }}"
+      authorized_ssh_keys: "{{ rhv_vm_ssh_key }}"
+    cloud_init_nics:
+      - nic_name: eth0
+        nic_boot_protocol: static
+        nic_ip_address: "{{ rhv_vm_ipaddress }}"
+        nic_netmask: "{{ rhv_vm_netmask }}"
+        nic_gateway: "{{ rhv_vm_gateway }}"
+        nic_on_boot: true

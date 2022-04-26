@@ -1,0 +1,58 @@
+# task file for install
+- name: main | RHV VM build
+  import_tasks: rhv-vm-buid.yml
+  when: rhvm_hostname is defined
+
+- name: main | Register to RHN
+  import_tasks: 1_rhsm_subscribe.yml
+
+- name: main | Patching system
+  import_tasks: 2_patch.yml
+
+- name: main | Configure LV
+  import_tasks: 3_storage_config.yml
+
+- name: main | Installing Satellite Packages
+  import_tasks: 4_install_packages.yml
+
+- name: main | Installing Satellite Packages
+  import_tasks: 5_firewalld.yml
+
+- name: main | fix hosts file
+  import_tasks: 7_dns_config.yml
+
+- name: main | install satellite
+  import_tasks: 8_install.yml
+
+- name: main | set satellite settings
+  import_tasks: 9_settings.yml
+
+- name: main | uploading manifests
+  import_tasks: 10_manifest.yml
+
+- name: main | Content Credentials
+  import_tasks: 10.5_content_credential.yml
+
+- name: main | enable requred capsule repos
+  import_tasks: 11_enablerepos.yml
+
+- name: main | Third Party Repos
+  import_tasks: 11.5_custom-products.yml
+
+- name: main | Sync repos
+  import_tasks: 12_repo_sync.yml
+
+- name: main | create content view
+  import_tasks: 13_content_views.yml
+
+- name: main | create Compsite views
+  import_tasks: 13.5_composite-content-views.yml
+
+- name: main | Create host collections
+  import_tasks: 14_host_collections.yml
+
+- name: main | Create lifecycle environments
+  import_tasks: 15_lifecycle-environments.yml
+
+- name: main | Create Capsule activation key
+  import_tasks: 16_activation_keys.yml

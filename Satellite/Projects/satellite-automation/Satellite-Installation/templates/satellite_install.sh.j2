@@ -1,0 +1,7 @@
+#!/bin/bash
+# note this file is created by and controlled by ansible
+# make a copy if you wish to modify and/or use it
+
+satellite-installer --scenario satellite \
+  --foreman-initial-admin-username "{{ satellite_admin_username }}" \
+  {{ satellite_options }}

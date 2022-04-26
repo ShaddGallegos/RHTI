@@ -1,0 +1,7 @@
+satellite_packages:
+  - satellite
+  - chrony
+  - sos
+  - ansible-collection-redhat-satellite
+
+delegate_host: localhost

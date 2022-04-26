@@ -1,0 +1,6 @@
+---
+- name: create activation key
+  include_tasks: lc_activationkeys.yml
+  loop_control:
+    loop_var: lifecycle_environments
+  loop: "{{ satellite_lifecycle_environments }}"

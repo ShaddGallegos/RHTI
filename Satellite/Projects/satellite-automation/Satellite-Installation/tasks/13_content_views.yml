@@ -1,0 +1,22 @@
+---
+
+- name: create content view task file directory
+  file:
+    path: "{{ role_path }}/tasks/satellite-configuration/{{ satellite_organization }}/content-views"
+    state: directory
+  delegate_to: "{{ delegate_host }}"
+
+- name: push task file to create content view based on number of repos
+  template:
+    src: templates/content-view.yml.j2
+    dest: "{{ role_path }}/tasks/satellite-configuration/{{ satellite_organization }}/content-views/{{ content_view.name }}.yml"
+  loop_control:
+    loop_var: content_view
+  loop: "{{ satellite_content_views }}"
+  delegate_to: "{{ delegate_host }}"
+
+- name: include tasks to create content views
+  include_tasks: "{{ role_path }}/tasks/satellite-configuration/{{ satellite_organization }}/content-views/{{ content_view.name }}.yml"
+  loop_control:
+    loop_var: content_view
+  loop: "{{ satellite_content_views }}"

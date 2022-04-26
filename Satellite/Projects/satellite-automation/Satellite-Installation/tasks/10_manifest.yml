@@ -1,0 +1,25 @@
+---
+- name: manifest | Check if Manifest is already pulled down
+  stat:
+    path: /opt/satellite_manifest.zip
+  register: stat_result
+
+- name: manifest | Pull down manifest
+  get_url:
+    url: https://subscription.rhsm.redhat.com/subscription/consumers/{{ satellite_manifest_uuid }}/export
+    username: "{{ satellite_rhn_username }}"
+    password: "{{ satellite_rhn_password }}"
+    dest: /opt/satellite_manifest.zip
+    validate_certs: no
+    timeout: 300
+  when: not stat_result.stat.exists
+
+- name: manifest | "Upload the manifest"
+  redhat.satellite.subscription_manifest:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "https://{{ ansible_fqdn }}"
+    organization: "{{ satellite_organization }}"
+    state: present
+    manifest_path: "/opt/satellite_manifest.zip"
+  when: not stat_result.stat.exists

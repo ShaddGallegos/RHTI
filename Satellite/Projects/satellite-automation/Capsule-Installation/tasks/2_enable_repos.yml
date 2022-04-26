@@ -1,0 +1,41 @@
+- name: RHSM Subscribe | Check if amazon-id.conf is there
+  stat:
+    path: /etc/yum/pluginconf.d/amazon-id.conf
+  register: stat_result
+
+- name: RHSM Subscribe | Disable amazon-id.conf
+  lineinfile:
+    path: /etc/yum/pluginconf.d/amazon-id.conf
+    regexp: '^enabled=1'
+    line: enabled=0
+    backrefs: yes
+  when: stat_result.stat.exists
+
+- name: RHSM Subscribe | Get a list of all the files in /etc/yum.repos.d
+  find:
+    paths: /etc/yum.repos.d
+    patterns: "*.repo"
+  register: repo_files
+
+- name: RHSM Subscribe | Remove any file in /etc/yum.repos.d that isn't redhat.repo
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  when: item.path != "/etc/yum.repos.d/redhat.repo"
+  with_items: "{{ repo_files.files }}"
+
+
+- name: Disable all RHSM repositories
+  rhsm_repository:
+    name: '*'
+    state: disabled
+
+- name: Enable a RHSM repository
+  rhsm_repository:
+    name:
+       - rhel-7-server-rpms
+       - rhel-7-server-satellite-capsule-6.10-rpms
+       - rhel-7-server-satellite-maintenance-6-rpms
+       - rhel-7-server-satellite-tools-6.10-rpms
+       - rhel-server-rhscl-7-rpms
+       - rhel-7-server-ansible-2.9-rpms
