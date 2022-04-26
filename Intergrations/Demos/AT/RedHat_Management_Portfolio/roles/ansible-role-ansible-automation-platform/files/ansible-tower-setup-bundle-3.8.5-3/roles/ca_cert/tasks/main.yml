@@ -1,0 +1,10 @@
+---
+- name: Copy custom CA cert
+  copy:
+    src: "{{ custom_ca_cert }}"
+    dest: "/etc/pki/ca-trust/source/anchors/tower-custom-ca-cert.crt"
+    mode: '0644'
+    owner: root
+    group: root
+  notify: Update CA trust
+

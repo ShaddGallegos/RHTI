@@ -1,0 +1,22 @@
+galaxy_info:
+  role_name: 'prepare_SUSE_HA_clusternode'
+  namespace: 'johanneskastl'
+  author: 'Johannes Kastl'
+  description: 'Prepare and configure a clusternode for SUSE HA (pacemaker, corosync, ...)'
+  company: 'B1 Systems GmbH'
+
+  license: 'BSD-3-Clause'
+
+  min_ansible_version: 2.4
+
+  platforms:
+    - name: opensuse
+      versions:
+        - '15.1'
+    - name: SLES
+      versions:
+        - '15SP1'
+
+  galaxy_tags: []
+
+dependencies: []

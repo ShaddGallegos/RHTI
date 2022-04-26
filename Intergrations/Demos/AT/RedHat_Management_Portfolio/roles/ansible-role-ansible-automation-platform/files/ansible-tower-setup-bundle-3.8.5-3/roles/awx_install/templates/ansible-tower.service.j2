@@ -1,0 +1,17 @@
+[Unit]
+Description=Ansible Tower service
+{% if awx_install_database == 'external' %}
+After=network.target {{ awx_install_redis_init_name|default('redis') }}.service nginx.service supervisord.service
+Wants={{ awx_install_redis_init_name|default('redis') }}.service nginx.service supervisord.service
+{% else %}
+After=network.target {{ awx_install_redis_init_name|default('redis') }}.service {{ awx_install_pg_init_name }}.service nginx.service supervisord.service
+Wants={{ awx_install_redis_init_name|default('redis') }}.service {{ awx_install_pg_init_name }}.service nginx.service supervisord.service
+{% endif %}
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/true
+
+[Install]
+WantedBy=multi-user.target

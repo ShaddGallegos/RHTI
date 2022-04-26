@@ -1,0 +1,10 @@
+---
+pulp_install_source: pip
+pulp_config_dir: '/etc/pulp'
+pulp_install_dir: '{{ (pulp_install_source == "packages") | ternary("/usr", "/usr/local/lib/pulp") }}' 
+pulp_settings_file: '{{ pulp_config_dir }}/settings.py'
+pulp_user: pulp
+pulp_default_admin_password: password
+pulp_url: 'http://127.0.0.1:24817/'
+pulp_validate_certs: true
+galaxy_importer_settings: {}

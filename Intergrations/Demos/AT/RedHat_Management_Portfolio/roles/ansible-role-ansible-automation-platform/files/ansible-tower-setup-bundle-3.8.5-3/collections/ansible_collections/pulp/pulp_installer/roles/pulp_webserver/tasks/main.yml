@@ -1,0 +1,120 @@
+---
+- name: Load OS specific variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - always
+
+- name: Ensure that if we have web cert, we also have key
+  fail:
+    msg: "If you give one of pulp_webserver_tls_cert and pulp_webserver_tls_key, you must also give the other."
+  when:
+    - pulp_webserver_tls_cert | length or pulp_webserver_tls_key | length
+    - not pulp_webserver_tls_cert | length or not pulp_webserver_tls_key | length
+
+- name: Python interpreter
+  debug:
+    msg: >
+      {{ (pulp_install_source == "packages") | ternary(pulp_python_interpreter, pulp_install_dir ~ "/bin/python") }}
+    verbosity: 1
+
+- name: "Check installed plugins for {{ pulp_webserver_server }} snippets"
+  script:
+    cmd: check_snippet.py {{ __pulp_webserver_plugin.key | regex_replace("-", "_") | quote }} {{ pulp_webserver_server }}.conf
+  args:
+    executable: '{{ (pulp_install_source == "packages") | ternary(pulp_python_interpreter, pulp_install_dir ~ "/bin/python") }}'
+  register: snippets
+  loop: '{{ pulp_install_plugins_normalized | dict2items }}'
+  loop_control:
+    loop_var: __pulp_webserver_plugin
+  failed_when: >
+    snippets.stderr is search("env: 'python': No such file or directory")
+  changed_when: false
+  check_mode: false
+
+- name: Create cert directory to hold SSL certificates
+  file:
+    path: "{{ pulp_certs_dir }}"
+    state: directory
+    owner: "{{ pulp_user }}"
+    group: "{{ pulp_group }}"
+    mode: 0700
+  become: true
+
+- include_tasks: generate_tls_certificates.yml
+  args:
+    apply:
+      become: true
+  when:
+    - not pulp_webserver_tls_cert | length
+    - not pulp_webserver_tls_key | length
+
+- include_tasks: import_certificates.yml
+  args:
+    apply:
+      become: true
+  when:
+    - pulp_webserver_tls_cert | length
+    - pulp_webserver_tls_key | length
+
+- name: Copy custom CA cert
+  copy:
+    src: "{{ pulp_webserver_tls_custom_ca_cert }}"
+    dest: "{{ pulp_webserver_trusted_root_certificates_path }}/pulp-custom-ca-cert.crt"
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: "{{ pulp_webserver_tls_files_remote }}"
+  when: pulp_webserver_tls_custom_ca_cert | length
+  become: true
+  notify: update ca trust
+
+- name: Create ACME dirs
+  file:
+    path: "{{ __pulp_webserver_acme_path }}"
+    state: directory
+    mode: 0755
+    owner: "{{ pulp_user }}"
+    group: "{{ pulp_group }}"
+  become: true
+  loop:
+    - "{{ pulp_webserver_static_dir }}"
+    - "{{ pulp_webserver_static_dir }}/.well-known"
+  loop_control:
+    loop_var: __pulp_webserver_acme_path
+
+- include_tasks: "{{ pulp_webserver_server }}.yml"
+
+- block:
+
+    - name: Install packages for Ansible seboolean module
+      yum:
+        name: "{{ pulp_seboolean_packages }}"
+        state: present
+
+    - name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+      seboolean:
+        name: httpd_can_network_connect
+        state: true
+        persistent: true
+
+  become: true
+  when:
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.selinux.status == 'enabled'
+    - not (pulp_api_bind.startswith('unix:') and pulp_content_bind.startswith('unix:'))
+
+- include_tasks: firewalld.yml
+  when: pulp_configure_firewall in ['firewalld', 'auto']
+
+# In case an ACME role relies on a change made in pulp_webserver.
+- name: Flush handlers
+  meta: flush_handlers

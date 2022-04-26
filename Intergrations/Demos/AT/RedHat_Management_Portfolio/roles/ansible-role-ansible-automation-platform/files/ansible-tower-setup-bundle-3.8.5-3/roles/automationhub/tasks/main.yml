@@ -1,0 +1,178 @@
+---
+- name: Include variables
+  include_vars: main.yml
+
+- name: Enable Ansible Tower Dependencies (ansible, nginx)
+  command: yum-config-manager --enable ansible-tower-dependencies
+  become: true
+
+- block:
+    - name: Ensure pg libs are installed
+      package:
+        name:
+          - rh-postgresql10-postgresql
+          - rh-postgresql10-postgresql-devel
+      become: true
+
+    # Packaging issue - this file needs to exist
+    # because this is the file that is beling lookedup
+    # to by psycopg2
+    - name: Fix libpq.so packaging issue
+      file:
+        src: /opt/rh/rh-postgresql10/root/lib64/libpq.so.rh-postgresql10-5.10
+        dest: /opt/rh/rh-postgresql10/root/lib64/libpq.so.5
+        state: link
+      become: true
+
+  when: ansible_distribution_major_version == "7"
+
+- block:
+    - name: Enable postgresql 10 dnf modules
+      shell: |
+        dnf module -y enable 'postgresql:10'
+      become: true
+      args:
+        warn: false
+
+    - name: Install Postgresql [RHEL8]
+      package:
+        name: 'postgresql'
+        state: present
+      become: true
+
+  when: ansible_distribution_major_version == "8"
+
+- name: Generate a Pulp secret
+  set_fact:
+    pulp_secret: "{{ lookup('password', '/dev/null', length=128) }}"
+  run_once: true
+  no_log: true
+
+- name: Determine proper protocol and port
+  set_fact:
+    pulp_proto: "{{ automationhub_disable_https | bool | ternary('http', 'https') }}"
+    pulp_port: "{{ automationhub_disable_https | bool | ternary('80', '443') }}"
+  run_once: true
+
+- name: Determine plugins list
+  set_fact:
+    pulp_install_plugins:
+      pulp-ansible: {}
+      galaxy-ng: {}
+  run_once: true
+  when: pulp_pkg_repo is defined
+
+- name: Determine plugins list
+  set_fact:
+    pulp_install_plugins:
+      pulp-ansible: {}
+      galaxy-ng:
+        collectstatic: false
+        version: '{{ automationhub_package_version }}'
+  run_once: true
+  when: pulp_pkg_repo is undefined
+
+- name: Default pulp settings
+  set_fact:
+    pulp_settings:
+      allowed_content_checksums:
+        - "sha224"
+        - "sha256"
+        - "sha384"
+        - "sha512"
+      secret_key: "{{ pulp_secret }}"
+      content_origin: "{{ pulp_proto }}://{{ inventory_hostname }}"
+      token_server: "{{ pulp_proto }}://{{ inventory_hostname }}/token"
+      x_pulp_api_proto: "{{ pulp_proto }}"
+      x_pulp_api_host: "{{ inventory_hostname }}"
+      x_pulp_api_port: "{{ pulp_port }}"
+      x_pulp_api_user: "admin"
+      x_pulp_api_password: "{{ automationhub_admin_password }}"
+      x_pulp_api_prefix: "pulp_ansible/galaxy/automation-hub/api"
+      galaxy_api_default_distribution_base_path: "published"
+      galaxy_require_content_approval: '{{ automationhub_require_content_approval | bool }}'
+      databases:
+        default:
+          HOST: "{{ automationhub_pg_host }}"
+          PORT: "{{ automationhub_pg_port }}"
+          ENGINE: django.db.backends.postgresql_psycopg2
+          NAME: "{{ automationhub_pg_database }}"
+          USER: "{{ automationhub_pg_username }}"
+          PASSWORD: "{{ automationhub_pg_password }}"
+      redis_url: 'unix:///var/run/redis/redis.sock'
+      ansible_api_hostname: "{{ pulp_proto }}://{{ inventory_hostname }}"
+      ansible_content_hostname: "{{ pulp_proto }}://{{ inventory_hostname }}"
+      verify_ssl: "{{ automationhub_ssl_validate_certs | bool }}"
+      content_bind: "{{ pulp_content_bind }}"
+
+  run_once: true
+  no_log: true
+
+- name: Install RHEL7 redis
+  set_fact:
+    pulp_redis_package_name: 'rh-redis5'
+    pulp_redis_server_name: 'rh-redis5-redis'
+    pulp_redis_conf_file: '/etc/opt/rh/rh-redis5/redis.conf'
+  when: ansible_distribution_major_version == '7'
+
+- name: Enable Automation Hub repository
+  command: yum-config-manager --enable '{{ redhat_automationhub_rhsm_repo }}'
+  when:
+    - not bundle_install | default(false) | bool
+    - not pulp_pkg_repo | default('')
+  become: true
+
+- name: Configure Pulp server with the needed plugins
+  include_role:
+    name: "{{ item }}"
+  with_items:
+    - "pulp.pulp_installer.pulp_redis"
+    - "pulp.pulp_installer.pulp_services"
+    - "pulp.pulp_installer.pulp_webserver"
+
+- block:
+
+    - name: Install automation-hub
+      package:
+        name: '{{ automationhub_package_name }} = {{ automationhub_package_version }}'
+        state: latest
+      notify: Restart pulpcore-api.service
+
+    - name: Upgrade Ansible to latest release available
+      yum:
+        name: ansible
+        state: latest
+      when: upgrade_ansible_with_hub | bool
+
+    - name: Ensure automation_hub assets directory is present
+      file:
+        path: /var/lib/pulp/assets
+        state: directory
+        owner: pulp
+        group: pulp
+        mode: 0755
+
+    - name: Ensure automation_hub static are present
+      file:
+        path: /var/lib/pulp/assets/galaxy_ng
+        src: /usr/share/automation-hub
+        state: link
+
+  when: pulp_pkg_repo is undefined
+  become: true
+
+- name: Init Automation Hub
+  include_role:
+    name: ansible.galaxy_collection.post_install_config
+  vars:
+    pulp_default_admin_password: "{{ automationhub_admin_password }}"
+    pulp_url: "{{ pulp_api_bind }}"
+    pulp_validate_certs: "{{ automationhub_ssl_validate_certs | bool }}"
+    galaxy_importer_settings: "{{ automationhub_importer_default_settings | combine(automationhub_importer_settings) }}"
+
+- name: Disable Automation Hub repository
+  command: yum-config-manager --disable '{{ redhat_automationhub_rhsm_repo }}'
+  when:
+    - not bundle_install | default(false) | bool
+    - not pulp_pkg_repo | default('')
+  become: true

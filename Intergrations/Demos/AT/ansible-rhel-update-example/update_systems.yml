@@ -1,0 +1,4 @@
+---
+- hosts: linux, windows
+  roles:
+    - ansible-role-patch

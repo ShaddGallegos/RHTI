@@ -1,0 +1,8 @@
+- name: install kpatch on RHEL
+  hosts: all
+  become: yes
+  roles:
+    - kpatch-rhel
+  post_tasks:
+    - name: run the insights-client and upload to c.rh.c
+      shell: insights-client

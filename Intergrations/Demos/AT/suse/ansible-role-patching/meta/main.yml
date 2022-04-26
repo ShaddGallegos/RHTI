@@ -1,0 +1,49 @@
+galaxy_info:
+  role_name: patching
+  author: Oscar Petersson
+  description: A role for patching Linux systems
+
+  license: MIT
+
+  min_ansible_version: 2.9
+
+  platforms:
+  - name: Fedora
+    versions:
+      - 29
+      - 30
+      - 31
+  - name: EL
+    versions:
+      - 7
+      - 8
+  - name: Debian
+    versions:
+      - stretch
+      - buster
+  - name: Ubuntu
+    versions:
+      - bionic
+      - disco dingo
+      - eoan
+  - name: ArchLinux
+    versions:
+      - any
+  - name: opensuse
+    versions:
+      - 12.1
+      - 12.2
+      - 12.3
+      - 13.1
+      - 13.2
+
+  galaxy_tags:
+    - rhel
+    - redhat
+    - patching
+    - patch
+    - system
+    - security
+
+dependencies: []
+allow_duplicates: no

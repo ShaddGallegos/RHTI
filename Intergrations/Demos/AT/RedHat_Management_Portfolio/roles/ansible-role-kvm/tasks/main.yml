@@ -1,0 +1,43 @@
+---
+# tasks file for ansible-role-kvm
+
+- name: Install packages for KVM
+  yum:
+    name: ["qemu-kvm", "libguestfs-tools", "libvirt-python", "libvirt", "virt-install"]
+    state: latest
+
+- name: Start & enable libvirtd
+  service:
+    name: libvirtd
+    enabled: yes
+    state: started
+
+- block:
+  - name: Install packages for Bridged KVM
+    yum:
+      name: ["nmap", "net-tools"]
+      state: latest
+
+  - name: Configure bridge network
+    community.general.nmcli:
+      type: bridge
+      conn_name: br0
+      state: present
+  
+  - name: Copy network xml over
+    copy:
+      src: files/bridged-network.xml
+      dest: /tmp
+
+  - name: Create KVM Bridge Network
+    command: virsh net-define /tmp/bridged-network.xml   
+
+  - name: Set default interface to use bridge
+    lineinfile:
+      path: "/etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}"
+      line: 'BRIDGE="br0"'
+      insertbefore: BOF
+  when: '"bridged" == kvm_network' 
+
+- name: Reboot
+  reboot:

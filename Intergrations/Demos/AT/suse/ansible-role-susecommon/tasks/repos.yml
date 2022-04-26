@@ -1,0 +1,37 @@
+---
+
+- name: Install normal repositories
+  zypper_repository:
+    repo: "{{ item }}"
+    priority: 100
+    auto_import_keys: true
+    state: present
+  with_items:
+    - "http://download.opensuse.org/repositories/devel:/tools:/scm/{{ suse_repo_default }}/devel:tools:scm.repo"
+    - "http://download.opensuse.org/repositories/X11:/Wayland/{{ suse_repo_default }}/X11:Wayland.repo"
+    - "http://download.opensuse.org/repositories/X11:/Solus/{{ suse_repo_default }}/X11:Solus.repo"
+    - "http://download.opensuse.org/repositories/M17N:/fonts/{{ suse_repo_default }}/M17N:fonts.repo"
+    - "http://download.opensuse.org/repositories/mozilla/{{ suse_repo_default }}/mozilla.repo"
+    - "http://download.opensuse.org/repositories/X11:/Enlightenment:/Factory/{{ suse_repo_default }}/X11:Enlightenment:Factory.repo"
+    - "http://download.opensuse.org/repositories/network/{{ suse_repo_default }}/network.repo"
+    - "http://download.opensuse.org/repositories/Virtualization:containers/{{ suse_repo_default }}/Virtualization:containers.repo"
+
+- name: "Install bulk of things"
+  zypper_repository:
+    repo: "{{ item }}"
+    priority: 100
+    auto_import_keys: true
+    state: present
+  with_items:
+    - "http://download.opensuse.org/repositories/X11:/Utilities/{{ suse_repo_factory }}/X11:Utilities.repo"
+    - "http://download.opensuse.org/repositories/devel:languages:lua/{{ suse_repo_factory }}/devel:languages:lua.repo"
+    - "http://download.opensuse.org/repositories/devel:/languages:/go/{{ suse_repo_factory }}/devel:languages:go.repo"
+    - "http://download.opensuse.org/repositories/devel:/tools:/building/{{ suse_repo_factory }}/devel:tools:building.repo"
+
+- name: "Install bulk of things"
+  zypper_repository:
+    name: packman
+    repo: "http://ftp.gwdg.de/pub/linux/misc/packman/suse/{{ suse_repo_default }}"
+    priority: 100
+    auto_import_keys: true
+    state: present

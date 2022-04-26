@@ -1,0 +1,8 @@
+---
+automationhub_disable_https: false
+automationhub_disable_hsts: false
+automationhub_ssl_validate_certs: false
+automationhub_require_content_approval: true
+automationhub_importer_settings: {}
+automationhub_upgrade: false
+upgrade_ansible_with_hub: false

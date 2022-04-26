@@ -1,0 +1,175 @@
+---
+- hosts: localhost
+  collections:
+    - redhat.satellite
+  gather_facts: false
+  vars_files:
+    - vars/server.yml
+    - vars/hostgroup.yml
+  tasks:
+    - include_tasks: tasks/location.yml
+      vars:
+        location_name: "{{ item }}"
+        location_state: present
+      with_items: "{{ hostgroup.locations }}"
+    - include_tasks: tasks/organization.yml
+      vars:
+        organization_name: "{{ item }}"
+        organization_state: present
+      with_items: "{{ hostgroup.organizations }}"
+    - include: tasks/content_view.yml
+      vars:
+        organization_name: "{{ hostgroup.organizations | first }}"
+        content_view_name: "{{ hostgroup.content_view.name }}"
+    - include: tasks/content_view_version.yml
+      vars:
+        organization_name: "{{ hostgroup.organizations | first }}"
+        content_view_name: "{{ hostgroup.content_view.name }}"
+        lifecycle_environments: "{{ hostgroup.lifecycle_environment }}"
+        version: "{{ hostgroup.content_view.version }}"
+    - include: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_state: absent
+
+- hosts: tests
+  collections:
+    - redhat.satellite
+  gather_facts: false
+  vars_files:
+    - vars/server.yml
+    - vars/hostgroup.yml
+  tasks:
+    - name: create HG
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_locations: "{{ hostgroup.locations }}"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_content_source: "{{ hostgroup.content_source }}"
+        hostgroup_lifecycle_environment: "{{ hostgroup.lifecycle_environment }}"
+        hostgroup_content_view: "{{ hostgroup.content_view.name }}"
+        hostgroup_parameters:
+          - name: test_param_one
+            parameter_type: string
+            value: oneoneone
+        hostgroup_activation_keys: key_one
+        hostgroup_state: present
+        expected_change: true
+
+    - name: create HG again, no change
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_locations: "{{ hostgroup.locations }}"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_content_source: "{{ hostgroup.content_source }}"
+        hostgroup_lifecycle_environment: "{{ hostgroup.lifecycle_environment }}"
+        hostgroup_content_view: "{{ hostgroup.content_view.name }}"
+        hostgroup_parameters:
+          - name: test_param_one
+            parameter_type: string
+            value: oneoneone
+        hostgroup_activation_keys: key_one
+        hostgroup_state: present
+        expected_change: false
+
+    - name: only set AK, HG should not lose params, no change
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_activation_keys: key_one
+        hostgroup_state: present
+        expected_change: false
+
+    - name: only set params, HG should not lose AK, no change
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_parameters:
+          - name: test_param_one
+            parameter_type: string
+            value: oneoneone
+        hostgroup_state: present
+        expected_change: false
+
+    - name: only set AK via params
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_parameters:
+          - name: kt_activation_keys
+            parameter_type: string
+            value: new_key
+        hostgroup_state: present
+        expected_change: true
+
+    - name: only set AK via params, again, no change
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_organizations: "{{ hostgroup.organizations }}"
+        hostgroup_organization: "{{ hostgroup.organizations | first }}"
+        hostgroup_parameters:
+          - name: kt_activation_keys
+            parameter_type: string
+            value: new_key
+        hostgroup_state: present
+        expected_change: false
+
+    - name: delete HG
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_state: absent
+        expected_change: true
+
+    - name: delete HG again, no change
+      include_tasks: tasks/hostgroup.yml
+      vars:
+        hostgroup_name: "New host group"
+        hostgroup_state: absent
+        expected_change: false
+
+- hosts: localhost
+  collections:
+    - redhat.satellite
+  gather_facts: false
+  vars_files:
+    - vars/server.yml
+    - vars/hostgroup.yml
+  tasks:
+    # There is no way for now to un publish content view version via ansible
+    # so we cannot cleanup content related stuff
+    #  - include: tasks/content_view_version.yml
+    #    vars:
+    #      organization_name: "{{ hostgroup.organizations | first }}"
+    #      content_view_name: "{{ hostgroup.content_view.name }}"
+    #      version: "{{ hostgroup.content_view.version }}"
+    #      state: absent
+    #  - include: tasks/content_view.yml
+    #    vars:
+    #      organization_name: "{{ hostgroup.organizations | first }}"
+    #      content_view_name: "{{ hostgroup.content_view.name }}"
+    #      content_view_state: absent
+    - include_tasks: tasks/location.yml
+      vars:
+        location_name: "{{ item }}"
+        location_state: "absent"
+      with_items: "{{ hostgroup.locations | reverse | list }}"
+    - include_tasks: tasks/organization.yml
+      vars:
+        organization_name: "{{ item }}"
+        organization_state: "absent"
+      # As we cannot cleanup content stuff we have to let the org used for it in place
+      #with_items: "{{ hostgroup.organizations }}"
+      with_items: "{{  hostgroup.organizations | difference([hostgroup.organizations | first]) }}"
+...

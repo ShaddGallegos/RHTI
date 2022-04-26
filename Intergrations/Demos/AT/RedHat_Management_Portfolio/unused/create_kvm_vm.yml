@@ -1,0 +1,4 @@
+---
+- hosts: libvirtserver
+  roles:
+    - ansible-role-kvm-vm

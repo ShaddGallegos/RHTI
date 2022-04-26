@@ -1,0 +1,29 @@
+---
+- name: Clean Yum Cache for Tower Repos
+  command: "yum clean all --enablerepo={{ ansible_tower_repo }},{{ ansible_tower_dependency_repo }}"
+
+- name: Install the Tower RPM.
+  yum:
+    name: '{{tower_package_rpm}}'
+    enablerepo: "{{ ansible_tower_repo }},{{ ansible_tower_dependency_repo }}"
+    disable_gpg_check: '{{ not gpgcheck | bool }}'
+    update_cache: yes
+    state: latest
+  notify: start PostgreSQL
+
+- name: Upgrade Ansible
+  yum:
+    name: ansible
+    state: latest
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+  when: upgrade_ansible_with_tower
+
+- name: Upgrade dependencies
+  yum:
+    name: '*'
+    exclude: 'ansible'
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+    disablerepo: "*"
+    disable_gpg_check: '{{ not gpgcheck | bool }}'
+    update_cache: yes
+    state: latest

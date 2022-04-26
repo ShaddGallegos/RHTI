@@ -1,0 +1,35 @@
+---
+# tasks file for ansible-role-vmware-vm
+- name: Create a virtual machine from rhel8-template
+  vmware_guest:
+    hostname: '{{ lookup("env", "VMWARE_HOST") }}'
+    username: '{{ lookup("env", "VMWARE_USER") }}'
+    password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
+    name: "{{ vm_name }}"
+    annotation: "VM Managed by Ansible - {{ tower_user_name }}-{{ tower_job_id }}"
+    state: poweredon
+    template: rhel8-template
+    datacenter: "{{ datacenter }}"
+    folder: "/"
+    disk:
+    - size_gb: "{{ vm_disk_size }}"
+      type: thin
+      datastore: "{{ datastore }}"
+    hardware:
+      memory_mb: "{{ vm_mem }}"
+      num_cpus: "{{ vm_cpus }}"
+      scsi: paravirtual
+      hotadd_cpu: True
+      hotremove_cpu: True
+      hotadd_memory: True
+      boot_firmware: "efi"
+    networks:
+    - name: "{{ network_profile }}"
+    wait_for_ip_address: true
+  delegate_to: localhost
+  register: deploy
+
+- name: Create artifact of VM IP address
+  set_stats:
+    data:
+      vm_ip_addr: "{{ deploy.instance.ipv4 }}"

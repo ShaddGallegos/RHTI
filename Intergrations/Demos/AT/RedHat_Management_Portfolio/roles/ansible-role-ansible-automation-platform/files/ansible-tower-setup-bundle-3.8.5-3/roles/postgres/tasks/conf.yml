@@ -1,0 +1,147 @@
+---
+- name: Update postgresql authentication settings
+  template:
+    dest: '{{ pg_hba_location }}'
+    owner: postgres
+    src: pg_hba.conf.j2
+  register: pg_hba_conf
+
+- name: Apply postgresql general settings
+  template:
+    dest: '{{ pg_conf_location }}'
+    owner: postgres
+    src: postgresql.conf.j2
+  register: pg_general_conf
+
+- name: Copy server SSL certificate
+  copy:
+    src: "{{ postgres_ssl_cert }}"
+    dest: "{{ pg_conf_dir }}/server.crt"
+    owner: postgres
+    group: postgres
+    mode: 0600
+  when: "postgres_use_ssl|default(False)|bool"
+
+- name: Copy server SSL private key
+  copy:
+    src: "{{ postgres_ssl_key }}"
+    dest: "{{ pg_conf_dir }}/server.key"
+    owner: postgres
+    group: postgres
+    mode: 0600
+  when: "postgres_use_ssl|default(False)|bool"
+
+- name: Create unix socket directory
+  file:
+    path: '{{ postgres_run_dir }}'
+    state: directory
+    owner: 'postgres'
+    group: 'postgres'
+    mode: 02775
+    setype: 'postgresql_var_run_t'
+
+- name: Configure postgresql tmpfiles.d
+  template:
+    src: 'postgresql.tmpfiles.d.j2'
+    dest: '/usr/lib/tmpfiles.d/postgresql.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    setype: 'lib_t'
+
+- name: restart postgresql when authentication settings changed
+  service:
+    name: '{{ postgres_init_name }}'
+    state: restarted
+  when: pg_hba_conf is changed or pg_general_conf is changed
+  register: postgresql_restart
+
+- name: wait for postgresql restart
+  wait_for:
+    host: localhost
+    port: 5432
+  when: postgresql_restart is changed
+
+- name: configure postgresql to start automatically
+  service:
+    name: '{{ postgres_init_name }}'
+    enabled: yes
+
+- block:
+    - name: check if awx pg user exists
+      command: >-
+        {{ pg_bash }} psql -tAc "SELECT COUNT(u.usename) FROM pg_catalog.pg_user u WHERE u.usename = '{{ postgres_username }}';"
+      become: True
+      become_user: postgres
+      environment: '{{ extra_env | default(omit) }}'
+      register: awx_pg_user_exists
+
+    - name: create the awx postgres user if it does not exist and set the password
+      command: >-
+        {{ pg_bash }} psql -c "CREATE USER {{ postgres_username }} WITH ENCRYPTED PASSWORD '{{ postgres_password }}';"
+      become: True
+      become_user: postgres
+      environment: '{{ extra_env | default(omit) }}'
+      when:
+       - "postgres_username is defined and postgres_username != ''"
+       - "postgres_password is defined and postgres_password != ''"
+       - "(awx_pg_user_exists.stdout | int) == 0"
+      no_log: True
+
+    - name: Set postgres user password again to ensure scram-sha-256 is used (needed for upgrades from 3.5.x and earlier)
+      shell:
+        cmd: "{{ pg_bash }} psql"
+        stdin: "ALTER ROLE {{ postgres_username }} WITH PASSWORD '{{ postgres_password }}';"
+      become: True
+      become_user: postgres
+      environment: '{{ extra_env | default(omit) }}'
+      no_log: True
+
+    - name: create the postgresql database for awx
+      postgresql_db:
+        name: "{{ postgres_database }}"
+        owner: "{{ postgres_username }}"
+        state: present
+        login_user: postgres
+      become: True
+      become_user: postgres
+      when:
+        - "postgres_username is defined and postgres_username != ''"
+        - "postgres_database is defined and postgres_database != ''"
+  when:
+    - groups['tower'] | default([]) | length
+
+- block:
+    - name: check if automationhub pg user exists
+      command: >-
+        {{ pg_bash }} psql -tAc "SELECT COUNT(u.usename) FROM pg_catalog.pg_user u WHERE u.usename = '{{ automationhub_postgres_username }}';"
+      become: true
+      become_user: postgres
+      environment: '{{ extra_env | default(omit) }}'
+      register: automationhub_pg_user_exists
+
+    - name: create the automationhub postgres user if it does not exist and set the password
+      command: >-
+        {{ pg_bash }} psql -c "CREATE USER {{ automationhub_postgres_username }} WITH ENCRYPTED PASSWORD '{{ automationhub_postgres_password }}';"
+      become: true
+      become_user: postgres
+      environment: '{{ extra_env | default(omit) }}'
+      when:
+        - "automationhub_postgres_username is defined and automationhub_postgres_username != ''"
+        - "automationhub_postgres_password is defined and automationhub_postgres_password != ''"
+        - "(automationhub_pg_user_exists.stdout | int) == 0"
+      no_log: true
+
+    - name: create the postgresql database for automationhub
+      postgresql_db:
+        name: "{{ automationhub_postgres_database }}"
+        owner: "{{ automationhub_postgres_username }}"
+        state: present
+        login_user: postgres
+      become: true
+      become_user: postgres
+      when:
+        - "automationhub_postgres_username is defined and automationhub_postgres_username != ''"
+        - "automationhub_postgres_database is defined and automationhub_postgres_database != ''"
+  when:
+    - groups['automationhub'] | default([]) | length

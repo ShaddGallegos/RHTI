@@ -1,0 +1,13 @@
+---
+# Indicate whether to verify gpg signatures during install
+gpgcheck: 1
+
+ansible_tower_repo: ansible-tower
+ansible_tower_dependency_repo: ansible-tower-dependencies
+
+isolated_package_name: ansible-tower-isolated
+isolated_package_rpm: '{{ isolated_package_name }} = {{ isolated_package_version }}'
+
+# Indicate whether to upgrade Ansible as well as Tower
+upgrade_ansible_with_tower: false
+isolated_key_generation: 'yes'

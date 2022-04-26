@@ -1,0 +1,24 @@
+---
+el_dependencies:
+  - python3-psycopg2
+  - python3-setuptools
+  - python3-libselinux
+  - python3-setools
+  - dnf-utils
+  - sudo
+  - acl
+
+dnf_modules:
+  - 'nginx:1.16'
+
+dnf_modules_disable:
+  - 'php'
+
+postgresql_packages:
+  - postgresql-contrib
+  - postgresql-server
+  - postgresql-upgrade96
+
+upgrade_postgres: False
+
+existing_pg_dir: '/var/lib/pgsql/data'

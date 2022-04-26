@@ -1,0 +1,6 @@
+---
+yum_repo_keys:
+  - 'RPM-GPG-KEY-redhat-release'
+
+yum_repo_packages:
+  - centos-release-scl

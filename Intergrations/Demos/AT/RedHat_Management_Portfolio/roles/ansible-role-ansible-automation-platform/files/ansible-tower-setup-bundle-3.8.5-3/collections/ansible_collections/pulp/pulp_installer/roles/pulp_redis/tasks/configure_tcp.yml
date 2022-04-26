@@ -1,0 +1,12 @@
+---
+- name: Ensure Redis will listen on the specified TCP socket
+  lineinfile:
+    path: '{{ pulp_redis_conf_file | default(_pulp_redis_conf_file) }}'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  loop:
+    - regexp: '^port '
+      line: 'port {{ pulp_redis_bind.split(":")[1] }}'
+    - regexp: '^bind '
+      line: 'bind {{ pulp_redis_bind.split(":")[0] }}'
+  notify: restart redis

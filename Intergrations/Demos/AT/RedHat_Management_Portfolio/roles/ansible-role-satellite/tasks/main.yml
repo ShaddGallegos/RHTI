@@ -1,0 +1,11 @@
+---
+# tasks file for ansible-role-satellite
+
+#- name: Execute firewalld tasks
+#  include: firewalld.yml
+
+- name: Register host with CDN
+  include: rhsm.yml
+
+- name: Update and install Satellite
+  include: satellite.yml

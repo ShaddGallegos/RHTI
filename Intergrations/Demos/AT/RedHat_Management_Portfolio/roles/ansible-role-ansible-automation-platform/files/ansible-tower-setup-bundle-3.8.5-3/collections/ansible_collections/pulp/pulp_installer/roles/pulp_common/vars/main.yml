@@ -1,0 +1,48 @@
+---
+# Intermediate var for pulp_install_plugins_normalized, based on this example;
+# https://gist.github.com/kcem/5ec90b97c08fafd0397f248e8c31b25b
+# With the to_json fix for Python2:
+# https://stackoverflow.com/questions/41521138/ansible-template-adds-u-to-array-in-template
+pulp_install_plugins_normalized_yml: |-
+  {% for key, value in pulp_install_plugins.items() %}
+  {{ key.replace('_', '-') }}: {{ value | to_json }}
+  {% endfor %}
+# List of plugin to ignore when collecting static files
+pulp_collectstatic_ignore_list: |-
+  {{ pulp_install_plugins | dict2items |
+      selectattr('value.collectstatic', "defined") |
+      selectattr('value.collectstatic', "sameas", False) |
+      map(attribute='key') |
+      map('regex_replace', "-", "_") |
+      map('regex_replace', "^", "--ignore ") |
+      list | join(" ") }}
+# A pulp_install_plugins but with the plugin names corrected:
+# pip/PyPI only uses dashes, not underscores.
+pulp_install_plugins_normalized: "{{ pulp_install_plugins_normalized_yml | from_yaml }}"
+pulp_certs_dir: "{{ pulp_config_dir }}/certs"
+# Users should not set these variables, but instead use `pulp_settings`
+__pulp_common_pulp_settings_defaults:
+  databases:
+    default:
+      HOST: localhost
+      ENGINE: django.db.backends.postgresql
+      NAME: pulp
+      USER: pulp
+      PASSWORD: pulp
+  private_key_path: "{{ pulp_certs_dir }}/token_private_key.pem"
+  public_key_path: "{{ pulp_certs_dir }}/token_public_key.pem"
+  token_server: "{{ pulp_webserver_disable_https | default(false) | ternary('http', 'https') }}://{{ ansible_facts.fqdn }}/token"
+  token_signature_algorithm: ES256
+__pulp_common_pulp_settings_fips_defaults:
+  allowed_content_checksums:
+    - sha1
+    - sha224
+    - sha256
+    - sha384
+    - sha512
+__pulp_common_merged_pulp_settings: "{{ __pulp_common_pulp_settings_defaults | combine(ansible_fips | ternary(__pulp_common_pulp_settings_fips_defaults, {}), pulp_settings, recursive=True) }}"
+
+__pulp_version: '{{ pulpcore_version | default("3.9.1") }}'
+
+# Pulps own replacement for django-admin setup in the proper environment
+pulp_django_admin_path: "{{ pulp_install_dir }}/bin/pulpcore-manager"

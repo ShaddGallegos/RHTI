@@ -1,0 +1,26 @@
+---
+- name: Tower | Create a directory for configuration files.
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/{{ now }}/conf/'
+    group: root
+    mode: 0700
+    owner: root
+    state: directory
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- name: Tower | Copy configuration files from conf.d.
+  shell: rsync --exclude=SECRET_KEY --exclude=conf.d/postgres.py --exclude=conf.d/channels.py --exclude=conf.d/caching.py -auq /etc/tower/ {{ backup_dir.rstrip("/") }}/{{ now }}/conf/
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- name: Tower | Copy common files from configuration
+  shell: rsync  -auq /etc/tower/SECRET_KEY {{ backup_dir.rstrip("/") }}/common/
+  when:
+    - groups['tower'] | default([]) | length
+    - inventory_hostname == groups['tower'][0]
+
+- name: Automation Hub | Copy configuration files
+  shell: rsync --exclude=settings.py -auq /etc/pulp/ {{ backup_dir.rstrip("/") }}/automationhub/automationhub/conf-pulp/
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])

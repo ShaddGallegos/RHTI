@@ -1,0 +1,14 @@
+---
+- block:
+    - name: Automation Hub | Ensure that /var/lib/pulp/ exists.
+      file:
+        group: pulp
+        mode: 0700
+        owner: pulp
+        path: /var/lib/pulp/
+        state: directory
+
+    - name: Automation Hub | Copy files into /var/lib/pulp/
+      shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/automationhub/var_lib_pulp/ /var/lib/pulp/
+
+  when: automationhub_backup_collections | default(true) | bool

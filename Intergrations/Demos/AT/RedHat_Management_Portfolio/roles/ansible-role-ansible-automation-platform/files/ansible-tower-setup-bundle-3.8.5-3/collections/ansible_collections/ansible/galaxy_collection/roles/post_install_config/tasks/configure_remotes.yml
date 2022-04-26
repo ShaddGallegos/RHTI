@@ -1,0 +1,53 @@
+---
+# Configure content sync remotes
+
+- name: Create temporary directory
+  tempfile:
+    state: directory
+    prefix: automationhub
+  become: true
+  become_user: '{{ pulp_user }}'
+  register: automationhub_tempdir
+
+- name: Copy default community requirements.yml
+  copy:
+    src: '{{ role_path }}/files/requirements.yml'
+    dest: '{{ automationhub_tempdir.path }}/requirements.yml'
+    mode: '0660'
+  become: true
+  become_user: '{{ pulp_user }}'
+
+- name: Configure Community remote
+  command: >
+    {{ pulp_install_dir }}/bin/pulpcore-manager
+     create-remote
+     community
+     https://galaxy.ansible.com/api/
+     -r {{ automationhub_tempdir.path }}/requirements.yml
+     --distribution community
+     --repository community
+  become: true
+  become_user: '{{ pulp_user }}'
+  environment:
+    PULP_SETTINGS: "{{ pulp_settings_file }}"
+
+- name: Configure RH Certified remote
+  command: >
+    {{ pulp_install_dir }}/bin/pulpcore-manager
+     create-remote
+     rh-certified
+     https://cloud.redhat.com/api/automation-hub/
+     --auth_url https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+     --distribution 'red-hat-certified'
+     --repository rh-certified
+  become: true
+  become_user: '{{ pulp_user }}'
+  environment:
+    PULP_SETTINGS: "{{ pulp_settings_file }}"
+
+- name: Remove temporary directory
+  file:
+    path: '{{ automationhub_tempdir.path }}'
+    state: absent
+  become: true
+  become_user: '{{ pulp_user }}'

@@ -1,0 +1,115 @@
+---
+- name: Ensure expected variables are defined
+  fail: msg="{{ item }} value missing and is required"
+  when: hostvars[inventory_hostname][item] is not defined
+  with_items: "{{ check_config_static_required_vars }}"
+
+- name: Ensure cluster hosts are not localhost
+  fail:
+    msg: "'localhost' is not allowed as a target host for cluster installs. Use the hostname or address instead (ansible_connection=local can still be used)"
+  when:
+    - groups['tower'] | default([]) | length > 1
+    - ansible_host == "localhost"
+
+- name: Check that controller uses queue name and not group name
+  fail: msg="Incorrectly referenced controller.
+    Please remove the leading `instance_group_` from `controller` variable `{{ controller }}`."
+  when:
+    - controller is defined
+    - controller.startswith('instance_group_')
+
+- name: Check that group names do not conflict with instance names
+  fail: msg="Hostname '{{ ansible_host }}' conflicts with the name of a group"
+  when: ('instance_group_' + ansible_host) in groups or ('isolated_group_' + ansible_host) in groups
+
+- name: Perform inventory sanity checks
+  run_once: True
+  delegate_to: localhost
+  block:
+
+    - name: Detect unsupported HA inventory file
+      fail:
+        msg: 'Detected an unsupported HA inventory file, please consult the documentation and update the inventory file accordingly.'
+      when: "'primary' in groups or 'secondary' in groups"
+
+    - name: Ensure at least one tower host or one automationhub host is defined
+      fail:
+        msg: "Must specify at least one host in the tower group {{ groups['tower']|length }} or in the automationhub group {{ groups['automationhub']|length }}"
+      when:
+        - not groups['tower'] | default([]) | length
+        - not groups['automationhub'] | default([]) | length
+
+    - name: Check that no instance groups are named tower
+      fail: msg="Cannot name instance group tower"
+      with_items: "{{ groups }}"
+      when:
+        - item != "tower"
+        - item.replace('isolated_group_', '').replace('instance_group_', '') == "tower"
+
+    - name: Ensure only one database host exists
+      fail:
+        msg: "One, and only one, database host may be specified. Database group hosts {{ groups['database'] }}"
+      when:
+        - groups['database'] | default([]) | length > 1
+
+    - name: Ensure only one automationhub host exists
+      fail:
+        msg: "One, and only one, automationhub host may be specified. Automationhub group hosts {{ groups['automationhub'] }}"
+      when:
+        - groups['automationhub'] | default([]) | length > 1
+
+    - name: Ensure Automation Hub and Tower are installed on different nodes
+      fail:
+        msg: "Automation Hub can not be installed on a Tower node. Please update your inventory."
+      when:
+        - groups['automationhub'] | default([]) | length
+        - groups['tower'] | default([]) | length
+        - (groups['automationhub'][0] in groups['tower'] or
+              hostvars[groups['automationhub'][0]]['ansible_host'] | default('') in groups['tower'] | map('extract', hostvars, 'ansible_host') | list)
+
+    - name: Ensure when postgres host is defined that the port is defined
+      fail: msg="pg_host variable defined but pg_port is not defined. Please define it."
+      when: "pg_host is defined and pg_port is not defined"
+
+    - name: Ensure that when a database host is specified, that pg_host or automationhub_pg_host is defined
+      fail:
+        msg: "pg_host or automationhub_pg_host is required when hosts in the database group exist."
+      when:
+        - groups['database'] | default([]) | length
+        - ((groups['tower'] | default([]) | length and not pg_host | default('') | length) or (groups['automationhub'] | default([]) | length and not automationhub_pg_host | default('') | length))
+
+    - name: Ensure that when a database host is specified, that pg_port or automationhub_pg_port is defined
+      fail:
+        msg: "pg_port or automationhub_pg_port is required when hosts in the database group exist."
+      when:
+        - groups['database'] | default([]) | length
+        - ((groups['tower'] | default([]) | length and not pg_port | default(0) | int) or (groups['automationhub'] | default([]) | length and not automationhub_pg_port | default(0) | int))
+
+    - name: Ensure that pg_hashed_password is not set
+      fail:
+        msg: "pg_hashed_password no longer needs to be set in the inventory file.  The more secure SCRAM-SHA-256 hash will be used instead by default."
+      when: "pg_hashed_password is defined"
+
+    - name: Ensure that if we have web cert, we also have key
+      fail:
+        msg: "If you give one of web_server_ssl_cert and web_server_ssl_key, you must also give the other."
+      when: "(web_server_ssl_cert is defined and web_server_ssl_key is not defined) or (web_server_ssl_key is defined and web_server_ssl_cert is not defined)"
+
+    - name: Preflight check - verify certificates for Postgres SSL install
+      fail:
+        msg: "When installing PostgreSQL in SSL mode, postgres_ssl_cert and postgres_ssl_key must be provided."
+      when: "'database' in groups and groups['database'] and (postgres_use_ssl|default(False)|bool) and ((postgres_ssl_cert is not defined) or (postgres_ssl_key is not defined))"
+
+    - name: HA mode requires an external postgres database with pg_host defined
+      fail:
+        msg: "pg_host must be defined when multiple hosts exists"
+      when:
+        - groups['tower'] | default([]) | length > 1
+        - not pg_host | default('') | length
+
+    - name: HA mode requires an external postgres database with pg_port defined
+      fail:
+        msg: "pg_port must be defined when multiple hosts exists"
+      when:
+        - groups['tower'] | default([]) | length > 1
+        - not pg_port | default('') | length

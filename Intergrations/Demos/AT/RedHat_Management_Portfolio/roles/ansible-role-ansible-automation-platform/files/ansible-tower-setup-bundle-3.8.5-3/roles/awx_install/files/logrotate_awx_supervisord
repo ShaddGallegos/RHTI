@@ -1,0 +1,26 @@
+/var/log/tower/dispatcher.log
+/var/log/tower/callback_receiver.log
+/var/log/tower/task_system.log
+/var/log/tower/tower.log
+/var/log/tower/wsbroadcast.log
+/var/log/tower/isolated_manager.log
+/var/log/tower/management_playbooks.log
+{
+    compress
+    delaycompress
+    missingok
+    ifempty
+    daily
+    rotate 14
+}
+
+/var/log/tower/rsyslog.err
+{
+    compress
+    copytruncate
+    missingok
+    ifempty
+    daily
+    size 10M
+    rotate 14
+}

@@ -1,0 +1,105 @@
+[unix_http_server]
+chown = awx:awx
+
+[supervisord]
+umask = 022
+minfds = 4096
+
+[program:awx-dispatcher]
+command = awx-manage run_dispatcher
+directory = /var/lib/awx
+environment = HOME="/var/lib/awx",USER="awx"
+user = awx
+autostart = true
+autorestart = true
+stopwaitsecs = 5
+redirect_stderr=true
+stdout_logfile = /var/log/supervisor/awx-dispatcher.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 10
+
+[program:awx-callback-receiver]
+command = /usr/bin/awx-manage run_callback_receiver
+directory = /var/lib/awx
+user = awx
+autostart = true
+autorestart = true
+stopwaitsecs = 5
+redirect_stderr=true
+stdout_logfile = /var/log/supervisor/awx-callback-receiver.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 10
+
+[program:awx-wsbroadcast]
+command = /usr/bin/awx-manage run_wsbroadcast
+directory = /var/lib/awx
+user = awx
+autostart = true
+autorestart = true
+stopwaitsecs = 5
+redirect_stderr=true
+stdout_logfile = /var/log/supervisor/awx-wsbroadcast.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 10
+
+[program:awx-uwsgi]
+command = {{ uwsgi_bash}} '/var/lib/awx/venv/awx/bin/uwsgi --socket /var/run/tower/uwsgi.sock --module=awx.wsgi:application --stats /var/lib/awx/uwsgi.stats --chmod-socket=660 --vacuum --master --no-orphans --buffer-size=32768 --workers=16 --worker-reload-mercy=30 --harakiri=120 --max-worker-lifetime=3600 --max-requests=100000 --reload-on-rss=1024 --cheaper=4 --cheaper-algo=busyness --cheaper-initial=4 --cheaper-step=2'
+directory = /var/lib/awx
+user = awx
+{% if ansible_distribution_major_version == '7' %}
+environment = LD_LIBRARY_PATH="/opt/rh/rh-postgresql10/root/usr/lib64"
+{% endif %}
+autostart = true
+autorestart = true
+stopwaitsecs = 15
+stopsignal = INT
+stopasgroup = true
+redirect_stderr = true
+stdout_logfile = /var/log/supervisor/awx-uwsgi.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 10
+
+[program:awx-daphne]
+command = /var/lib/awx/venv/awx/bin/daphne -u /var/run/tower/daphne.sock awx.asgi:channel_layer
+directory = /var/lib/awx
+user = awx
+autostart = true
+autorestart = true
+stopwaitsecs = 5
+redirect_stderr = true
+stdout_logfile = /var/log/supervisor/awx-daphne.log
+stdout_logfile_maxbytes = 10MB
+stdout_logfile_backups = 10
+
+[program:awx-rsyslogd]
+command = rsyslogd -n -i /var/run/awx-rsyslog/rsyslog.pid -f /var/lib/awx/rsyslog/rsyslog.conf
+user = awx
+autostart = true
+autorestart = true
+stopwaitsecs = 5
+stopsignal=TERM
+stopasgroup=true
+killasgroup=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/awx-rsyslog.log
+stdout_logfile_maxbytes=0
+
+[group:tower-processes]
+programs=awx-dispatcher,awx-callback-receiver,awx-uwsgi,awx-daphne,awx-wsbroadcast,awx-rsyslogd
+priority=5
+
+[eventlistener:exit-event-listener]
+command=/usr/bin/failure-event-handler
+stderr_logfile = /var/log/supervisor/failure-event-handler.stderr.log
+stderr_logfile_maxbytes = 10MB
+stderr_logfile_backups = 10
+buffer_size = 50
+events=PROCESS_STATE
+priority=0
+
+# NOTE: This is useful if the socket service encounters a problem
+#       where it consumes too much memory.  You will need to install
+#       superlance:   pip install superlance
+# [eventlistener:memmon]
+# command=memmon -p awx-socketio-service=200MB
+# events=TICK_60

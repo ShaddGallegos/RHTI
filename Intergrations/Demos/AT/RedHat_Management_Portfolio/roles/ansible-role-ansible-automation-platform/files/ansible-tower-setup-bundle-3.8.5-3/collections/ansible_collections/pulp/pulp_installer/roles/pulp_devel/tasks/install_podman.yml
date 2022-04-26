@@ -1,0 +1,99 @@
+---
+- name: Ensure podman apt key is present (Debian-specific)
+  apt_key:
+    url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable\
+    /{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_version }}/Release.key"
+    state: present
+  when:
+    - ansible_facts.distribution == 'Debian'
+    - ansible_facts['distribution_major_version'] == "10"
+
+- name: Ensure podman repository (Debian-specific)
+  apt_repository:
+    repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable\
+    /{{ ansible_facts.distribution }}_{{ ansible_facts.distribution_version }}/ /"
+    filename: libcontainers
+  when:
+    - ansible_facts.distribution == 'Debian'
+    - ansible_facts['distribution_major_version'] == "10"
+
+- name: Ensure backports repository (Debian-specific)
+  apt_repository:
+    repo: "deb http://deb.debian.org/debian buster-backports main"
+    filename: backports
+  when:
+    - ansible_facts.distribution == 'Debian'
+    - ansible_facts['distribution_major_version'] == "10"
+
+- name: Install libseccomp2 from backports (Debian-specific)
+  apt:
+    name:
+      - libseccomp2=2.4*
+    default_release: buster-backports
+    state: present
+  retries: "{{ pulp_devel_package_retries }}"
+  register: result
+  until: result is succeeded
+  when:
+    - ansible_facts.distribution == 'Debian'
+    - ansible_facts['distribution_major_version'] == "10"
+
+- name: Install podman, buildah, and runc
+  package:
+    name:
+      - podman
+      - buildah
+      - runc
+    state: present
+  retries: "{{ pulp_devel_package_retries }}"
+  register: result
+  until: result is succeeded
+  # Because of this error on CentOS Stream (pre-8.2):
+  # No available modular metadata for modular package 'criu-3.12-9.module_el8.1.0+293+ad8ef41f.x86_64', it cannot be installed on the system
+  ignore_errors: '{{ ansible_facts.distribution_version == "8.1" }}'
+
+- name: Adding podman registries (Debian-specific)
+  # This should have been a toml_file module if I had found one
+  ini_file:
+    path: /etc/containers/registries.conf
+    section: registries.search
+    option: registries
+    value: "['docker.io', 'quay.io']"
+  become: yes
+  when: ansible_facts.distribution == 'Debian'
+
+- name: Adding podman insecure registries (Debian-specific)
+  # This should have been a toml_file module if I had found one
+  ini_file:
+    path: /etc/containers/registries.conf
+    section: registries.insecure
+    option: registries
+    value: "['localhost:24817']"
+  become: yes
+  when:
+    - ansible_facts.distribution == 'Debian'
+    - pulp_webserver_disable_https | default(false)
+
+# Needed to allow non-root users to run podman containers on Debian
+- name: Enable unprivileged_userns_clone (Debian specific)
+  sysctl:
+    name: kernel.unprivileged_userns_clone
+    value: "1"
+  become: yes
+  when:
+    - ansible_facts.distribution == 'Debian'
+    # This tries to catch all possible ways to identify the use of ansible against a container environment
+    - ansible_facts.virtualization_type | default("") not in ["docker", "podman"]
+    - ansible_facts.env.container | default("") not in ["docker", "podman"]
+
+# Needed to allow non-root users to run podman containers on EL7
+- name: Set max_user_namespaces (EL7 specific)
+  sysctl:
+    name: user.max_user_namespaces
+    value: "15000"
+  when:
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.distribution_major_version |int == 7
+  tags:  # Modifying podman setting while running it in docker causes it to fail tests
+    - molecule-notest
+...

@@ -1,0 +1,19 @@
+galaxy_info:
+  role_name: 'suse-ses-prepare_admin_node'
+  author: 'Johannes Kastl'
+  description: 'Prepare the admin node for a SUSE Enterprise Storage Cluster'
+  company: 'B1 Systems GmbH'
+
+  license: 'BSD-3-Clause'
+
+  min_ansible_version: 2.4
+
+  platforms:
+  - name: SLES
+    versions:
+    - 12
+    - 15
+
+  galaxy_tags: []
+
+dependencies: []

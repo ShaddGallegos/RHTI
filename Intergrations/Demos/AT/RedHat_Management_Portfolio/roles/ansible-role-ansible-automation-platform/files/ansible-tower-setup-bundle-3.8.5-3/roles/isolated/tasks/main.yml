@@ -1,0 +1,126 @@
+- name: Assign controller instance for the install of each isolated instance
+  set_fact:
+    _controller: "{{ groups['tower'][0] if hostvars[inventory_hostname]['controller'] == 'tower' else groups['instance_group_' + hostvars[inventory_hostname]['controller']][0] }}"
+
+- name: Install the Isolated Tower RPM.
+  yum:
+    name: "{{ isolated_package_rpm }}"
+    enablerepo: "{{ ansible_tower_repo }},{{ ansible_tower_dependency_repo }}"
+    disable_gpg_check: "{{ not gpgcheck | bool }}"
+    update_cache: yes
+    state: latest
+
+- name: Upgrade Ansible
+  yum:
+    name: ansible
+    state: latest
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+  when: upgrade_ansible_with_tower
+
+- name: Upgrade ansible-runner
+  yum:
+    name: ansible-runner
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+    state: latest
+
+- name: Configure the Tower system user's home directory.
+  file: path=/var/lib/awx state=directory owner=awx group=awx mode=0755
+
+- name: Register associated isolated instances.
+  shell: awx-manage provision_instance --is-isolated --hostname="{{ cluster_host_identifier }}"
+  args:
+    executable: /bin/bash
+  register: provision_instance
+  changed_when: "'changed: True' in provision_instance.stdout"
+  become_user: awx
+  become: yes
+  delegate_to: "{{ _controller }}"
+
+- name: Register associated isolated instance group.
+  shell: >
+      awx-manage register_queue
+      --queuename="{{ item|regex_replace('^isolated_group_','') }}"
+      --hostnames="{{ ','.join(groups[item] | map('extract', hostvars, 'cluster_host') | list | select('defined'))  }}"
+      --controller="{{ controller }}"
+  args:
+    executable: /bin/bash
+  become_user: awx
+  become: True
+  register: register_queue
+  changed_when: "'changed: True' in register_queue.stdout"
+  delegate_to: "{{ _controller }}"
+  with_items: "{{ group_names }}"
+  when: item.startswith('isolated_group_')
+
+- name: Set the isolated key generation settings based on the installer flag
+  shell: echo 'settings.AWX_ISOLATED_KEY_GENERATION = {{ "True" if isolated_key_generation|bool else "False" }}' | awx-manage shell_plus
+  delegate_to: "{{ _controller }}"
+  run_once: True
+
+- name: Generate an initial SSH Key for all isolated nodes (run_once=True)
+  shell: awx-manage generate_isolated_key
+  args:
+    executable: /bin/bash
+  become_user: awx
+  become: True
+  delegate_to: "{{ _controller }}"
+  run_once: True
+  when: isolated_key_generation|bool
+
+- name: Look up the generated public SSH key
+  shell: awx-manage generate_isolated_key
+  args:
+    executable: /bin/bash
+  become_user: awx
+  become: True
+  register: isolated_key
+  delegate_to: "{{ _controller }}"
+  run_once: True
+  when: isolated_key_generation|bool
+
+- name: Set authorized key
+  authorized_key:
+    user: awx
+    state: present
+    key: "{{ isolated_key.stdout }}"
+  when: isolated_key_generation|bool
+
+- name: Add ansible-runner cgroup config
+  blockinfile:
+    path: /etc/cgconfig.conf
+    owner: root
+    group: root
+    mode: 0644
+    create: yes
+    insertafter: EOF
+    marker: "# <!-- {mark} ansible-runner cgroup -->"
+    block: |
+      group ansible-runner {
+        perm {
+          admin {
+            uid = awx;
+            gid = awx;
+          }
+
+          task {
+            uid = awx;
+            gid = awx;
+          }
+        }
+
+        cpuacct { }
+        memory { }
+        pids { }
+      }
+  become: true
+
+- name: Enable, start cgconfig service
+  service:
+    name: cgconfig
+    state: restarted
+    enabled: true
+  become: true
+
+- name: Perform the first isolated heartbeat
+  shell: echo 'from awx.main.tasks import awx_isolated_heartbeat; awx_isolated_heartbeat.apply_async()' | awx-manage shell_plus
+  delegate_to: "{{ _controller }}"

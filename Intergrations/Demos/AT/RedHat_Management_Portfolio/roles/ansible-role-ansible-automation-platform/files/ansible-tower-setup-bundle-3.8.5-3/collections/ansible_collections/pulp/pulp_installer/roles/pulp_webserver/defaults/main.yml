@@ -1,0 +1,33 @@
+---
+pulp_webserver_server: nginx
+pulp_content_bind: '127.0.0.1:24816'
+pulp_api_bind: '127.0.0.1:24817'
+pulp_configure_firewall: auto
+
+pulp_webserver_disable_https: false
+pulp_webserver_disable_hsts: false
+pulp_certs_dir: '{{ pulp_config_dir }}/certs'
+pulp_webserver_httpd_servername: '{{ ansible_facts.fqdn }}'
+# The "static" dir is used by Pulp 2, and has conflicting SELinux policies.
+# https://pulp.plan.io/issues/5995
+pulp_webserver_static_dir: "{{ pulp_user_home | regex_replace('\\/$', '') }}/pulpcore_static"
+pulp_webserver_tls_files_remote: false
+
+pulp_webserver_http_port: 80
+pulp_webserver_https_port: 443
+
+# To fit nicely with other roles calling pulp_installer.pulp_webserver it is a
+# good idea to handle the case when wrapper call the role with value defined
+# but set to '' - to act as undefined. Without the following the following
+# statement will be evaluated to truthy (because it ends up being defined)
+# when really it should be falsy:
+#
+# - name: Include role
+#   include_role
+#     name: pulp_webserver
+#   vars:
+#     pulp_webserver_tls_key: '{{ myundefvar | default("") }}'
+#
+pulp_webserver_tls_key: ''
+pulp_webserver_tls_cert: ''
+pulp_webserver_tls_custom_ca_cert: ''

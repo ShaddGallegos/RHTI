@@ -1,0 +1,5 @@
+---
+backup_dir: /var/backups/tower/
+backup_dest: "{{ playbook_dir }}/"
+use_compression: False
+db_filename: tower.db

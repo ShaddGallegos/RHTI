@@ -1,0 +1,39 @@
+---
+- block:
+    - name: Create configuration directory for Pulp
+      file:
+        path: '{{ pulp_config_dir }}'
+        state: directory
+        owner: root
+        group: '{{ pulp_group }}'
+        mode: 0750
+      notify: Restore SELinux contexts on Pulp dirs that must exist
+
+    - name: Create configuration file for Pulp
+      template:
+        src: settings.py.j2
+        dest: '{{ pulp_settings_file }}'
+        owner: root
+        group: '{{ pulp_group }}'
+        mode: 0640
+        force: yes
+      notify: Restart all Pulp services
+
+    - name: Create wrapper to call pulpcore-manager
+      template:
+        src: pulpcore-manager.j2
+        dest: "/usr/local/bin/pulpcore-manager"
+        owner: root
+        group: "{{ pulp_group }}"
+        mode: "0750"
+
+    - name: Configure sudo for pulpcore-manager
+      lineinfile:
+        path: /etc/sudoers.d/pulpcore-manager
+        line: "%{{ pulp_group }} ALL=({{ pulp_user }}:{{ pulp_group }}) NOPASSWD:SETENV: {{ pulp_django_admin_path }}"
+        create: true
+        owner: root
+        group: root
+        mode: "0440"
+
+  become: true

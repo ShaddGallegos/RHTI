@@ -1,0 +1,15 @@
+ansible_python_interpreter: /usr/bin/python3
+pulp_install_plugins:
+  # galaxy-ng: {}
+  # pulp-ansible: {}
+  # pulp-certguard: {}
+  # pulp-container: {}
+  # pulp-cookbook: {}
+  # pulp-deb: {}
+  pulp-file:
+    version: 1.6.1
+  # pulp-gem: {}
+  # pulp-maven: {}
+  # pulp-npm: {}
+  # pulp-python: {}
+  # pulp-rpm: {}

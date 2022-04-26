@@ -1,0 +1,5 @@
+---
+redis_init_name: 'redis'
+redis_conf_location: '/etc/redis.conf'
+redis_conf_logfile: '/var/log/redis/redis.log'
+redis_conf_dir: '/var/lib/redis'

@@ -1,0 +1,47 @@
+## Cluster Assignment
+cluster-ceph/cluster/*.sls
+
+## Roles
+# ADMIN
+role-master/cluster/*-suse-ses-admin*.sls
+role-admin/cluster/*-suse-ses-admin*.sls
+
+# Monitoring
+role-prometheus/cluster/*-suse-ses-admin*.sls
+role-grafana/cluster/*-suse-ses-admin*.sls
+
+# MON
+role-mon/cluster/*-suse-ses-mon0*.sls
+
+# MGR (mgrs are usually colocated with mons)
+role-mgr/cluster/*-suse-ses-mon0*.sls
+
+# MDS
+role-mds/cluster/*-suse-ses-mon0*.sls
+
+# IGW
+role-igw/cluster/*-suse-ses-mon0*.sls
+
+# RGW
+role-rgw/cluster/*-suse-ses-mon0*.sls
+
+# NFS
+role-ganesha/cluster/*-suse-ses-mon0*.sls
+
+{% if ansible_distribution == "SLES" and ansible_distribution_major_version == "12" %}
+# openAttic
+role-openattic/cluster/*-suse-ses-admin*.sls
+
+{% endif %}
+# COMMON
+config/stack/default/global.yml
+config/stack/default/ceph/cluster.yml
+
+# Storage
+role-storage/cluster/*-suse-ses-data*.sls
+
+{% if ansible_distribution == "SLES" and ansible_distribution_major_version == "12" %}
+# PROFILES
+profile-default/cluster/*.sls
+profile-default/stack/default/ceph/minions/*.yml
+{% endif %}

@@ -1,0 +1,30 @@
+---
+- block:
+
+  - name: Apply the SELinux type to the TCP port that pulpcore-content listens on
+    seport:
+      ports: '{{ pulp_content_bind.split(":")[1] }}'
+      proto: tcp
+      setype: pulpcore_port_t
+    when:
+      - not (pulp_content_bind.startswith('unix:'))
+      - ansible_facts.os_family == 'RedHat'
+      # We can also try using seport's ignore_selinux_state variable
+      - ansible_facts.selinux.status == "enabled"
+
+  - name: Install pulpcore-content service file
+    template:
+      src: pulpcore-content.service.j2
+      dest: /lib/systemd/system/pulpcore-content.service
+      owner: root
+      group: root
+      mode: 0644
+    notify: Reload systemd and restart pulp content app
+
+  - name: Set state of pulp content app
+    systemd:
+      daemon_reload: true
+      name: pulpcore-content.service
+      state: started
+      enabled: true
+  become: true

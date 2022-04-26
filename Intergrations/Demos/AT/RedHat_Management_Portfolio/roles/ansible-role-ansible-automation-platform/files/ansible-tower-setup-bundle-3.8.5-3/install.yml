@@ -1,0 +1,248 @@
+---
+# This playbook deploys the Ansible Automation Platform application (database, web and
+# worker daemons) to a single server.
+
+- hosts: tower:automationhub:database:instance_group_*:isolated_group_*
+  gather_facts: false
+  roles:
+    - role: check_config_static
+      check_config_static_required_vars:
+        - tower_package_name
+        - tower_package_version
+        - tower_package_release
+    - role: config_dynamic
+
+- name: "Group nodes by OS distribution"
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: group hosts by distribution
+      group_by: 
+        key: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}"
+      changed_when: false
+
+- name: "Group supported distributions"
+  hosts: RedHat_7:CentOS_7:RedHat_8:CentOS_8
+  gather_facts: false
+  tasks:
+    - name: Retrieve the point in time version (CentOS)
+      shell: cat /etc/redhat-release | awk '{ print $4 }'
+      args:
+        warn: False
+      register: centos_version
+      when: ansible_distribution == "CentOS"
+
+    - name: Set the proper ansible_distribution_version fact (CentOS)
+      set_fact:
+        ansible_distribution_version: '{{ centos_version.stdout }}'
+      when: ansible_distribution == "CentOS"
+
+    - name: group hosts for supported distributions
+      group_by: key="supported"
+      changed_when: false
+      when: ansible_distribution_version is version_compare ('7.7', '>=')
+
+- name: "Group deprecated distributions"
+  hosts: RedHat_7:CentOS_7:CentOS_8
+  gather_facts: false
+  tasks:
+    - name: group hosts for supported distributions
+      group_by: key="deprecated"
+      changed_when: false
+
+- name: "Ensure all node OS distributions are supported"
+  hosts: "!supported"
+  gather_facts: false
+  tasks:
+    - name: fail for unsupported distribution
+      fail: msg="{{ ansible_distribution }} {{ ansible_distribution_version }}
+                 is not a supported OS for an Ansible Automation Platform installation.
+                 Supported OSes include Red Hat Enterprise Linux 7.7+, CentOS Linux 7.7+, and CentOS Stream 8."
+
+- name: "Check for deprecated platforms"
+  hosts: deprecated
+  gather_facts: false
+  tasks:
+    - name: warn for deprecated distribution
+      fail: msg="{{ ansible_distribution }} {{ ansible_distribution_version }}
+                 is a deprecated OS for an Ansible Automation Platform, and
+                 support will be removed in a future release."
+      ignore_errors: true
+
+    - name: pause for warning
+      pause: seconds=5
+
+- name: "Define role discovered variables, usable throughout the playbook"
+  hosts: tower:automationhub:database:instance_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  roles:
+    - role: postgres
+      postgres_exec_vars_only: true
+
+- name: "Sanity check"
+  hosts: tower:automationhub:instance_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    - include_role:
+        name: preflight
+
+- name: "Prep Tower node(s)"
+  hosts: tower:instance_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  roles:
+    - role: migrations
+      migrations_database: "{{ config_dynamic_database }}"
+      migrations_pg_database: "{{ pg_database }}"
+      migrations_tower_version: "{{ tower_version }}"
+
+- name: "Install custom CA certificate, if provided"
+  hosts: tower:automationhub:instance_group_*:database
+  any_errors_fatal: true
+  gather_facts: false
+  roles:
+    - role: ca_cert
+      when: custom_ca_cert is defined
+
+- name: "Prep installation repos"
+  hosts: tower:automationhub:instance_group_*:database:isolated_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  roles:
+    - role: repos_el
+
+- name: "Install postgres database node"
+  hosts: database:tower:automationhub
+  any_errors_fatal: true
+  gather_facts: false
+  pre_tasks:
+    - set_fact:
+        _postgres_allowed_ipv4: "0.0.0.0/0"
+        _postgres_allowed_ipv6: "::/0"
+      when:
+        - groups['automationhub'] | default([]) | length
+        - groups['tower'] | default([]) | length
+
+    - set_fact:
+        _do_run_db_install: true
+      when:
+        - inventory_hostname in groups['tower'] | default([]) or (inventory_hostname in groups['automationhub'] | default([]) and (groups['tower'] is undefined or not groups['tower'] | default([]) | length))
+
+    - include_role:
+        name: packages_el
+      vars:
+        packages_el_install_tower: false
+        packages_el_install_postgres: "{{ inventory_hostname in groups['database'] | default([]) or (_do_run_db_install | default(false) | bool and not groups['database'] | default([]) | length) }}"
+
+  roles:
+    - role: postgres
+      postgres_allowed_ipv4: "0.0.0.0/0"
+      postgres_allowed_ipv6: "::/0"
+      postgres_username: "{{ pg_username }}"
+      postgres_password: "{{ pg_password }}"
+      postgres_database: "{{ pg_database }}"
+      automationhub_postgres_username: "{{ automationhub_pg_username }}"
+      automationhub_postgres_password: "{{ automationhub_pg_password }}"
+      automationhub_postgres_database: "{{ automationhub_pg_database }}"
+      max_postgres_connections: 1024
+      postgres_shared_memory_size: "{{ (ansible_memtotal_mb*0.3)|int }}"
+      postgres_work_mem: "{{ (ansible_memtotal_mb*0.03)|int }}"
+      postgres_maintenance_work_mem: "{{ (ansible_memtotal_mb*0.04)|int }}"
+      when:
+        - "config_dynamic_database == 'external'"
+        - inventory_hostname in groups['database'] | default([])
+
+    - role: postgres
+      postgres_allowed_ipv4: "{{ _postgres_allowed_ipv4 | default('127.0.0.1/32') }}"
+      postgres_allowed_ipv6: "{{ _postgres_allowed_ipv6 | default('::1/128') }}"
+      postgres_username: "{{ pg_username }}"
+      postgres_password: "{{ pg_password }}"
+      postgres_database: "{{ pg_database }}"
+      automationhub_postgres_username: "{{ automationhub_pg_username }}"
+      automationhub_postgres_password: "{{ automationhub_pg_password }}"
+      automationhub_postgres_database: "{{ automationhub_pg_database }}"
+      max_postgres_connections: 200
+      postgres_shared_memory_size: "{{ (ansible_memtotal_mb*0.1)|int }}"
+      postgres_work_mem: "{{ (ansible_memtotal_mb*0.01)|int }}"
+      postgres_maintenance_work_mem: "{{ (ansible_memtotal_mb*0.04)|int }}"
+      when:
+        - "config_dynamic_database == 'internal'"
+        - _do_run_db_install | default(false) | bool
+
+    - role: firewall
+      firewalld_http_port: "{{ nginx_http_port | default(80) }}"
+      firewalld_https_port: "{{ nginx_https_port | default(443) }}"
+
+- name: "Install Tower node(s)"
+  hosts: tower:instance_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  pre_tasks:
+    - set_fact: cluster_host="{{ routable_hostname|default(ansible_host) }}"
+
+    - include_role:
+        name: packages_el
+      vars:
+        packages_el_tower_package_name: "{{ tower_package_name }}"
+        packages_el_tower_package_version: "{{ tower_package_version }}"
+
+  roles:
+    - role: redis
+      tag: redis
+
+    - role: firewall
+      firewalld_http_port: "{{ nginx_http_port }}"
+      firewalld_https_port: "{{ nginx_https_port }}"
+
+    - role: rsyslog
+
+    - role: awx_install
+      awx_install_admin_password: "{{ admin_password }}"
+      awx_install_database: "{{ config_dynamic_database }}"
+      awx_install_pg_host: "{{ pg_host }}"
+      awx_install_pg_port: "{{ pg_port }}"
+      awx_install_pg_username: "{{ pg_username }}"
+      awx_install_pg_password: "{{ pg_password }}"
+      awx_install_pg_database: "{{ pg_database }}"
+      awx_install_pg_init_name: "{{ postgres_init_name }}"
+      awx_install_redis_init_name: "{{ redis_init_name }}"
+      awx_install_cluster_host: "{{ cluster_host }}"
+
+    - role: supervisor
+      local_queue: "{{ cluster_host }}"
+
+    - role: nginx
+
+    - role: misc
+      cluster_host_identifier: "{{ cluster_host }}"
+
+  post_tasks:
+    - name: Start the ansible-tower service
+      service:
+        name: ansible-tower
+        state: started
+
+- name: "Install Automation Hub node"
+  hosts: automationhub
+  any_errors_fatal: true
+  gather_facts: false
+  environment:
+    DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+    LD_LIBRARY_PATH: "/opt/rh/rh-postgresql10/root/usr/lib64"
+  tasks:
+    - include_role:
+        name: automationhub
+
+- name: "Install Tower isolated node(s)"
+  hosts: isolated_group_*
+  any_errors_fatal: true
+  become: yes
+  gather_facts: false
+  pre_tasks:
+    - set_fact: cluster_host="{{ routable_hostname|default(ansible_host) }}"
+  roles:
+    - role: isolated
+      isolated_package_version: "{{ tower_package_version }}"
+      cluster_host_identifier: "{{ cluster_host }}"

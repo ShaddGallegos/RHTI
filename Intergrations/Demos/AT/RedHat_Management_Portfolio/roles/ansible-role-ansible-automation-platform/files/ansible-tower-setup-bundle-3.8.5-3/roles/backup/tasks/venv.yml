@@ -1,0 +1,28 @@
+---
+- name: Create a directory for custom virtual environments
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/{{ now }}/{{ item }}/'
+    group: root
+    mode: 0700
+    owner: root
+    state: directory
+  with_items:
+    - venv
+    - custom_venv_paths
+
+- name: Copy virtual environments directories from tower
+  shell: rsync --exclude=/awx --exclude=/ansible -auq /var/lib/awx/venv/ {{ backup_dir.rstrip("/") }}/{{ now }}/venv/
+
+- name: Discover custom venvs path by querying the DB
+  command: awx-manage print_settings CUSTOM_VENV_PATHS --format=yaml
+  register: custom_venv_paths
+  run_once: true
+  become: yes
+
+- name: Set custom venvs path to backup
+  set_fact:
+    paths_to_backup: '{{ custom_venv_paths.stdout | from_yaml }}'
+
+- name: Copy virtual environments directories from tower
+  shell: rsync -auq --relative {{ item }} {{ backup_dir.rstrip("/") }}/{{ now }}/custom_venv_paths/
+  with_items: '{{ paths_to_backup["CUSTOM_VENV_PATHS"] }}'

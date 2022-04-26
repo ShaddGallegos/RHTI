@@ -1,0 +1,27 @@
+---
+- name: mssql_gse
+  hosts: mssql_suse_nodes
+  remote_user: root
+  become: true
+  vars:
+    db_name: mssql_db
+    db_host: localhost    
+    db_user: SA
+    db_password: ******
+
+  roles:
+    - { role: deploy.mssql }
+
+  tasks:
+    - name: Wait up to 60 seconds for server to become available after creation
+      wait_for:
+        port: 1433
+        timeout: 60
+
+    - name: Create new db
+      mssql_db:
+        name:  "{{ db_name }}"
+        state: present
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ ****** }}"

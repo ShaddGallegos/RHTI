@@ -1,0 +1,64 @@
+- name: Get the DNS servers
+  vmware.vmware_rest.appliance_networking_dns_servers_info:
+  register: result
+- ansible.builtin.debug: var=result
+
+- name: Set static DNS servers
+  vmware.vmware_rest.appliance_networking_dns_servers:
+    servers:
+      - 1.1.1.1
+    mode: is_static
+    state: set
+  register: result
+- ansible.builtin.debug: var=result
+
+- ansible.builtin.assert:
+    that:
+      - result.value.servers == ["1.1.1.1"]
+
+- pause:
+    seconds: 10
+
+
+- name: _Set the DNS servers (again)
+  vmware.vmware_rest.appliance_networking_dns_servers:
+    servers:
+      - 1.1.1.1
+    mode: is_static
+    state: set
+  register: result
+- ansible.builtin.debug: var=result
+
+- pause:
+    seconds: 10
+
+
+- name: Add another DNS server
+  vmware.vmware_rest.appliance_networking_dns_servers:
+    server: 8.8.4.4
+    state: add
+  register: result
+- ansible.builtin.debug: var=result
+
+- ansible.builtin.assert:
+    that:
+      - result.value.servers == ["1.1.1.1", "8.8.4.4"]
+
+- pause:
+    seconds: 10
+
+- name: Use the DNS servers from the DHCP
+  vmware.vmware_rest.appliance_networking_dns_servers:
+    mode: dhcp
+    servers: []
+    state: set
+  register: result
+- ansible.builtin.debug: var=result
+
+- name: Test the DNS servers
+  vmware.vmware_rest.appliance_networking_dns_servers:
+    state: test
+    servers:
+      - google.com
+  register: result
+- ansible.builtin.debug: var=result

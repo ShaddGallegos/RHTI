@@ -1,0 +1,66 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+lint: |
+    yamllint .
+    ansible-lint
+    # rubocop
+# This is ignored by molecule, but can be reused in yaml
+.platform_base: &platform_base
+  privileged: False
+  volumes:
+    - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  tmpfs:
+    # Fixes issues accessing .so files under /tmp during pip builds.
+    # https://github.com/docker/compose/issues/1339
+    - /tmp:exec,mode=1777
+    - /run
+    - /run/lock
+  capabilities:
+    - NET_ADMIN
+    - NET_RAW
+  pre_build_image: true
+platforms:
+  - <<: *platform_base
+    name: debian-10
+    # molecule often fails to pull, so we pull all images in .travis.yml
+    image: quay.io/pulp/pulp-ci-dbuster:3.0.0
+    command: /sbin/init
+  - <<: *platform_base
+    name: fedora-33
+    image: quay.io/pulp/pulp_rpm-ci-f33:3.9.0
+    command: /usr/sbin/init
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      stdout_callback: debug
+      callback_whitelist: profile_tasks
+  inventory:
+    links:
+      host_vars: ../scenario_resources/host_vars/
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    # pip installing from source always replaces the installed version, thus
+    # the task is always reports changed. During upgrades, we need the handlers
+    # to run on the pip install tasks, so we can't alter said tasks to never
+    # report changed. So let's just not run idempotency on this scenario.
+    - check
+    - side_effect
+    - verify
+  playbooks:
+    prepare: prepare.yml
+verifier:
+  name: ansible
+  directory: tests

@@ -1,0 +1,20 @@
+# Set up virtualenvwrapper
+export WORKON_HOME={{pulp_install_dir}}/..
+export PIP_VIRTUALENV_BASE=$WORKON_HOME
+export VIRTUALENV_USE_DISTRIBUTE=true
+export PIP_RESPECT_VIRTUALENV=true
+{% if ansible_distribution == 'Fedora' %}
+# make sure python3 is used in virtual environments
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+source /usr/bin/virtualenvwrapper-3.sh
+{% endif %}
+{% if ansible_distribution == 'Debian' %}
+export VIRTUALENVWRAPPER_HOOK_DIR=$HOME/.virtualenvs
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+{% endif %}
+{% if ansible_distribution == 'CentOS' and ansible_distribution_major_version|int == 8 %}
+export VIRTUALENVWRAPPER_PYTHON={{ pulp_install_dir }}/bin/python3
+{% endif %}
+{% if ansible_distribution == 'CentOS' %}
+source /usr/bin/virtualenvwrapper.sh
+{% endif %}

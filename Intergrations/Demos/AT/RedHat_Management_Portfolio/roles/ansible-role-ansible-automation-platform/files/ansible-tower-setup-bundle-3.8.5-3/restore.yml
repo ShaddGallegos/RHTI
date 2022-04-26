@@ -1,0 +1,107 @@
+---
+- hosts: database
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    - name: Temporarily grant createdb role to '{{ pg_username }}'
+      postgresql_user:
+        name: '{{ pg_username }}'
+        role_attr_flags: CREATEDB
+      become: yes
+      become_user: postgres
+      when: pg_username | default('') | length
+
+    - name: Temporarily grant createdb role to '{{ automationhub_pg_username }}'
+      postgresql_user:
+        name: '{{ automationhub_pg_username }}'
+        role_attr_flags: CREATEDB
+      become: yes
+      become_user: postgres
+      when: automationhub_pg_username | default('') | length
+
+- hosts: tower:instance_group_*
+  any_errors_fatal: true
+  gather_facts: yes
+  tasks:
+    - name: Stop Tower services on all nodes
+      command: ansible-tower-service stop
+    - include: roles/postgres/tasks/vars.yml
+    - include_vars: roles/config_dynamic/defaults/main.yml
+    - include: roles/config_dynamic/tasks/main.yml
+    - name: Start database services on primary node if needed
+      service:
+        name: '{{ postgres_init_name }}'
+        state: started
+      when: config_dynamic_database == 'internal' and inventory_hostname == groups['tower'][0]
+
+- hosts: tower
+  any_errors_fatal: true
+  gather_facts: true
+  tasks:
+    - name: Temporarily grant createdb role to '{{ automationhub_pg_username }}'
+      postgresql_user:
+        name: '{{ automationhub_pg_username }}'
+        role_attr_flags: CREATEDB
+      become: yes
+      become_user: postgres
+      when:
+        - automationhub_pg_username | default('') | length
+        - groups['tower'] | default | length
+        - inventory_hostname == groups['tower'][0]
+        - config_dynamic_database == 'internal'
+        - automationhub_config_dynamic_database == 'external'
+
+- hosts: tower:instance_group_*:automationhub
+  any_errors_fatal: true
+  gather_facts: yes
+  roles:
+    - role: check_config_static
+    - role: config_dynamic
+    - role: restore
+      restore_database: "{{ config_dynamic_database }}"
+      automationhub_restore_database: "{{ automationhub_config_dynamic_database }}"
+      restore_pg_database: "{{ pg_database }}"
+
+- hosts: tower:instance_group_*
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    - name: Start Tower services on all nodes
+      command: ansible-tower-service start
+
+- hosts: tower
+  any_errors_fatal: true
+  gather_facts: true
+  tasks:
+    - name: Revoke createdb role from '{{ automationhub_pg_username }}'
+      postgresql_user:
+        name: '{{ automationhub_pg_username }}'
+        role_attr_flags: NOCREATEDB
+      become: yes
+      become_user: postgres
+      when:
+        - automationhub_pg_username | default('') | length
+        - groups['tower'] | default | length
+        - inventory_hostname == groups['tower'][0]
+        - config_dynamic_database == 'internal'
+        - automationhub_config_dynamic_database == 'external'
+
+- hosts: database
+  any_errors_fatal: true
+  gather_facts: false
+  tasks:
+    - name: Revoke createdb role from '{{ pg_username }}'
+      postgresql_user:
+        name: '{{ pg_username }}'
+        role_attr_flags: NOCREATEDB
+      become: yes
+      become_user: postgres
+      when: pg_username | default('') | length
+
+    - name: Revoke createdb role from '{{ automationhub_pg_username }}'
+      postgresql_user:
+        name: '{{ automationhub_pg_username }}'
+        role_attr_flags: NOCREATEDB
+      become: yes
+      become_user: postgres
+      when: automationhub_pg_username | default('') | length

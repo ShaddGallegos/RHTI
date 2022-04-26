@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-role-kvm-vm
+
+- name: Deploy KVM VM
+  include: deploy.yml
+  tags: deploy
+
+- name: Destroy KVM VM
+  include: destroy.yml
+  tags: destroy

@@ -1,0 +1,14 @@
+---
+# suse-ses-prepare_admin_node/tasks/salt_master_and_deepsea.yml
+
+- name: "Install salt-master and salt-minion packages"
+  package:
+    name: "{{ admin_node_salt_packages }}"
+
+- name: "Start the salt services"
+  service:
+    name: "{{ item }}"
+    state: "started"
+    enabled: "true"
+  with_items:
+    - "{{ admin_node_salt_services }}"

@@ -1,0 +1,48 @@
+---
+- hosts: tower:instance_group_*
+  gather_facts: yes
+  roles:
+    - role: check_config_static
+    - role: config_dynamic
+
+- hosts: tower:instance_group_*
+  gather_facts: yes
+  tasks:
+    - name: Stop Tower services on all nodes
+      command: ansible-tower-service stop
+    - include: roles/postgres/tasks/vars.yml
+    - include_vars: roles/config_dynamic/defaults/main.yml
+    - include: roles/config_dynamic/tasks/main.yml
+    - name: Start database services on primary node if needed
+      service:
+        name: '{{ postgres_init_name }}'
+        state: started
+      when: config_dynamic_database == 'internal' and inventory_hostname == groups['tower'][0]
+
+- hosts: tower:instance_group_*
+  gather_facts: false
+  tasks:
+
+    - name: Assign primary instance for the rekey command
+      set_fact:
+        _primary: "{{ groups['tower'][0] }}"
+
+    - name: generate a new SECRET_KEY
+      command: "awx-manage regenerate_secret_key --use-custom-key"
+      environment:
+        TOWER_SECRET_KEY: "{{ secret_key_override | default('') }}"
+      register: new_key
+      become_user: awx
+      no_log: true
+      delegate_to: "{{ _primary }}"
+      run_once: True
+
+    - name: distribute the new SECRET_KEY to all nodes
+      copy:
+        dest: /etc/tower/SECRET_KEY
+        content: "{{ new_key.stdout }}"
+        mode: '0640'
+        backup: yes
+
+    - name: Start Tower services on all nodes
+      command: ansible-tower-service start

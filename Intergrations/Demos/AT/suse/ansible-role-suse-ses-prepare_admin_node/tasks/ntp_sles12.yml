@@ -1,0 +1,13 @@
+---
+# suse-ses-prepare_admin_node/tasks/ntp_sles12.yml
+
+- name: "Install ntp package (on SLES12 only)"
+  package:
+    name: "ntp"
+    state: "present"
+
+- name: "Enable and start the ntpd service (on SLES12 only)"
+  service:
+   name: "ntpd"
+   state: "started"
+   enabled: true

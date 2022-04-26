@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-role-patch
+- name: Updating RHEL based systems
+  yum:
+    name: '*'
+    state: latest
+  become: yes
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' or ansible_distribution == 'Fedora'
+ 
+- name: Updating Debian based systems
+  apt:
+    name: '*'
+    state: latest
+  become: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Updating Windows based systems
+  win_updates:
+    state: installed
+  when: ansible_os_family == 'Windows'

@@ -1,0 +1,80 @@
+---
+
+- name: pulp_install_plugins
+  debug:
+    var: pulp_install_plugins
+    verbosity: 1
+- name: pulp_install_plugins_normalized_yml
+  debug:
+    var: pulp_install_plugins_normalized_yml
+    verbosity: 1
+- name: pulp_install_plugins_normalized
+  debug:
+    var: pulp_install_plugins_normalized
+    verbosity: 1
+
+- name: Check if required variables are set
+  assert:
+    that:
+      # This check runs it through jinja2 templating twice: built-in
+      # "that:" (like when:), and then the {{ }}
+      # It converts from item, to the string like pulp_default_admin_password ,
+      # to the value of pulp_default_admin_password .
+      - "{{ __pulp_common_req_var }} | default('', true) | length > 0"
+    fail_msg: >
+      {{ __pulp_common_req_var }} is undefined, null, an empty string, or an empty dictionary "{}" . Please
+      set it in your variables
+      (e.g. pulp_installer/playbooks/example-use/group_vars/all)
+      and run pulp_installer again.
+      See https://docs.pulpproject.org/pulp_installer/ or
+      pulp_installer/roles/pulp/README.md for more info.
+  loop:
+    - pulp_settings.content_origin
+    - pulp_settings.secret_key
+    - pulp_install_plugins
+  loop_control:
+    loop_var: __pulp_common_req_var
+
+- name: Load OS specific variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - always
+
+- name: Is this a supported version of CentOS
+  fail:
+    msg: Pulp Installer only supports CentOS 7.7 or higher.
+  when:
+    - ansible_facts.distribution == 'CentOS'
+    - ansible_facts.distribution_version|float < 7.7
+
+# Note: We cannot use `systemd-path search-binaries-default` because
+# it wasn't added until systemd 239. Thus no CentOS 7 or Fedora 28
+# support, etc.
+- name: Enumerate default system PATH
+  # pipefail is not needed due to grep's rc, but it resolves ansible-lint 306
+  shell: |
+    set -o pipefail
+    systemctl show-environment | grep -E '^PATH=' | sed 's/PATH=//g'
+  args:
+    # Debian defaults to bourne, but it doesn't understand pipefail.
+    executable: /bin/bash
+  changed_when: false
+  register: systemd_show_env_path
+  check_mode: false
+
+- name: set the default system PATH as a fact
+  set_fact:
+    default_bin_path: "{{ systemd_show_env_path.stdout }}"
+
+- import_tasks: repos.yml
+- import_tasks: install.yml
+- import_tasks: configure.yml

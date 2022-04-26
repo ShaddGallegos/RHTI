@@ -1,0 +1,7 @@
+---
+backup_dir: /var/backups/tower/
+restore_database: 'internal'
+pg_database: awx
+restore_backup_file: "./tower-backup-latest.tar.gz"
+use_compression: False
+db_filename: tower.db

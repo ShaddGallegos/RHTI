@@ -1,0 +1,71 @@
+---
+- block:
+
+    - name: Install Apache
+      package:
+        name: "{{ pulp_webserver_apache_package }}"
+        state: present
+
+    - name: Install Apache vhost file
+      template:
+        src: pulp-vhost.conf.j2
+        dest: "{{ pulp_webserver_apache_vhost_dir }}/pulp-vhost.conf"
+      notify: reload apache
+
+    - name: Enable Apache mod files
+      apache2_module:
+        state: present
+        name: "{{ item }}"
+      loop:
+        - headers
+        - proxy
+        - proxy_http
+        - ssl
+      when: ansible_facts.os_family == "Debian"
+      notify: reload apache
+
+    - name: Enable Apache vhost files
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+      loop:
+        - src: ../sites-available/pulp-vhost.conf
+          dest: /etc/apache2/sites-enabled/pulp-vhost.conf
+      when: ansible_facts.os_family == "Debian"
+      notify: reload apache
+
+    - name: Remove default apache vhost file
+      file:
+        state: absent
+        path: /etc/apache2/sites-enabled/000-default.conf
+      when: ansible_facts.os_family == "Debian"
+      notify: reload apache
+
+    - name: Create directory for Pulp Apache snippets
+      file:
+        path: "{{ pulp_webserver_apache_snippets_dir }}"
+        state: directory
+
+    # FIXME: The ansible output here over the results is very ugly.
+    # It may be a lot cleaner if we were to use the command module,
+    # above and/or create a temporary data structure.
+    - name: Symlink Apache snippets
+      file:
+        src: "{{ __pulp_webserver_snippet.stdout_lines | last }}"
+        dest: "{{ pulp_webserver_apache_snippets_dir }}/{{ __pulp_webserver_snippet.__pulp_webserver_plugin.key | regex_replace('-', '_') }}.conf"
+        state: link
+      loop: '{{ snippets.results }}'
+      loop_control:
+        loop_var: __pulp_webserver_snippet
+      when: __pulp_webserver_snippet.rc == 0
+      notify: reload apache
+
+    - name: Start and enable Apache
+      systemd:
+        name: "{{ pulp_webserver_apache_service }}"
+        state: started
+        enabled: true
+        daemon_reload: true
+
+  become: true

@@ -1,0 +1,28 @@
+---
+# Indicate whether to verify gpg signatures during install
+gpgcheck: 1
+
+# Indicate whether to upgrade Ansible as well as Tower
+upgrade_ansible_with_tower: false
+
+# Specify the format to use when installing tower with the 'yum' module.
+tower_package_rpm: '{{ packages_el_tower_package_name }} = {{ packages_el_tower_package_version }}'
+
+# These need to be base packages only
+
+el_dependencies: []
+dnf_modules: []
+
+packages_el_install_tower: true
+packages_el_install_postgres: false
+
+ansible_tower_repo: ansible-tower
+ansible_tower_dependency_repo: ansible-tower-dependencies
+
+# Don't install PostgreSQL unless someone specifically asks us to
+config_dynamic_database: False
+upgrade_postgres: False
+
+# Defaults that should only apply if this role is directly executed
+packages_el_tower_package_name: ansible-tower
+packages_el_tower_package_version: "{{ tower_package_version }}"

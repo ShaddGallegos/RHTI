@@ -1,0 +1,20 @@
+---
+
+# Upgrade Postgres Client Libraries on Tower Nodes
+
+- name: Uninstall Postgresql 9.6 Client [RHEL 8]
+  shell: |
+    dnf module reset -y 'postgresql'
+  args:
+    warn: false
+
+- name: Enable postgresql 10 dnf modules
+  shell: |
+    dnf module -y enable 'postgresql:10'
+  args:
+    warn: false
+
+- name: Install Postgresql 10 [RHEL8]
+  dnf:
+    name: postgresql
+    state: present

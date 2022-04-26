@@ -1,0 +1,8 @@
+---
+- hosts: webservers
+  tasks:
+
+  - name: update all packages
+    zypper:
+      name: '*'
+      state: latest

@@ -1,0 +1,118 @@
+---
+- name: Preflight check - require new enough Ansible
+  fail:
+    msg: "Your current version of Ansible ({{ ansible_version['full']}}) is too old for this version of Ansible Tower/Automation Hub. Please upgrade."
+  when: ansible_version.full is version_compare(minimum_ansible_version, '<')
+
+- name: Preflight check - Fail if this machine lacks sufficient RAM.
+  fail:
+    msg: This machine does not have sufficient RAM to run Ansible Tower/Automation Hub.
+  when:
+    - ansible_memtotal_mb < required_ram|int
+    - not ignore_preflight_errors| default(false) | bool
+
+- name: Preflight check - Get Hard Max FD limit
+  shell: ulimit -H -n
+  register: ulimit
+  changed_when: False
+
+- name: Preflight check - Verify minimum open fds
+  fail:
+    msg: 'The default max number of file descriptors is too low {{ ulimit.stdout }} should be {{ min_open_fds }}'
+  when: ulimit.stdout|int < min_open_fds|int and not ignore_preflight_errors|default(False)|bool
+
+- name: Preflight check - Get /var/log permissions
+  stat: path=/var/log
+  register: vl_st
+
+- name: Preflight check - Does /var/log have appropriate permissions?
+  fail:
+    msg: 'The permissions on /var/log ({{ vl_st.stat.mode }}) prevent successful installation. /var/log must be world-readable.'
+  when: not vl_st.stat.roth
+
+- name: Preflight check - Read in tower version
+  slurp:
+    src: "/var/lib/awx/.tower_version"
+  register: result
+  ignore_errors: true
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- name: Preflight check - Perform fresh install checks
+  when: result.content is not defined
+  block:
+    - name: Preflight check - Passwords must be defined for a fresh install
+      fail:
+        msg: 'Please configure passwords in the inventory file before running setup'
+      when:
+        - "(pg_password|default('') == '') or (admin_password|default('') == '')"
+        - groups['tower'] | default([]) | length
+      delegate_to: localhost
+      run_once: True
+
+    - name: Preflight check - Automation Hub passwords must be defined for a fresh install (if AH is enabled)
+      fail:
+        msg: 'Please configure automationhub passwords in the inventory file before running setup'
+      when:
+        - "(automationhub_pg_password|default('') == '') or (automationhub_admin_password|default('') == '')"
+        - groups['automationhub'] | default([]) | length
+      delegate_to: localhost
+      run_once: True
+
+    - name: Find mount options for /var, /var/tmp, and /tmp
+      check_mode: yes
+      lineinfile:
+        name: /proc/mounts
+        regexp: ' {{ item }} .*noexec'
+        state: absent
+      loop:
+        - "/var"
+        - "/var/tmp"
+        - "/tmp"
+      register: mount
+
+    - name: Fail if the filesystem is mounted with noexec
+      fail:
+        msg: "{{ item.item }} cannot be mounted w/ noexec"
+      when: ((item is changed) or (item is failed)) and not ignore_preflight_errors|default(False)|bool
+      loop: "{{ mount.results }}"
+
+- name: Preflight check - Perform upgrade checks
+  when: result.content is defined
+  block:
+    - name: Preflight check - User must be on Tower 3.6.x to upgrade
+      fail:
+        msg: 'Please upgrade to 3.6.x before upgrading to {{ tower_package_version }} or later'
+      when: result.content|b64decode is version_compare('3.6', '<')
+
+    - name: Preflight check - check Tower license type
+      shell: awx-manage check_license
+      become_user: awx
+      become: True
+      register: license_type
+
+    - name: Preflight check - check Tower license type (detailed)
+      shell: awx-manage check_license --data
+      become_user: awx
+      become: True
+      register: subscription_details
+
+    - name: Preflight check - check Tower license validity for upgrades
+      fail:
+        msg: "A valid Ansible Tower license is required to upgrade."
+      when: "license_type is defined and license_type.stdout == 'open'"
+
+    - name: Preflight check - check Tower subscription compliance for upgrades
+      fail:
+        msg: "A compliant Ansible Tower subscription is required to upgrade. Subscription details: {{ subscription_details }}"
+      when:
+        - result.content|b64decode is not version_compare(tower_package_version, '=')
+        - subscription_details is defined
+        - subscription_details is not failed
+        - not (subscription_details.stdout | from_json).compliant | bool
+
+- name: Preflight check - Ensure rabbitmq_host is not defined
+  fail:
+    msg: "rabbitmq_host set for host '{{ inventory_hostname }}'. Please use routable_hostname instead"
+  when: rabbitmq_host is defined
+  delegate_to: localhost

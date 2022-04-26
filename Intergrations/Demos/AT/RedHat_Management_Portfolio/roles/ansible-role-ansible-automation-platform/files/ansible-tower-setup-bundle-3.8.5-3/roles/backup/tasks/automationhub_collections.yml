@@ -1,0 +1,4 @@
+---
+- name: Copy /var/lib/pulp files
+  shell: rsync -auq /var/lib/pulp/ {{ backup_dir.rstrip("/") }}/automationhub/automationhub/var_lib_pulp/
+  when: automationhub_backup_collections | default(true) | bool

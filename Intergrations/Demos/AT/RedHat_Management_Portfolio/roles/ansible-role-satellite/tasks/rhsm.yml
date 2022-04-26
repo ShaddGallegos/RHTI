@@ -1,0 +1,24 @@
+---
+# tasks file for registering host to red hat cdn
+- name: Register with red hat cdn and attach satellite infrastructure subscription
+  redhat_subscription:
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+    state: present
+    pool: '^(Red Hat Satellite Infrastructure Subscription)$'
+
+- name: Disable all RHSM repositories
+  rhsm_repository:
+    name: '*'
+    state: disabled
+
+- name: Enable all repositories needed for satellite 6.10
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - rhel-7-server-rpms
+    - rhel-7-server-satellite-6.10-rpms
+    - rhel-7-server-satellite-maintenance-6-rpms
+    - rhel-server-rhscl-7-rpms
+    - rhel-7-server-ansible-2.9-rpms

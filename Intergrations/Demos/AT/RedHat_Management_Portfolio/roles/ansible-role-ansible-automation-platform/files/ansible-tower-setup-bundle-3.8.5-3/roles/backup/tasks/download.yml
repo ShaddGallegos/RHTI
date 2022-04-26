@@ -1,0 +1,227 @@
+---
+- block:
+  - name: Get non-escalated user name
+    command: whoami
+    vars:
+      ansible_become: false
+    register: non_escalated_user_name
+
+  - name: Set non escalated ansible_user fact
+    set_fact:
+      non_escalated_ansible_user: '{{ non_escalated_user_name.stdout }}'
+
+  when: ansible_user is not defined or ansible_user == ''
+
+- name: Set non escalated ansible_user fact
+  set_fact:
+    non_escalated_ansible_user: '{{ ansible_user }}'
+  when: ansible_user is defined and ansible_user != ''
+
+- block:
+    - name: Pre-create system backup data file to set file mode.
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/{{ inventory_hostname }}.tar.gz'
+        state: touch
+        mode: '0600'
+        owner: '{{ non_escalated_ansible_user }}'
+      notify: Remove the backup tarball.
+
+    - name: Compress the backup data.
+      archive:
+        path: '{{ backup_dir.rstrip("/") }}/{{ now }}/'
+        dest: '{{ backup_dir.rstrip("/") }}/{{ inventory_hostname }}.tar.gz'
+        format: gz
+
+    - name: Verify file mode on system backup data file.
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/{{ inventory_hostname }}.tar.gz'
+        state: file
+        mode: '0600'
+        owner: '{{ non_escalated_ansible_user }}'
+
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- block:
+
+  - name: Pre-create common backup data file to set file mode.
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common.tar.gz'
+      state: touch
+      mode: '0600'
+      owner: '{{ non_escalated_ansible_user }}'
+    notify: Remove the common tarball.
+
+  - name: Compress the common backup data.
+    archive:
+      path: '{{ backup_dir.rstrip("/") }}/common/'
+      dest: '{{ backup_dir.rstrip("/") }}/common.tar.gz'
+      format: gz
+
+  - name: Verify file mode on common backup data file.
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common.tar.gz'
+      state: file
+      mode: '0600'
+      owner: '{{ non_escalated_ansible_user }}'
+
+  when:
+    - groups['tower'] | default([]) | length
+    - inventory_hostname == groups['tower'][0]
+
+- block:
+
+  - name: Pre-create automationhub backup data file to set file mode.
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/automationhub.tar.gz'
+      state: touch
+      mode: '0600'
+      owner: '{{ non_escalated_ansible_user }}'
+    notify: Remove the automationhub tarball.
+
+  - name: Compress the automationhub backup data.
+    archive:
+      path: '{{ backup_dir.rstrip("/") }}/automationhub/'
+      dest: '{{ backup_dir.rstrip("/") }}/automationhub.tar.gz'
+      format: gz
+
+  - name: Verify file mode on automationhub backup data file.
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/automationhub.tar.gz'
+      state: file
+      mode: '0600'
+      owner: '{{ non_escalated_ansible_user }}'
+
+  when:
+    - groups['automationhub'] | default([]) | length
+    - inventory_hostname == groups['automationhub'][0]
+
+- name: Make a directory to hold the multiple backup files
+  file:
+    path: '{{ backup_dest.rstrip("/") }}/{{ now }}'
+    state: directory
+    mode: '0700'
+  run_once: true
+  delegate_to: localhost
+  vars:
+    ansible_become: False
+  notify: Remove backup dest stage directory.
+
+- block:
+
+    - name: Pre-create system backup download target to set file mode.
+      file:
+        path: '{{ backup_dest.rstrip("/") }}/{{ now }}/{{ inventory_hostname }}.tar.gz'
+        state: touch
+        mode: '0600'
+      delegate_to: localhost
+      vars:
+        ansible_become: False
+
+    - name: Download the system backup.
+      fetch:
+        dest: '{{ backup_dest.rstrip("/") }}/{{ now }}/{{ inventory_hostname }}.tar.gz'
+        fail_on_missing: yes
+        flat: yes
+        src: '{{ backup_dir.rstrip("/") }}/{{ inventory_hostname }}.tar.gz'
+      vars:
+        ansible_become: False
+
+    - name: Make sure downloaded file has the right mode.
+      file:
+        path: '{{ backup_dest.rstrip("/") }}/{{ now }}/{{ inventory_hostname }}.tar.gz'
+        state: file
+        mode: '0600'
+      delegate_to: localhost
+      vars:
+        ansible_become: False
+
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- block:
+
+  - name: Pre-create common backup download target to set file mode.
+    file:
+      path: '{{ backup_dest.rstrip("/") }}/{{ now }}/common.tar.gz'
+      state: touch
+      mode: '0600'
+    delegate_to: localhost
+    vars:
+      ansible_become: False
+  
+  - name: Download the common backup.
+    fetch:
+      dest: '{{ backup_dest.rstrip("/") }}/{{ now }}/common.tar.gz'
+      fail_on_missing: yes
+      flat: yes
+      src: '{{ backup_dir.rstrip("/") }}/common.tar.gz'
+    vars:
+      ansible_become: False
+
+  - name: Make sure downloaded file has the right mode.
+    file:
+      path: '{{ backup_dest.rstrip("/") }}/{{ now }}/common.tar.gz'
+      state: file
+      mode: '0600'
+    delegate_to: localhost
+    vars:
+      ansible_become: False
+
+  when:
+    - groups['tower'] | default([]) | length
+    - inventory_hostname == groups['tower'][0]
+
+- block:
+
+  - name: Pre-create automationhub backup download target to set file mode.
+    file:
+      path: '{{ backup_dest.rstrip("/") }}/{{ now }}/automationhub.tar.gz'
+      state: touch
+      mode: '0600'
+    delegate_to: localhost
+    vars:
+      ansible_become: False
+
+  - name: Download the automationhub backup.
+    fetch:
+      dest: '{{ backup_dest.rstrip("/") }}/{{ now }}/automationhub.tar.gz'
+      fail_on_missing: yes
+      flat: yes
+      src: '{{ backup_dir.rstrip("/") }}/automationhub.tar.gz'
+    vars:
+      ansible_become: False
+
+  - name: Make sure downloaded file has the right mode.
+    file:
+      path: '{{ backup_dest.rstrip("/") }}/{{ now }}/automationhub.tar.gz'
+      state: file
+      mode: '0600'
+    delegate_to: localhost
+    vars:
+      ansible_become: False
+
+  when:
+    - groups['automationhub'] | default([]) | length
+    - inventory_hostname == groups['automationhub'][0]
+
+- name: Archive backup
+  shell: '(umask 0077 && tar cvfz ../tower-backup-{{ now }}.tar.gz .)'
+  args:
+    chdir: '{{ backup_dest.rstrip("/") }}/{{ now }}'
+  run_once: true
+  delegate_to: localhost
+  vars:
+    ansible_become: False
+  
+- name: Create symbolic link to the most recent backup
+  file:
+    state: 'link'
+    src: '{{ backup_dest.rstrip("/") }}/tower-backup-{{ now }}.tar.gz'
+    path: '{{ backup_dest.rstrip("/") }}/tower-backup-latest.tar.gz'
+    force: yes
+  run_once: true
+  delegate_to: localhost
+  vars:
+    ansible_become: False
+

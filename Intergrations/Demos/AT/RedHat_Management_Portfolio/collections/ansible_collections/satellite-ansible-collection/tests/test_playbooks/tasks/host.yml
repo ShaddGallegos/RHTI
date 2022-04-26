@@ -1,0 +1,53 @@
+---
+- name: "Ensure host '{{ host_name }}' is {{ host_state }}"
+  host:
+    username: "{{ foreman_username }}"
+    password: "{{ foreman_password }}"
+    server_url: "{{ foreman_server_url }}"
+    validate_certs: "{{ foreman_validate_certs }}"
+    name: "{{ host_name }}"
+    location: "{{ host_location | default(omit) }}"
+    organization: "{{ host_organization | default(omit) }}"
+    hostgroup: "{{ host_hostgroup | default(omit) }}"
+    compute_resource: "{{ host_compute_resource | default(omit) }}"
+    compute_profile: "{{ host_compute_profile | default(omit) }}"
+    domain: "{{ host_domain | default(omit) }}"
+    subnet: "{{ host_subnet | default(omit) }}"
+    subnet6: "{{ host_subnet6 | default(omit) }}"
+    enabled: "{{ host_enabled | default(omit) }}"
+    managed: "{{ host_managed | default(omit) }}"
+    build: "{{ host_build | default(omit) }}"
+    ip: "{{ host_ip | default(omit) }}"
+    mac: "{{ host_mac | default(omit) }}"
+    comment: "{{ host_comment | default(omit) }}"
+    owner: "{{ host_owner | default(omit) }}"
+    owner_group: "{{ host_owner_group | default(omit) }}"
+    realm: "{{ host_realm | default(omit) }}"
+    architecture: "{{ host_architecture | default(omit) }}"
+    operatingsystem: "{{ host_operatingsystem | default(omit) }}"
+    medium: "{{ host_installation_medium | default(omit) }}"
+    ptable: "{{ host_ptable | default(omit) }}"
+    pxe_loader: "{{ host_pxe_loader | default(omit) }}"
+    root_pass: "{{ host_root_pass | default(omit) }}"
+    environment: "{{ host_environment | default(omit) }}"
+    config_groups: "{{ host_config_groups | default(omit) }}"
+    puppet_proxy: "{{ host_puppet_proxy | default(omit) }}"
+    puppet_ca_proxy: "{{ host_puppet_ca_proxy | default(omit) }}"
+    puppetclasses: "{{ host_puppetclasses | default(omit) }}"
+    openscap_proxy: "{{ host_openscap_proxy | default(omit) }}"
+    content_source: "{{ host_content_source | default(omit) }}"
+    lifecycle_environment: "{{ host_lifecycle_environment | default(omit) }}"
+    content_view: "{{ host_content_view | default(omit) }}"
+    provision_method: "{{ host_provision_method | default(omit) }}"
+    image: "{{ host_image | default(omit) }}"
+    interfaces_attributes: "{{ host_interfaces_attributes | default(omit) }}"
+    state: "{{ host_state | default(omit) }}"
+  register: result
+- assert:
+    fail_msg: "Ensuring host is {{ host_state }} failed! (expected_change: {{ expected_change | default('unknown') }})"
+    that:
+      - result.changed == expected_change
+  when: expected_change is defined
+  vars:
+    host_state: present
+...

@@ -1,0 +1,30 @@
+---
+- hosts: all
+  pre_tasks:
+    # The version string below is the highest of all those in roles' metadata:
+    # "min_ansible_version". It needs to be kept manually up-to-date.
+    - name: Verify Ansible meets min required version
+      assert:
+        that: "ansible_version.full is version_compare('2.8', '>=')"
+        msg: >
+          "You must update Ansible to at least 2.8 to use this version of Pulp 3 Installer."
+
+    # Upgrading packages may break due to wrong base url
+    # following tasks replace yum pulpcore repository base url from
+    # https://fedorapeople.org/groups/katello/releases/yum/nightly/pulpcore/
+    # to https://yum.theforeman.org/pulpcore/
+    - name: Check if pulpcore repo exists
+      stat:
+        path: /etc/yum.repos.d/pulpcore.repo
+      register: pulpcorerepo
+
+    - name: Remove pulpcore fedorapeople
+      lineinfile:
+        path: /etc/yum.repos.d/pulpcore.repo
+        regexp: 'fedorapeople'
+        line: "baseurl = {{ pulp_pkg_repo }}"
+      when: pulpcorerepo.stat.exists
+  roles:
+    - pulp_all_services
+  environment:
+    DJANGO_SETTINGS_MODULE: pulpcore.app.settings

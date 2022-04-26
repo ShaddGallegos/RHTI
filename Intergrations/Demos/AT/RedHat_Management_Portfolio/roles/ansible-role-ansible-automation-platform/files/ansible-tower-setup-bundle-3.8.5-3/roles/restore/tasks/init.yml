@@ -1,0 +1,122 @@
+---
+- name: Create a directory for the database restore to live.
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/restore/'
+    mode: 0775
+    owner: root
+    state: directory
+  notify: Remove the restore directory.
+
+- name: Upload the backup tarball to the server.
+  copy:
+    dest: '{{ backup_dir.rstrip("/") }}/restore/tower-restore.tar.gz'
+    mode: 0664
+    owner: root
+    src: '{{ restore_backup_file }}'
+
+- name: Uncompress the backup file.
+  unarchive:
+    src: '{{ backup_dir.rstrip("/") }}/restore/tower-restore.tar.gz'
+    dest: '{{ backup_dir.rstrip("/") }}/restore/'
+    remote_src: true
+
+- name: Check for a host specific directory
+  stat:
+    path: '{{ backup_dir.rstrip("/") }}/restore/{{ inventory_hostname }}.tar.gz'
+  register: host_archive
+
+- name: Register presence of host archive
+  set_fact:
+    has_host_archive: '{{ host_archive.stat.exists }}'
+
+- name: Extract the common archive.
+  unarchive:
+    src: '{{ backup_dir.rstrip("/") }}/restore/common.tar.gz'
+    dest: '{{ backup_dir.rstrip("/") }}/restore/'
+    remote_src: true
+  when:
+    - groups['tower'] | default([]) | length
+
+- name: Extract the automationhub archive.
+  unarchive:
+    src: '{{ backup_dir.rstrip("/") }}/restore/automationhub.tar.gz'
+    dest: '{{ backup_dir.rstrip("/") }}/restore/'
+    remote_src: true
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])
+
+- name: Extract the host specific archive
+  unarchive:
+    src: '{{ backup_dir.rstrip("/") }}/restore/{{ inventory_hostname }}.tar.gz'
+    dest: '{{ backup_dir.rstrip("/") }}/restore/'
+    remote_src: true
+  when: has_host_archive | bool
+
+- name: Changing the permission of the restore directory after extraction of backup archive
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/restore'
+    state: directory
+    mode: 0755
+    owner: root
+
+- block:
+    - name: Tower | Stop Web Service.
+      service:
+        name: nginx
+        state: stopped
+      notify: start web service.
+
+    - name: Tower | Stop supervisor.
+      service:
+        name: supervisord
+        state: stopped
+      notify: start supervisord.
+
+    - name: Tower | Get tower db settings
+      shell: "awx-manage print_settings | grep '^DATABASES'"
+      register: results
+      changed_when: False
+      no_log: True
+
+    - name: Tower | Ingest database settings
+      set_fact:
+        tower_db_settings: "{{ results.stdout | regex_replace('DATABASES\\s+= ', '') }}"
+      no_log: True
+
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- block:
+    - name: Automation Hub | Retrieve list of pulpcore-worker services
+      shell: 'systemctl -t service list-units | grep pulpcore-worker | cut -d" " -f1'
+      changed_when: false
+      register: pulpcore_worker_services
+
+    - name: Automation Hub | Set pulpcore_services fact
+      set_fact:
+        _pulpcore_services:
+          - pulpcore-api
+          - pulpcore-content
+          - pulpcore-resource-manager
+          - '{{ pulpcore_worker_services.stdout_lines }}'
+          - nginx
+
+    - name: Automation Hub | Stop Automation Hub services
+      service:
+        name: '{{ item }}'
+        state: stopped
+      loop: '{{ _pulpcore_services | flatten(1) }}'
+      notify: start Automation Hub services.
+
+    - name: Automation Hub | Get Automation Hub database settings
+      shell: "grep '^DATABASES' /etc/pulp/settings.py"
+      register: ah_database_settings
+      changed_when: false
+      no_log: true
+
+    - name: Automation Hub | Ingest Automation Hub database settings
+      set_fact:
+        automationhub_db_settings: "{{ ah_database_settings.stdout | regex_replace('DATABASES\\s+= ', '') }}"
+      no_log: true
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])

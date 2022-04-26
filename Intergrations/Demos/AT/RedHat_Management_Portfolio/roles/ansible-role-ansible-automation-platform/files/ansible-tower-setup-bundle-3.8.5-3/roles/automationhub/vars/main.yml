@@ -1,0 +1,19 @@
+---
+pulp_install_db: false
+pulp_install_source: "packages"
+pulp_default_admin_password: "{{ automationhub_admin_password }}"
+pulp_webserver_disable_https: "{{ automationhub_disable_https | bool }}"
+pulp_webserver_disable_hsts: "{{ automationhub_disable_hsts | bool }}"
+pulp_api_workers: 4
+pulp_redis_bind: 'unix:/var/run/redis/redis.sock'
+pulp_api_bind: 'unix:/var/run/pulpcore-api/pulpcore-api.sock'
+pulp_content_bind: 'unix:/var/run/pulpcore-content/pulpcore-content.sock'
+pulp_ld_library_path: '/opt/rh/rh-postgresql10/root/usr/lib64'
+epel_release_packages: [] # prevent pulp from installing EPEL
+pulp_webserver_tls_cert: '{{ automationhub_ssl_cert | default("") }}'
+pulp_webserver_tls_key: '{{ automationhub_ssl_key | default("") }}'
+pulp_webserver_tls_custom_ca_cert: '{{ custom_ca_cert | default("") }}'
+pulp_pkg_upgrade_all: '{{ automationhub_upgrade | bool }}'
+automationhub_importer_default_settings:
+  tmp_root_dir: '/var/lib/pulp/tmp'
+  ansible_local_tmp: '/var/lib/pulp/tmp'

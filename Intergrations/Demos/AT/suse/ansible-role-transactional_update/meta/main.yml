@@ -1,0 +1,25 @@
+galaxy_info:
+  role_name: 'transactional_update'
+  author: 'Johannes Kastl'
+  description: 'Run the transactional-update command used on openSUSE/SLES machines'
+  company: 'B1 Systems GmbH'
+
+  license: 'BSD-3-Clause'
+
+  min_ansible_version: 2.4
+
+  platforms:
+  - name: SLES
+    versions:
+    - all
+  - name: opensuse
+    versions:
+    - all
+  - name: openSUSE MicroOS
+    versions:
+    - all
+
+  galaxy_tags: []
+
+dependencies:
+   - { role: "reboot" }

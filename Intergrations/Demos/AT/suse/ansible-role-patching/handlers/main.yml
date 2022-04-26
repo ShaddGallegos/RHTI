@@ -1,0 +1,4 @@
+## roles/ansible-role-patching/handlers/main.yml
+# vim:ft=ansible:
+---
+...

@@ -1,0 +1,37 @@
+---
+site_name: Pulp Installer
+site_description: Pulp 3 Ansible Installer
+site_author: Pulp Team
+site_url: https://docs.pulpproject.org/pulp_installer/
+repo_name: pulp/pulp_installer
+repo_url: https://github.com/pulp/pulp_installer
+theme: readthedocs
+nav:
+  - Home: index.md
+  - Getting started: quickstart.md
+  - contributing.md
+  - pulplift.md
+  - Let's Encrypt: letsencrypt.md
+  - FIPS: fips.md
+  - Changelog: CHANGES.md
+  - Roles:
+      - Pulp Common: roles/pulp_common.md
+      - Pulp API: roles/pulp_api.md
+      - Pulp Content: roles/pulp_content.md
+      - Pulp Database: roles/pulp_database.md
+      - Pulp Database Configuration: roles/pulp_database_config.md
+      - Pulp Devel: roles/pulp_devel.md
+      - Pulp Redis: roles/pulp_redis.md
+      - Pulp Resource Manager: roles/pulp_resource_manager.md
+      - Pulp Webserver: roles/pulp_webserver.md
+      - Pulp Workers: roles/pulp_workers.md
+      - Pulp Health Check: roles/pulp_health_check.md
+  - Prereq Roles:
+      - Pulp RPM prerequisites: prereq_roles/pulp_rpm_prerequisites.md
+  - Meta Roles:
+      - Pulp All Services: meta_roles/pulp_all_services.md
+      - Pulp Services: meta_roles/pulp_services.md
+markdown_extensions:
+  - pymdownx.superfences
+  - toc:
+      permalink: True

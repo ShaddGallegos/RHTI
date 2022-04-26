@@ -1,0 +1,53 @@
+---
+- zypper_repository:
+    description: Microsoft SQL repo
+    repo: https://packages.microsoft.com/config/sles/12/mssql-server-2017.repo
+    state: absent
+    disable_gpg_check: yes
+
+- zypper_repository:  
+    description: Microsoft SQL tools repo
+    repo: https://packages.microsoft.com/config/sles/12/prod.repo
+    state: absent
+    disable_gpg_check: yes
+
+- name: Install mssql-server packages
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items: "{{mssql_packages}}"
+
+- name: Install pymssql for future playbooks against DB server
+  pip:
+    name: pymssql
+    state: present
+
+- name: Install mssql-cli-tool via command with args
+  shell: ACCEPT_EULA=Y yum install mssql-tools -y
+  when: install_cli
+
+- name: Add mssql tools to .bashrc
+  lineinfile:
+    dest: "{{ ansible_user_dir}}/.bashrc"
+    state: present
+    line: 'export PATH="$PATH:/opt/mssql-tools/bin"'
+  when: install_cli
+
+- name: Add firewalld settings
+  firewalld:
+    zone: public
+    port: 1433/tcp
+    permanent: true
+    state: enabled
+  when: enable_iptables
+  notify: restart iptables
+
+- name: Stop any existing mssql-server
+  service:
+      name: mssql-server
+      state: stopped
+
+- name: Run mssql setup script
+  shell:  MSSQL_PID="{{edition}}" MSSQL_SA_PASSWORD="{{db_password}}" /opt/mssql/bin/mssql-conf -n setup accept-eula
+  register: setup_output
+  failed_when: "'Setup has completed successfully. SQL Server is now starting.' not in setup_output.stdout"

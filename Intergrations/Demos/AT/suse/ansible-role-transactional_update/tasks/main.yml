@@ -1,0 +1,15 @@
+---
+# tasks file for transactional_update
+
+- name: "Run transactional update"
+  command: "/usr/sbin/transactional-update"
+  register: transactional_update
+  changed_when:
+    - '"zypper: nothing to update" not in transactional_update.stdout'
+  notify:
+    - "Reboot"
+    - "Wait for the machine(s) to be ready again"
+  when: 'ansible_distribution == "openSUSE MicroOS"'
+
+- name: 'transactional-updates: force reboot at this point to not lose changes'
+  meta: flush_handlers

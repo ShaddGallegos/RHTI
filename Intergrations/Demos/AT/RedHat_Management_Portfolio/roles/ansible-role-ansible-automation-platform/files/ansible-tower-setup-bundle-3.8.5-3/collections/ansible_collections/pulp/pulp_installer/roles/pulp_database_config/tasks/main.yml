@@ -1,0 +1,48 @@
+---
+- name: Check if required variables are set
+  assert:
+    that:
+      # This check runs it through jinja2 templating twice: built-in
+      # "that:" (like when:), and then the {{ }}
+      # It converts from item, to the string like pulp_default_admin_password ,
+      # to the value of pulp_default_admin_password .
+      - "{{ __pulp_database_config_req_variable }} | default('', true) | length > 0"
+    fail_msg: >
+      {{ __pulp_database_config_req_variable }} is undefined, null, or an empty string. Please
+      set it in your variables
+      (e.g. pulp_installer/playbooks/example-use/group_vars/all)
+      and run pulp_installer again.
+      See https://docs.pulpproject.org/pulp_installer/ or
+      pulp_installer/roles/pulp/README.md for more info.
+  loop:
+    - pulp_default_admin_password
+  loop_control:
+    loop_var: __pulp_database_config_req_variable
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- block:
+    - name: Run database migrations
+      command: '{{ pulp_django_admin_path }} migrate --no-input'
+      register: result
+      changed_when: "'No migrations to apply' not in result.stdout"
+
+    - name: Check if admin account has been created
+      command: >
+        {{ pulp_django_admin_path }} shell -c
+        'from django.contrib.auth import get_user_model; print(get_user_model().objects.filter(username="admin").exists())'
+      register: __pulp_database_config_admin_account_exists
+      changed_when: false
+      check_mode: false
+
+    - name: Set the Pulp admin user's password
+      command: "{{ pulp_django_admin_path }} reset-admin-password --password {{ pulp_default_admin_password }}"
+      no_log: true
+      when: (__pulp_database_config_admin_account_exists.stdout == "False" ) | default(false)
+
+  run_once: "{{ __pulp_database_config_run_once }}"
+  become: true
+  become_user: '{{ pulp_user }}'
+  environment:
+    PULP_SETTINGS: "{{ pulp_settings_file }}"

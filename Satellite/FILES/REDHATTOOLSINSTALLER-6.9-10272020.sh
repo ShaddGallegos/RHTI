@@ -459,7 +459,7 @@ echo 'Verifying that the system is attached to a Satellite Subscription'
 echo "*******************************************************************"
 echo " "
 subscription-manager attach --pool=`subscription-manager list --available --matches 'Red Hat Satellite Infrastructure Subscription' --pool-only`
-sleep 1￼
+sleep 1
 echo " "
 echo "*********************************************************"
 echo "GATHERING VARIABLES SPECIFIC TO THIS SYSTEM, NO INPUT REQUIRED"
@@ -540,7 +540,7 @@ subscription-manager repos --enable=rhel-7-server-rpms \
 --enable=rhel-7-server-satellite-6.10-rpms \
 --enable=rhel-7-server-satellite-maintenance-6-rpms \
 --enable=rhel-server-rhscl-7-rpms \
---enable=rhel-7-server-ansible-2.9-rpms \
+--enable=rhel-7-server-ansible-2.9-rpms 
 yum clean all
 rm -rf /var/cache/yum
 echo " "
@@ -775,7 +775,7 @@ foreman-maintain packages unlock
 satellite-installer --scenario satellite -v \
 --foreman-proxy-tftp=true \
 --foreman-proxy-tftp-servername="$INTERNALIP" \
---foreman-proxy-tftp-managed=true \
+--foreman-proxy-tftp-managed=false \
 --foreman-proxy-tftp-listen-on=both \
 --foreman-proxy-puppetca=true \
 --foreman-proxy-plugin-remote-execution-ssh-install-key true \
@@ -788,7 +788,7 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dns-server="$(hostname)" \
 --foreman-proxy-dns-reverse="$DNS_REV" \
 --foreman-proxy-dns-provider=nsupdate \
---foreman-proxy-dns-managed=true \
+--foreman-proxy-dns-managed=false \
 --foreman-proxy-dns-listen-on=both \
 --foreman-proxy-dns-interface="$SAT_INTERFACE" \
 --foreman-proxy-dns-forwarders="$DNS" \
@@ -798,7 +798,7 @@ satellite-installer --scenario satellite -v \
 --foreman-proxy-dhcp-pxefilename "pxelinux.0" \
 --foreman-proxy-dhcp-provider isc \
 --foreman-proxy-dhcp-nameservers="$DHCP_DNS" \
---foreman-proxy-dhcp-managed=true \
+--foreman-proxy-dhcp-managed=false \
 --foreman-proxy-dhcp-listen-on="both" \
 --foreman-proxy-dhcp-interface="$SAT_INTERFACE" \
 --foreman-proxy-dhcp-gateway="$DHCP_GW" \
@@ -1583,7 +1583,7 @@ echo "*********************************************************"
 hammer medium create --path=http://repos/${ORG}/Library/content/dist/rhel/server/7/7.9/x86_64/kickstart/ --organizations=$ORG --os-family=Redhat --name="RHEL 7.9 Kickstart" --operatingsystems="RedHat 7.9"
 
 #RHEL 8 
-hammer medium create --path=http://repos/REDHAT/Library/content/dist/rhel8/8.4/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.4 Kickstart" --operatingsystems="RedHat-8.4"
+hammer medium create --path=http://repos/REDHAT/Library/content/dist/rhel8/8.5/x86_64/baseos/kickstart --organizations=$ORG --os-family=Redhat --name="RHEL 8.4 Kickstart" --operatingsystems="RedHat-8.4"
 sudo touch ~/Downloads/RHTI/MEDIUM
 }
 

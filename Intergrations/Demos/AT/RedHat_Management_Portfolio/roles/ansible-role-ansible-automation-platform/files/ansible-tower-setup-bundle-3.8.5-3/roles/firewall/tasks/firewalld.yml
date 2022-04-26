@@ -1,0 +1,27 @@
+- name: Start firewalld if it is enabled and not running
+  service:
+    name: firewalld
+    state: started
+  when:
+    - systemctl_unit_files.stdout_lines | select('match','firewalld.service\s+enabled') | list | length == 1
+    - firewalld_running.rc != 0
+
+- name: Enable base Tower firewall ports
+  firewalld:
+    port: '{{item}}/tcp'
+    permanent: true
+    state: enabled
+    immediate: yes
+    zone: "{{ tower_firewalld_zone }}"
+  when: inventory_hostname in groups['tower'] | default([])
+  with_items: "{{ tower_firewall_ports }}"
+
+- name: Enable Standalone Database firewall ports
+  firewalld:
+    port: '{{item}}/tcp'
+    permanent: true
+    state: enabled
+    immediate: yes
+    zone: "{{ tower_firewalld_zone }}"
+  when: inventory_hostname in groups['database'] | default([])
+  with_items: "{{ database_firewall_ports }}"

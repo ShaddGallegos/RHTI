@@ -1,0 +1,10 @@
+---
+# defaults file for ansible-rhv-vm-role
+rhv_cluster: DEMO
+rhv_network_profile: DEMO
+rhv_storage_domain: DEMO-iSCSI
+
+vm_mem: 2GiB
+vm_cpus: 2
+vm_disk_size: 10GiB
+vm_name: new-vm

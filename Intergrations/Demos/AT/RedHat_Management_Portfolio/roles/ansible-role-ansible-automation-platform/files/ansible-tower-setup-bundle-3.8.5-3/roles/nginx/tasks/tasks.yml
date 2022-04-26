@@ -1,0 +1,137 @@
+---
+- name: Open up permissions on nginx.
+  seboolean:
+    name: '{{item}}'
+    persistent: yes
+    state: 'true'
+  when: ansible_selinux is defined and ansible_selinux.status == "enabled"
+  with_items:
+    - httpd_can_network_connect
+
+- name: Copy user-provided SSL certificates, if we have them
+  when: web_server_ssl_cert is defined
+  block:
+
+    - name: Copy SSL certificate
+      copy:
+        src: "{{ web_server_ssl_cert }}"
+        dest: /etc/tower/tower.cert
+        owner: root
+        group: awx
+        mode: 0600
+      notify:
+        - restart nginx
+
+    - name: Copy SSL private key
+      copy:
+        src: "{{ web_server_ssl_key }}"
+        dest: /etc/tower/tower.key
+        owner: root
+        group: awx
+        mode: 0600
+      notify:
+        - restart nginx
+
+- name: Set up self-signed SSL certificate, if the user did not provide one
+  when: web_server_ssl_cert is not defined
+  block:
+
+    - name: Create the self-signed cert on the first tower host
+      when: inventory_hostname == groups['tower'][0]
+
+      block:
+
+        - name: Create temporary directory for openssl config
+          tempfile:
+            state: directory
+            suffix: tower_openssl
+          register: tempfile_results
+
+        - name: copy openssl config
+          copy:
+            src: openssl.cnf
+            dest: "{{ tempfile_results.path }}/openssl.cnf"
+            group: awx
+            owner: root
+            mode: 0600
+
+        - name: create self signed SSL certificates
+          command: openssl req -x509 -nodes -sha256 -days 824 -newkey rsa:2048 -keyout /etc/tower/tower.key -out /etc/tower/tower.cert -config {{ tempfile_results.path }}/openssl.cnf
+          args:
+            creates: /etc/tower/tower.cert
+          notify:
+            - restart nginx
+
+        - name: set permissions on self-signed SSL certificate
+          file:
+            path: '{{ item }}'
+            group: awx
+            follow: yes
+            mode: 0600
+            owner: root
+          with_items:
+          - /etc/tower/tower.cert
+          - /etc/tower/tower.key
+
+        - name: slurp self-signed SSL certificate
+          slurp:
+            src: /etc/tower/tower.cert
+          register: tower_cert
+          no_log: True
+
+        - name: slurp self-signed SSL key
+          slurp:
+            src: /etc/tower/tower.key
+          register: tower_key
+          no_log: True
+      always:
+        - name: Remove the temporary openssl config directory and file
+          file:
+            path: "{{ tempfile_results.path }}"
+            state: absent
+          when: tempfile_results is defined and tempfile_results.path is defined
+
+    - name: Copy the cert we just created to additional hosts
+      when: inventory_hostname != groups['tower'][0]
+      block:
+
+        - name: place self-signed SSL certificates
+          copy:
+            content: "{{ hostvars[groups['tower'][0]]['tower_cert']['content'] | b64decode }}"
+            dest: /etc/tower/tower.cert
+            group: awx
+            follow: yes
+            mode: 0600
+            force: false
+            owner: root
+          notify:
+            - restart nginx
+
+        - name: place self-signed SSL key file
+          copy:
+            content: "{{ hostvars[groups['tower'][0]]['tower_key']['content'] | b64decode }}"
+            dest: /etc/tower/tower.key
+            group: awx
+            follow: yes
+            mode: 0600
+            force: false
+            owner: root
+          notify:
+            - restart nginx
+
+- name: Install Tower nginx.conf
+  template:
+    src: nginx.conf
+    dest: '/etc/nginx/nginx.conf'
+    force: True
+    owner: root
+    group: root
+  notify:
+    - restart nginx
+
+- name: start nginx and configure to startup automatically
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+

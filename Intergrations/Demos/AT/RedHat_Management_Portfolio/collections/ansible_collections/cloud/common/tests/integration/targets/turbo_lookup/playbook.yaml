@@ -1,0 +1,83 @@
+- hosts: localhost
+  gather_facts: no
+
+  environment:
+    ANSIBLE_TURBO_LOOKUP_TTL: 1
+    ANOTHER_ANSIBLE_VARS: 10
+
+  tasks:
+    - name: variables definition
+      set_fact:
+        var00: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+        var01: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"  
+
+    - pause:
+        seconds: 2
+
+    - name: variables definition
+      set_fact:
+        var10: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+        var11: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+      environment:
+        ANSIBLE_TURBO_LOOKUP_TTL: 4
+ 
+    - pause:
+        seconds: 2
+
+    - name: variables definition
+      set_fact:
+        var20: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+        var21: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+
+    - name: validate output
+      assert:
+        that:
+        - '"turbo_demo_counter: 1" in var00'
+        - '"turbo_demo_counter: 2" in var01'
+        - '"turbo_demo_counter: 1" in var10'
+        - '"turbo_demo_counter: 2" in var11'
+        - '"turbo_demo_counter: 3" in var20'
+        - '"turbo_demo_counter: 4" in var21'
+
+    - name: Wait for the socket to be closed
+      pause:
+        seconds: 5
+
+
+- hosts: localhost
+  gather_facts: no
+
+  vars:
+    turbo_play_var: "simple ansible playbook variable"
+
+  tasks:
+    - name: set variables using lookup plugin
+      set_fact:
+        var0: "{{ lookup('cloud.common.turbo_demo', terms, playbook_vars=['turbo_play_var', 'turbo_task_var'], wantlist=True) }}"
+        var1: "{{ lookup('cloud.common.turbo_demo', terms, playbook_vars=['turbo_task_var'], wantlist=True) }}"
+        var2: "{{ lookup('cloud.common.turbo_demo', terms, playbook_vars=['turbo_play_var'], wantlist=True) }}"
+      vars:
+        terms: ["2.9", "2.10"]
+        turbo_task_var: "simple ansible task variable"
+
+    - name: test lookup plugin using a module
+      debug:
+        msg: "{{ lookup('cloud.common.turbo_demo', wantlist=True) }}"
+      register: output
+
+    - name: validate other settings
+      assert:
+        that:
+        - '"turbo_demo_counter: 1" in var0'
+        - '"turbo_demo_counter: 2" in var1'
+        - '"turbo_demo_counter: 3" in var2'
+        - '"turbo_demo_counter: 4" in output.msg'
+        - '"simple ansible task variable" in var0'
+        - '"simple ansible task variable" in var1'
+        - 'turbo_play_var in var0'
+        - 'turbo_play_var in var2'
+        - '["2.9", "2.10"] in var0'
+        - '["2.9", "2.10"] in var1'
+        - '["2.9", "2.10"] in var2'
+    
+    

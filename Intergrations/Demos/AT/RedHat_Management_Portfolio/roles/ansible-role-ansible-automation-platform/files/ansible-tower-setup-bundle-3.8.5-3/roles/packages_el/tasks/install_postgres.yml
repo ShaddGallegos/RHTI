@@ -1,0 +1,54 @@
+---
+- name: Check for old Postgres data
+  stat:
+    path: "{{ existing_pg_dir }}/PG_VERSION"
+  register: old_pg_version_file
+
+- name: Read PG_VERSION file contents
+  command: "cat {{ existing_pg_dir }}/PG_VERSION"
+  register: old_pg_version_file_content
+  when: old_pg_version_file.stat.exists
+
+- name: Check if Postgres has already been upgraded
+  stat:
+    path: "{{ existing_pg_dir }}/PG_VERSION.upgraded"
+  register: pg_already_upgraded
+
+- name: Determine if we should upgrade Postgres
+  set_fact:
+    upgrade_postgres: >-
+      {{ (old_pg_version_file.stat.exists and
+          ((old_pg_version_file_content.stdout | trim | int) != 10) and
+          (not pg_already_upgraded.stat.exists) | bool) }}
+
+- name: Install postgres [RHEL7]
+  yum:
+    name: "{{ postgresql_packages }}"
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+    disable_gpg_check: '{{ not gpgcheck | bool }}'
+    state: present
+  when: ansible_distribution_major_version == "7"
+
+- name: Enable Postgres SCL for login shells
+  copy: 
+    dest: /etc/profile.d/rh-postgresql10-env.sh 
+    content: |
+      #!/bin/bash \
+      source scl_source enable rh-postgresql10
+  when: ansible_distribution_major_version == "7"
+
+- name: Enable postgresql 10 dnf modules
+  shell: |
+    dnf module -y enable 'postgresql:10'
+  args:
+    warn: false
+  when: ansible_distribution_major_version == "8" and not upgrade_postgres
+
+- name: Install Postgresql [RHEL8]
+  dnf:
+    name: '@postgresql:10'
+    state: present
+  when: ansible_distribution_major_version == "8" and not upgrade_postgres
+
+- include: upgrade_postgres.yml
+  when: upgrade_postgres

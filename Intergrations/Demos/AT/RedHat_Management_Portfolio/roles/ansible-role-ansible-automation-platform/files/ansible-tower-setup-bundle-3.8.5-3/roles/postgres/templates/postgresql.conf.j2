@@ -1,0 +1,110 @@
+#------------------------------------------------------------------------------
+# CONNECTIONS AND AUTHENTICATION
+#------------------------------------------------------------------------------
+
+# - Connection Settings -
+
+listen_addresses = '*'
+#port = 5432
+max_connections = {{ max_postgres_connections }}
+unix_socket_directories = '{{ postgres_run_dir }}, /tmp'
+shared_buffers = {{ postgres_shared_memory_size }}MB
+work_mem = {{ postgres_work_mem }}MB
+maintenance_work_mem = {{ postgres_maintenance_work_mem }}MB
+#max_stack_depth = 2MB			# min 100kB
+dynamic_shared_memory_type = posix	# the default is the first option
+#max_worker_processes = 8
+
+# - Security and Authentication -
+
+#authentication_timeout = 1min          # 1s-600s
+#ssl = off
+#ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+#ssl_prefer_server_ciphers = on
+#ssl_ecdh_curve = 'prime256v1'
+#ssl_dh_params_file = ''
+#ssl_cert_file = 'server.crt'
+#ssl_key_file = 'server.key'
+#ssl_ca_file = ''
+#ssl_crl_file = ''
+password_encryption = 'scram-sha-256'             # md5 or scram-sha-256
+#db_user_namespace = off
+#row_security = on
+
+{% if postgres_use_ssl|default(False)|bool %}
+ssl=on
+ssl_cert_file='{{ pg_conf_dir }}/server.crt'
+ssl_key_file='{{ pg_conf_dir }}/server.key'
+{% endif %}
+
+#wal_level = minimal			# minimal, archive, hot_standby, or logical
+#fsync = on				# turns forced synchronization on or off
+#synchronous_commit = on		# synchronization level;
+#wal_sync_method = fsync		# the default is the first option
+#full_page_writes = on			# recover from partial page writes
+#wal_log_hints = off			# also do full page writes of non-critical updates
+#wal_buffers = -1			# min 32kB, -1 sets based on shared_buffers
+#wal_writer_delay = 200ms		# 1-10000 milliseconds
+
+
+#checkpoint_segments = 3		# in logfile segments, min 1, 16MB each
+#checkpoint_timeout = 5min		# range 30s-1h
+#checkpoint_completion_target = 0.5	# checkpoint target duration, 0.0 - 1.0
+#checkpoint_warning = 30s		# 0 disables
+
+#max_wal_senders = 0		# max number of walsender processes
+#wal_keep_segments = 0		# in logfile segments, 16MB each; 0 disables
+#wal_sender_timeout = 60s	# in milliseconds; 0 disables
+#max_replication_slots = 0	# max number of replication slots
+
+# - Master Server -
+#synchronous_standby_names = ''	# standby servers that provide sync rep
+#vacuum_defer_cleanup_age = 0	# number of xacts by which cleanup is delayed
+
+# - Standby Servers -
+#hot_standby = off			# "on" allows queries during recovery
+#max_standby_archive_delay = 30s	# max delay before canceling queries
+#max_standby_streaming_delay = 30s	# max delay before canceling queries
+#wal_receiver_status_interval = 10s	# send replies at least this often
+#hot_standby_feedback = off		# send info from standby to prevent
+#wal_receiver_timeout = 60s		# time that receiver waits for
+
+log_destination = 'stderr'		# Valid values are combinations of
+logging_collector = on			# Enable capturing of stderr and csvlog
+log_directory = 'pg_log'		# directory where log files are written,
+log_filename = 'postgresql-%a.log'	# log file name pattern,
+log_truncate_on_rotation = on		# If on, an existing log file with the
+log_rotation_age = 1d			# Automatic rotation of logfiles will
+log_rotation_size = 0			# Automatic rotation of logfiles will
+
+log_line_prefix = '< %m %a >'			# special values:
+log_timezone = 'UTC'
+
+# - Locale and Formatting -
+
+datestyle = 'iso, mdy'
+timezone = 'UTC'
+lc_messages = '{{ ansible_env.LC_ALL | d(ansible_env.LC_MESSAGES) | d(ansible_env.LANG) | d("en_US.UTF-8") }}'			# locale for system error message
+lc_monetary = '{{ ansible_env.LC_ALL | d(ansible_env.LC_MONETARY) | d(ansible_env.LANG) | d("en_US.UTF-8") }}'			# locale for monetary formatting
+lc_numeric = '{{ ansible_env.LC_ALL | d(ansible_env.LC_NUMERIC) | d(ansible_env.LANG) | d("en_US.UTF-8") }}'			# locale for number formatting
+lc_time = '{{ ansible_env.LC_ALL | d(ansible_env.LC_TIME) | d(ansible_env.LANG) | d("en_US.UTF-8") }}'				# locale for time formatting
+
+default_text_search_config = 'pg_catalog.english'
+
+{% if pg_enable_debug_logging|default(False)|bool %}
+log_lock_waits = on
+deadlock_timeout = 10000
+log_min_duration_statement = 8000
+{% endif %}
+
+#------------------------------------------------------------------------------
+# CONFIG FILE INCLUDES
+#------------------------------------------------------------------------------
+
+# These options allow settings to be loaded from files other than the
+# default postgresql.conf.
+
+#include_dir = 'conf.d'			# include files ending in '.conf' from
+					# directory 'conf.d'
+#include_if_exists = 'exists.conf'	# include file only if it exists
+#include = 'special.conf'		# include file

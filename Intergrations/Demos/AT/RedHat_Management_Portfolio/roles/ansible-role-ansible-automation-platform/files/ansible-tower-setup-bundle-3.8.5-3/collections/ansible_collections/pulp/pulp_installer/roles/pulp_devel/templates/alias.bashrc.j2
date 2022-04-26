@@ -1,0 +1,261 @@
+# If adding new functions to this file, note that you can add help text to the function
+# by defining a variable with name _<function>_help containing the help text
+
+SERVICES=("pulpcore-content {% for num in range(pulp_workers) %}pulpcore-worker@{{ num + 1 }} {% endfor %}pulpcore-resource-manager pulpcore-api")
+
+_paction() {
+    echo systemctl $@ ${SERVICES}
+    sudo systemctl $@ ${SERVICES}
+}
+
+pstart() {
+    _paction start
+}
+_pstart_help="Start all pulp-related services"
+
+pstop() {
+    _paction stop
+}
+_pstop_help="Stop all pulp-related services"
+
+prestart() {
+    _paction restart
+}
+_prestart_help="Restart all pulp-related services"
+
+pstatus() {
+    _paction status
+}
+_pstatus_help="Report the status of all pulp-related services"
+
+pdbreset() {
+    workon pulp
+    pstop
+    {{ pulp_django_admin_path }} reset_db --noinput
+    {{ pulp_django_admin_path }} migrate
+    {{ pulp_django_admin_path }} reset-admin-password --password {{ pulp_default_admin_password }}
+}
+_pdbreset_help="Reset the Pulp database"
+# can get away with not resetting terminal settings here since it gets reset in phelp
+_pdbreset_help="$_dbreset_help - `setterm -foreground red -bold on`THIS DESTROYS YOUR PULP DATA"
+
+pclean() {
+    pdbreset
+    sudo rm -rf {{ pulp_user_home }}/artifact
+    {{ pulp_django_admin_path }} collectstatic --noinput --link
+}
+_pclean_help="Restore pulp to a clean-installed state"
+# can get away with not resetting terminal settings here since it gets reset in phelp
+_pclean_help="$_pclean_help - `setterm -foreground red -bold on`THIS DESTROYS YOUR PULP DATA"
+
+pjournal() {
+    # build up the journalctl cmdline per-unit
+    journal_cmd="journalctl"
+    for svc in ${SERVICES}; do
+        journal_cmd="$journal_cmd -u $svc"
+    done
+
+    if [ -z $1 ]; then
+        # not passed any args, follow the units' journals by default
+        $journal_cmd -f
+    else
+        # passed some args, send all args through to journalctl
+        $journal_cmd $@
+    fi
+}
+_pjournal_help="Interact with the journal for pulp-related units
+    pjournal takes optional journalctl args e.g. 'pjournal -r', runs pjournal -f by default"
+
+reset_pulp2() {
+    sudo systemctl stop httpd pulp_workers pulp_resource_manager pulp_celerybeat
+    mongo pulp_database --eval "db.dropDatabase()"
+    sudo rm -rf /var/lib/pulp/content
+    sudo rm -rf /var/lib/pulp/published
+    sudo -u apache pulp-manage-db;
+    sudo systemctl start httpd pulp_workers pulp_resource_manager pulp_celerybeat
+}
+_reset_pulp2_help="Resets Pulp 2: drop the DB, remove content and publications from FS, restart services."
+
+populate_pulp2_iso() {
+    pulp-admin login -u admin -p admin
+    pulp-admin iso repo create --feed https://fixtures.pulpproject.org/file/ --repo-id file
+    pulp-admin iso repo create --feed https://fixtures.pulpproject.org/file2/ --repo-id file2 --download-policy on_demand
+    pulp-admin iso repo create --feed https://fixtures.pulpproject.org/file-many/ --repo-id file-many --download-policy on_demand
+    pulp-admin iso repo create --feed https://fixtures.pulpproject.org/file-large/ --repo-id file-large
+    pulp-admin iso repo sync run --repo-id file &
+    pulp-admin iso repo sync run --repo-id file2 &
+    pulp-admin iso repo sync run --repo-id file-many &
+    pulp-admin iso repo sync run --repo-id file-large &
+}
+_populate_pulp2_iso_help="Syncs 4 ISO repos."
+
+populate_pulp2_rpm() {
+    pulp-admin login -u admin -p admin
+    pulp-admin rpm repo create --feed https://fixtures.pulpproject.org/rpm-unsigned/ --repo-id rpm_unsigned --download-policy on_demand
+    pulp-admin rpm repo sync run --repo-id rpm_unsigned &
+}
+_populate_pulp2_rpm_help="Sync 1 RPM repo."
+
+populate_pulp2_docker() {
+    pulp-admin login -u admin -p admin
+    pulp-admin docker repo create --feed=https://registry-1.docker.io  --repo-id test-fixture-1 --upstream-name=pulp/test-fixture-1
+    pulp-admin docker repo sync run --repo-id test-fixture-1 &
+}
+_populate_pulp2_docker_help="Sync 1 Docker repo."
+
+_populate_pulp2() {
+    reset_pulp2
+    populate_pulp2_iso
+    populate_pulp2_rpm
+    populate_pulp2_docker
+}
+_populate_pulp2_help="Reset Pulp 2 and sync ISO, RPM, Docker repos."
+
+phelp() {
+    # get a list of declared functions, filter out ones with leading underscores as "private"
+    funcs=$(declare -F | awk '{ print $3 }'| grep -v ^_ | grep -v fzf)
+
+    # for each func, if a help string is defined, assume it's a pulp function and print its help
+    # (this is bash introspection via variable variables)
+    for func in $funcs; do
+        # get the "help" variable name for this function
+        help_var="_${func}_help"
+        # use ${!<varname>} syntax to eval the help_var
+        help=${!help_var}
+        # If the help var had a value, echo its value here (the value is function help text)
+        if [ ! -z "$help" ]; then
+            # make the function name easy to spot
+            setterm -foreground yellow -bold on
+            echo -n "$func"
+            # reset terminal formatting before printing the help text
+            # (implicitly format it as normal text)
+            setterm -default
+            echo ": $help"
+        fi
+    done
+
+    # explicitly restore terminal formatting is reset before exiting function
+    setterm -default
+}
+_phelp_help="Print this help"
+
+pyclean () {
+        find . -type f -name "*.py[co]" -delete
+        find . -type d -name "__pycache__" -delete
+}
+_pyclean_help="Cleanup extra python files"
+
+pbindings(){
+    CURRENT_DIR=$(pwd)
+
+    if [ -d $HOME/devel/pulp-openapi-generator ]
+    then
+        cd $HOME/devel/pulp-openapi-generator
+    else
+        cd $HOME/devel
+        git clone https://github.com/pulp/pulp-openapi-generator.git
+        cd pulp-openapi-generator
+    fi
+
+    sed -i 's/docker/podman/g' generate.sh
+    workon pulp
+
+    if [ $1 != 'pulpcore' ]
+    then
+        ./generate.sh pulpcore $2
+        case $2 in
+            python)
+                pip install ./pulpcore-client
+                ;;
+            ruby)
+                cd pulpcore-client
+                gem build pulpcore_client
+                GEM_FILE="$(ls | grep pulpcore_client-)"
+                gem install --both ./${GEM_FILE}
+                cd ..
+                ;;
+            *)
+                echo "Sorry, language not supported"
+                ;;
+        esac
+        rm -rf pulpcore-client
+
+        # check server is up before proceeding in case server is autoreloading
+        for i in {1..5}; do http :24817/pulp/api/v3/status/ && break || sleep 5; done
+    fi
+
+    ./generate.sh $@
+    case $2 in
+        python)
+            pip install ./$1-client
+            ;;
+        ruby)
+            cd $1-client
+            gem build $1_client
+            GEM_FILE="$(ls | grep ${1}_client-)"
+            gem install --both ./${GEM_FILE}
+            cd ..
+            ;;
+        *)
+            echo "Sorry, language not supported"
+            ;;
+    esac
+    rm -rf $1-client
+
+    sed -i 's/podman/docker/g' generate.sh
+    cd $CURRENT_DIR
+}
+_pbindings_help="Create and install bindings. Example usage: pbindings pulpcore python"
+
+pfixtures () {
+    cat ~/.config/pulp_smash/settings.json | \
+    jq "setpath([\"custom\",\"fixtures_origin\"]; \"http://localhost:8000/fixtures/\")" > ~/.config/pulp_smash/.settings.json.tmp
+    mv ~/.config/pulp_smash/.settings.json.tmp ~/.config/pulp_smash/settings.json
+    podman run --rm -it -p 0.0.0.0:8000:80 --name pulp_fixtures pulp/pulp-fixtures
+    cat ~/.config/pulp_smash/settings.json | \
+    jq "setpath([\"custom\",\"fixtures_origin\"]; \"https://fixtures.pulpproject.org/\")" > ~/.config/pulp_smash/.settings.json.tmp
+    mv ~/.config/pulp_smash/.settings.json.tmp ~/.config/pulp_smash/settings.json
+}
+_pfixtures_help="Run pulp-fixtures container in foreground"
+
+pminio(){
+    if [ "$1" = 'stop' ]
+    then
+        sudo bash -c "sed -i '/AWS_ACCESS_KEY_ID/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_SECRET_ACCESS_KEY/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_STORAGE_BUCKET_NAME/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_DEFAULT_ACL/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/S3_USE_SIGV4/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_S3_SIGNATURE_VERSION/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_S3_ADDRESSING_STYLE/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_S3_REGION_NAME/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/DEFAULT_FILE_STORAGE/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/MEDIA_ROOT/d' /etc/pulp/settings.py"
+        sudo bash -c "sed -i '/AWS_S3_ENDPOINT_URL/d' /etc/pulp/settings.py"
+        podman stop pulp_minio && podman rm pulp_minio
+        echo "The minio instance has been torn down. It's recommended that you run 'pclean' now."
+    else
+        export MINIO_ACCESS_KEY=AKIAIT2Z5TDYPX3ARJBA
+        export MINIO_SECRET_KEY=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
+        podman run -d -p 0.0.0.0:9000:9000 --name pulp_minio -e MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY -e MINIO_SECRET_KEY=$MINIO_SECRET_KEY minio/minio server /data
+        while ! nc -z localhost 9000; do echo 'Wait minio to startup...' && sleep 0.1; done;
+        mc config host add s3 http://localhost:9000 AKIAIT2Z5TDYPX3ARJBA fqRvjWaPU5o0fCqQuUWbj9Fainj2pVZtBCiDiieS --api S3v4
+        mc config host rm local
+        mc mb s3/pulp3 --region eu-central-1
+        echo "Declaring S3 environment variables..."
+        sudo bash -c "echo AWS_ACCESS_KEY_ID = \'$MINIO_ACCESS_KEY\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_SECRET_ACCESS_KEY = \'$MINIO_SECRET_KEY\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_STORAGE_BUCKET_NAME = \'pulp3\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_DEFAULT_ACL = None >> /etc/pulp/settings.py"
+        sudo bash -c "echo S3_USE_SIGV4 = True >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_S3_SIGNATURE_VERSION = \'s3v4\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_S3_ADDRESSING_STYLE = \'path\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_S3_REGION_NAME = \'eu-central-1\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo DEFAULT_FILE_STORAGE = \'storages.backends.s3boto3.S3Boto3Storage\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo MEDIA_ROOT = \'\' >> /etc/pulp/settings.py"
+        sudo bash -c "echo AWS_S3_ENDPOINT_URL = \'http:\/\/localhost:9000\' >> /etc/pulp/settings.py"
+        echo "The minio instance has been setup. It's recommended that you run 'pclean' now."
+    fi
+    _paction restart
+}
+_pminio_help="Switch to minio for S3 testing. For stopping it: pminio stop"

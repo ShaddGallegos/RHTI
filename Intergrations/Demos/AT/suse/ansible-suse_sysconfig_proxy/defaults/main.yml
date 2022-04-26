@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-suse_sysconfig_proxy
+suse_sysconfig_proxy:
+  proxy_enabled: "no"
+  http_proxy: ""
+  https_proxy: ""
+  ftp_proxy: ""
+  gopher_proxy: ""
+  no_proxy: localhost, 127.0.0.1 

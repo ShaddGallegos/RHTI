@@ -1,0 +1,33 @@
+{
+ "collection_info": {
+  "namespace": "pulp",
+  "name": "squeezer",
+  "version": "0.0.6",
+  "authors": [
+   "Matthias Dellweg <2500@gmx.de>",
+   "Timo Funke <timoses@msn.com>",
+   "Jacob Floyd <cognifloyd@gmail.com>",
+   "Yanis Guenane <yguenane@redhat.com>"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "pulp"
+  ],
+  "description": null,
+  "license": [],
+  "license_file": "LICENSE",
+  "dependencies": {},
+  "repository": null,
+  "documentation": null,
+  "homepage": null,
+  "issues": null
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "03f52e3a4a4e901d99662e802fd8eae9d5c72a93be706c3170a80ce325163a09",
+  "format": 1
+ },
+ "format": 1
+}

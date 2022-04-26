@@ -1,0 +1,97 @@
+Define pulp-content {{ __pulp_webserver_apache_content_bind }}
+Define pulp-api {{ __pulp_webserver_apache_api_bind }}
+
+{% if pulp_webserver_disable_https | bool %}
+<VirtualHost *:{{ pulp_webserver_http_port }}>
+  ServerName {{ pulp_webserver_httpd_servername }}
+
+  ## Logging
+  ErrorLog "{{ pulp_webserver_apache_log_dir }}/pulp_error.log"
+  ServerSignature Off
+  CustomLog "{{ pulp_webserver_apache_log_dir }}/pulp_access.log" combined
+
+  ## Proxy rules
+  ProxyRequests Off
+  ProxyPreserveHost Off
+
+  ProxyPass /pulp/api/v3 ${pulp-api}/pulp/api/v3
+  ProxyPassReverse /pulp/api/3 ${pulp-api}/pulp/api/v3
+
+  ProxyPass /auth/login/ ${pulp-api}/auth/login/
+  ProxyPassReverse /auth/login/ ${pulp-api}/auth/login/
+
+  ProxyPass /pulp/content ${pulp-content}/pulp/content
+  ProxyPassReverse /pulp/content ${pulp-content}/pulp/content
+
+  IncludeOptional pulp/*.conf
+
+  # static files are served through whitenoise - http://whitenoise.evans.io/en/stable/
+  # exclude all pulp v2 api calls
+  ProxyPassMatch ^/pulp/api/v2 !
+  ProxyPass / ${pulp-api}/
+  ProxyPassReverse / ${pulp-api}/
+
+</VirtualHost>
+{% else %}
+<VirtualHost *:{{ pulp_webserver_http_port }}>
+  ServerName {{ pulp_webserver_httpd_servername }}
+  Redirect permanent / https://{{ pulp_webserver_httpd_servername }}/
+</VirtualHost>
+
+<VirtualHost *:{{ pulp_webserver_https_port }}>
+  ServerName {{ pulp_webserver_httpd_servername }}
+
+  # static files that can change dynamically, or are needed for TLS
+  # purposes are served through the webserver.
+  DocumentRoot {{ pulp_webserver_static_dir }}
+
+  ## TLS Configuration
+  SSLEngine On
+  SSLCertificateFile {{ pulp_certs_dir }}/pulp_webserver.crt
+  SSLCertificateKeyFile {{ pulp_certs_dir }}/pulp_webserver.key
+  SSLProtocol TLSv1.2
+  SSLCipherSuite ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
+  SSLHonorCipherOrder on
+
+{% if not pulp_webserver_disable_hsts | bool %}
+  # HSTS (15768000 seconds = 6 months)
+  Header always set Strict-Transport-Security "max-age=15768000;; includeSubDomains; preload"
+{% endif %}
+
+  ## Logging
+  ErrorLog "{{ pulp_webserver_apache_log_dir }}/pulp_error.log"
+  ServerSignature Off
+  CustomLog "{{ pulp_webserver_apache_log_dir }}/pulp_access.log" combined
+
+  ## Proxy rules
+  ProxyRequests Off
+  ProxyPreserveHost Off
+
+  ProxyPass /pulp/api/v3 ${pulp-api}/pulp/api/v3
+  ProxyPassReverse /pulp/api/v3 ${pulp-api}/pulp/api/v3
+
+  ProxyPass /auth/login/ ${pulp-api}/auth/login/
+  ProxyPassReverse /auth/login/ ${pulp-api}/auth/login/
+
+  ProxyPass /pulp/content ${pulp-content}/pulp/content
+  ProxyPassReverse /pulp/content ${pulp-content}/pulp/content
+
+  IncludeOptional pulp/*.conf
+
+  # most pulp static files are served through whitenoise
+  # http://whitenoise.evans.io/en/stable/
+  # exclude all pulp v2 api calls
+  ProxyPassMatch ^/pulp/api/v2 !
+  ProxyPass / ${pulp-api}/
+  ProxyPassReverse / ${pulp-api}/
+
+  # ACME http-01 tokens, i.e, for Let's Encrypt
+  <Location "/.well-known">
+    AllowOverride None
+    ProxyPass "!"
+    ProxyPassReverse "!"
+    Require all granted
+  </Location>
+
+</VirtualHost>
+{% endif %}

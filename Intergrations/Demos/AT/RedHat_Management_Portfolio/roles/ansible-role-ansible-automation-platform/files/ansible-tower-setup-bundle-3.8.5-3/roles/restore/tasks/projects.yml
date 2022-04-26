@@ -1,0 +1,12 @@
+---
+- name: Tower | Ensure that tower projects directory exists.
+  file:
+    group: "awx"
+    mode: 0755
+    owner: "awx"
+    path: "/var/lib/awx/projects"
+    state: directory
+
+- name: Tower | Restore manual projects
+  shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/projects/ /var/lib/awx/projects/
+  when: has_host_archive | bool

@@ -1,0 +1,9 @@
+---
+- name: Delete MS SQL db specified
+  mssql_db:
+    name: "{{ db_name }}"
+    state: absent
+    login_host: "{{db_host}}"
+    login_port: "{{db_port}}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"

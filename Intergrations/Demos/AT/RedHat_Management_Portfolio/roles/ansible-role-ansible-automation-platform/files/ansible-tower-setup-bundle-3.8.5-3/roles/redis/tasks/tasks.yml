@@ -1,0 +1,34 @@
+---
+- name: Ensure redis socket directory exists
+  file: path=/var/run/redis state=directory mode=0750 owner=redis group=redis
+
+- name: Ensure Redis socket directory has the correct SELinux context
+  shell: restorecon -R /var/run/redis
+
+- name: Create tmpfiles.d entry for redis socket directory
+  template:
+    src: redis_tmpd.conf
+    dest: /etc/tmpfiles.d/redis.conf
+    force: yes
+    mode: '0640'
+    owner: root
+    group: root
+
+- name: add awx to the redis group so it can access the socket
+  user: name=awx groups=redis append=yes
+
+- name: Install Tower redis.conf
+  template:
+    src: redis.conf
+    dest: "{{ redis_conf_location }}"
+    force: True
+    owner: redis
+    group: root
+
+# TODO: only on change
+- name: start redis and configure to startup automatically
+  service:
+    name: "{{ redis_init_name }}"
+    state: restarted
+    enabled: yes
+

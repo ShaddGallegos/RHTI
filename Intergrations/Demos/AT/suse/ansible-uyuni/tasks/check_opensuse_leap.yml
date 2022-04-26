@@ -1,0 +1,4 @@
+---
+- name: Ensure having 15 SP3 release
+  fail: msg="Please upgrade to SP3"
+  when: "ansible_distribution_version != '15.3'"

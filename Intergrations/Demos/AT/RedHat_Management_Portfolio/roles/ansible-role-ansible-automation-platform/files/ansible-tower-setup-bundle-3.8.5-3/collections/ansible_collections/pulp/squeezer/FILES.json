@@ -1,0 +1,264 @@
+{
+ "files": [
+  {
+   "name": ".",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "README.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "db7e0158d41cacd0e2328d66ac420f33737e2fb3cee7e04bd022a241a58dc78f",
+   "format": 1
+  },
+  {
+   "name": "plugins",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/modules",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/rpm_publication.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c879a85564a4ce656b59885b0da0a95303c1254f3c182bd24bb968de938ab8a3",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/ansible_remote.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c4513fd09390be101ed70c984a47a275c4141baa27e0e3ae6906537fa3d6065a",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/status.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "3d6ba759ff211884fb94006c77e8d3a6dadee61ce28681b2a5dd79a388b8a672",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/python_remote.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b54463f199de5fd1239501ec6a2fbb8c87614ef13d9fb03d8f1b3782e2d821bc",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/rpm_sync.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "bdb3e7e5dc53deb7f22ebfda4391a34ebcc304a7e2419e44b5482f58a8a27037",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/ansible_sync.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "bc134f2c0e9b8f6b0aaa8f063b16bebdc98d0591e08f8f654ba2a7603fe747cb",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/rpm_distribution.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "d100d6594a6b471054862629c60037cf294aea43dd5a88026f55f8dd7944cf17",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/ansible_distribution.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5b95c0c80f81e4a29b98dcdf20de14682fc91a1906f0cf7f9a3a6452d3b2dc31",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/python_distribution.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "871f481226cc4d1b5825bd534fabf96353dd94796ef2bc98235b7f5841170e01",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/artifact.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "c60a9e8b7d69a293d17719b26b000e595bbdcb3d229581b2e5e670cf5678f7c9",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/rpm_repository.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "a7184843450872c2fad48654430a2c4aff9ea7bec645f95424a3873f5cdd8e76",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_remote.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "6ce05d7725d400e82a40d52b9a92201ff5cc6fbb337d36771b2d5917e6c37827",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_content.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "ad82c4b3fe7a3984bc863b0f4b2c881f6a424bab320b7ee08ab59d2fcce17657",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_sync.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "2617c2ad07d69302c779210b022b6f258a99a658961051ac509948eceacbf8f9",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_repository.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "b31241d8c733c10506d294b81989f4c9a57ed62a88d9bdd69c384d67b620ad18",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/python_sync.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "bcd155125afb4d98d5df10213dddf22000addc159e14047bf44638690bfeb407",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/delete_orphans.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5b8d2d28d4893e5f1276b921a28f60e4fef7d4c624e4c0d980f87aa86c71aa26",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_publication.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "7976f2eb16c780a45a2dd96c53952ddaaa9734759d77ef83ba0529e894765f9e",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/ansible_role.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "085f8e76793246f7f2a379e817969d18409d4326fc107f7185388fc2491d7c28",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/ansible_repository.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "05c9e2f6c1393b160b9b32ac0a4cb4dfa6d3354fbab07ebcdd23ebd9961df67c",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_distribution.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "f23c29c7e2342e431648297afe4b9a852a7321656fc61888f04cdebfcf8547f0",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/x509_cert_guard.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "036edd22f15b28fc303fcfa4f638a2f9f7be92b824e138b4df3668cf7d11f9c6",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/python_repository.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "13240461cf2cf99d5be4bfc0f50076314b847e55b10edc8596464fd12193e7a5",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/task.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "375f84c1bdcf7349acb93ecc1ffdd12bbf541261eaa626aae7c5f97a97f81021",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/file_repository_content.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5f2e769e343794ebab31065efd973ab66c5b4511a281d1afef950a291991c7bd",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/python_publication.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "d3cbec47485d4336de1d38be8d38e84264d9d224cbf1ec942e9eaa8072bd31d0",
+   "format": 1
+  },
+  {
+   "name": "plugins/modules/rpm_remote.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "91e08bd01263475efe888853c18fcfb745ba27be9d4189455191a479c4061d4c",
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils/pulp.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "40eb2ee972e477e716639a7ffc8c695377ba5383d73b4215e5f14526744fbd2d",
+   "format": 1
+  },
+  {
+   "name": "plugins/module_utils/openapi.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "03d88a8c1df326a59f30c0cd75f48519c63995066ce2f600bae9f9121d4fdcc3",
+   "format": 1
+  },
+  {
+   "name": "plugins/doc_fragments",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/doc_fragments/pulp.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "788d068cc4b69ca5ba02d02f8b8b5f4669d4441cd2801afc95ce726aca6a7abd",
+   "format": 1
+  },
+  {
+   "name": "LICENSE",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+   "format": 1
+  }
+ ],
+ "format": 1
+}

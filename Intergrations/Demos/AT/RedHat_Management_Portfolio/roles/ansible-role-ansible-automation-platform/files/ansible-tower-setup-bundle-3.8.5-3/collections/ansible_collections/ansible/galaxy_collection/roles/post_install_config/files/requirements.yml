@@ -1,0 +1,4 @@
+---
+collections:
+  - name: namespace.collection_name
+    source: https://galaxy.ansible.com/

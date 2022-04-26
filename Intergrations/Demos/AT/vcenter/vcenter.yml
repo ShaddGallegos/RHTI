@@ -1,0 +1,163 @@
+- name: Test out ESXi Use Cases
+  hosts: localhost
+  vars:
+    datacenter_name: TestDC
+    cluster_name: TestC
+    esxi_hostname: Host01
+  tasks:
+
+    - name: ESXI | Add ESXi hosts to vCenter and assign to vCenter cluster
+      vmware_host:
+        datacenter: '{{ datacenter_name }}'
+        cluster: '{{ cluster_name }}'
+        esxi_hostname: '{{ esxi_hostname }}'
+        esxi_username: '{{ esxi_username }}'
+        esxi_password: '{{ esxi_password }}'
+        state: present
+        validate_certs: no
+      delegate_to: localhost
+
+    # Ability to enable / disable SSH / ESXi Shell per host
+    # Create computer account(s) in Active Directory matching the name of the ESXi in a specific OU
+
+    - name: ESXI | Join ESXi/vCenter to domain
+      vmware_host_active_directory:
+        esxi_hostname: '{{ esxi_hostname }}'
+        ad_domain: '{{ domain }}'
+        ad_user: '{{ ad_user }}'
+        ad_password: '{{ ad_password }}'
+        ad_state: present
+        validate_certs: no
+      delegate_to: localhost
+
+    - name: ESXI | Assign a license to a host
+      vcenter_license:
+        esxi_hostname: '{{ esxi_hostname }}'
+        license: '{{ esxi_license }}'
+        state: present
+        validate_certs: no
+      delegate_to: localhost
+
+    - name: ESXI | Set ESXi Syslog Config Settings
+      vmware_host_config_manager:
+    #    cluster_name: '{{ cluster_name }}'
+        esxi_hostname: '{{ esxi_hostname }}'
+        validate_certs: no
+        options:
+            'Syslog.global.logHost': '{{ syslog_ip }}'
+            'Syslog.global.defaultRotate': 10
+            'Syslog.global.defaultSize': 10240
+      delegate_to: localhost
+
+    - name: ESXI | Enable syslog firewall outbound to IP
+      vmware_host_firewall_manager:
+        esxi_hostname: '{{ esxi_hostname }}'
+        validate_certs: no
+        rules:
+          - name: syslog
+            enabled: true
+            allowed_hosts:
+              all_ip: False
+              ip_address:
+                - '{{ syslog_ip }}'
+
+    - name: ESXI | Enable and configure SNMP community
+      vmware_host_snmp:
+        hostname: '{{ esxi_hostname }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        community:
+          - '{{ snmp_community }}'
+        state: enabled
+        validate_certs: no
+      delegate_to: localhost
+
+    - name: ESXI | Change root password
+      vmware_local_user_manager:
+        hostname: '{{ esxi_hostname }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        local_user_name: root
+        local_user_password: '{{ new_password }}'
+        validate_certs: no
+      delegate_to: localhost
+
+
+    ##### VCENTER #####
+
+    - name: VCenter | Validate HA turned on for vCenter cluster
+      vmware_cluster_ha:
+        datacenter: '{{ datacenter_name }}'
+        cluster: '{{ cluster_name }}'
+        enable_ha: yes
+        slot_based_admission_control:
+          failover_level: 1
+        host_isolation_response: none
+    #    ha_host_monitoring: enabled
+        validate_certs: no
+      delegate_to: localhost
+
+    - name: VCenter | Enable DRS and set default VM behavior to partially automated
+      vmware_cluster_drs:
+        datacenter_name: '{{ datacenter_name }}'
+        cluster_name: "{{ cluster_name }}"
+        enable_drs: True
+        drs_default_vm_behavior: partiallyAutomated
+        validate_certs: no
+      delegate_to: localhost
+    Status
+
+
+    #- name: VCenter | Create dvSwitch with all options
+    #  vmware_dvswitch:
+    #    datacenter: '{{ datacenter }}'
+    #    switch: dvSwitch
+    #    version: 6.5.0
+    #    mtu: 9000
+    #    uplink_quantity: 2
+    #    uplink_prefix: 'Uplink_'
+    #    discovery_protocol: cdp
+    #    discovery_operation: both
+    #    multicast_filtering_mode: snooping
+    #    health_check:
+    #      vlan_mtu: true
+    #      vlan_mtu_interval: 1
+    #      teaming_failover: true
+    #      teaming_failover_interval: 1
+    #    state: present
+    #    validate_certs: no
+    #  delegate_to: localhost
+
+
+    - name: VCenter | Enable EVC Mode
+      vmware_evc_mode:
+        datacenter_name: "{{ datacenter_name }}"
+        cluster_name: "{{ cluster_name }}"
+        evc_mode: "intel-broadwell"
+        state: present
+        validate_certs: no
+      delegate_to: localhost
+      check_mode: yes
+      register: enable_evc
+
+    - name: VCenter | Configure vCenter general settings
+      vmware_vcenter_settings:
+        runtime_settings:
+          unique_id: '{{ vcenter_uid }}'
+        mail:
+          server: '{{ mail_server }}'
+          sender: '{{ vcenter_email }}'
+        validate_certs: no
+      delegate_to: localhost
+
+    - name: ESXI | Configure NTP servers for an ESXi Host
+      vmware_host_ntp:
+    #    cluster_name: '{{ cluster_name }}'
+        esxi_hostname: '{{ esxi_hostname }}'
+        ntp_servers:
+            - 0.pool.ntp.org
+            - 1.pool.ntp.org
+        verbose: yes
+        validate_certs: no
+      delegate_to: localhost
+

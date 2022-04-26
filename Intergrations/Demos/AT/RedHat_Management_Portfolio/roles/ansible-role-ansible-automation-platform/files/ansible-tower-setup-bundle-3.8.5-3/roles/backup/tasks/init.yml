@@ -1,0 +1,55 @@
+---
+- name: Create a directory for a backup to live.
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/{{ now }}/'
+    mode: 0755
+    owner: root
+    state: directory
+  notify: Remove the backup directory.
+
+- block:
+    - name: Create a directory for non-instance specific backups
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/common/'
+        mode: 0700
+        owner: root
+        state: directory
+      notify: Remove common directory.
+
+    - name: Get tower database settings
+      shell: "awx-manage print_settings | grep '^DATABASES'"
+      register: results
+      changed_when: False
+      no_log: True
+
+    - name: Ingest tower database settings
+      set_fact:
+        tower_db_settings: "{{ results.stdout | regex_replace('DATABASES\\s+= ', '') }}"
+      no_log: True
+
+  when:
+    - groups['tower'] | default([]) | length
+    - inventory_hostname == groups['tower'][0]
+
+- block:
+    - name: Create a directory for Automation Hub specific backups
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/automationhub/automationhub/'
+        mode: 0711
+        owner: root
+        state: directory
+      notify: Remove automationhub directory.
+
+    - name: Get Automation Hub database settings
+      shell: "grep '^DATABASES' /etc/pulp/settings.py"
+      register: ah_database_settings
+      changed_when: false
+      no_log: true
+
+    - name: Ingest Automation Hub database settings
+      set_fact:
+        automationhub_db_settings: "{{ ah_database_settings.stdout | regex_replace('DATABASES\\s+= ', '') }}"
+      no_log: true
+
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])

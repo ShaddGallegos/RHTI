@@ -1,0 +1,59 @@
+---
+- name: Install several useful packages (distro-agnostic)
+  package:
+    name:
+      - dstat
+      - git
+      - htop
+      - iotop
+      - jq
+      - ncdu
+      - tmux
+      - tree
+      - wget
+      - curl
+      - gnupg
+      - rubygems
+      - npm
+    state: present
+  retries: "{{ pulp_devel_package_retries }}"
+  register: result
+  until: result is succeeded
+
+- name: Install several useful packages (distro-specific)
+  package:
+    name: "{{ pulp_devel_distro_pkgs }}"
+    state: present
+  retries: "{{ pulp_devel_package_retries }}"
+  register: result
+  until: result is succeeded
+
+- name: Install virtualenvwrapper
+  pip:
+    name: virtualenvwrapper
+    state: present
+    virtualenv: '{{ pulp_install_dir }}'
+    virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+  when:
+    - (ansible_facts.distribution == 'CentOS') or (ansible_facts.distribution == 'RedHat')
+    - ansible_facts.distribution_major_version|int == 8
+
+- name: Create virtualenvwrapper symlink
+  file:
+    src: "{{ pulp_install_dir }}/bin/virtualenvwrapper.sh"
+    dest: /usr/bin/virtualenvwrapper.sh
+    state: link
+  when:
+    - (ansible_facts.distribution == 'CentOS') or (ansible_facts.distribution == 'RedHat')
+    - ansible_facts.distribution_major_version|int == 8
+
+- name: Install Minio Client
+  get_url:
+    url: https://dl.min.io/client/mc/release/linux-amd64/mc
+    dest: /usr/local/bin
+    owner: '{{ developer_user }}'
+    mode: 0750
+  retries: "{{ pulp_devel_package_retries }}"
+  register: result
+  until: result is succeeded
+...

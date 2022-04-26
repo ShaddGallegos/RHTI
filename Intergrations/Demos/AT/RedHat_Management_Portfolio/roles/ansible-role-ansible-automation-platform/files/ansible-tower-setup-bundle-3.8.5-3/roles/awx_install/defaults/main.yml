@@ -1,0 +1,20 @@
+---
+# Ansible repository location. This should be the
+# root of the repo, and does not include the /deb or /rpm path
+aw_repo_url: "http://releases.ansible.com/ansible-tower"
+
+# Django Options
+admin_username: admin
+admin_email: admin@example.com
+
+# Params
+awx_install_pg_init_name: None
+
+# SSL CA trust store
+ca_trust_bundle: '/etc/pki/tls/certs/ca-bundle.crt'
+
+# Default image for containerized job runs
+container_groups_image: "registry.redhat.io/ansible-tower-38/ansible-runner-rhel7"
+
+# Default url for uploads to automation analytics
+automation_analytics_url: 'https://cloud.redhat.com/api/ingress/v1/upload'

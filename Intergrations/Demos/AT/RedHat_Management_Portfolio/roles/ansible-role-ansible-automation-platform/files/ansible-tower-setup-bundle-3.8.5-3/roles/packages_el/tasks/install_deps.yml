@@ -1,0 +1,29 @@
+---
+# Tasks to install required packages for EL distros
+- name: Install playbook dependencies
+  yum:
+    name: '{{ el_dependencies }}'
+    state: present
+    disable_gpg_check: '{{not gpgcheck|bool}}'
+
+- name: Disable required dnf modules
+  shell: |
+    dnf module -y disable {{ item }}
+  args:
+    warn: false
+  with_items: "{{ dnf_modules_disable }}"
+  when: ansible_distribution_major_version == "8"
+
+- name: Enable required dnf modules
+  shell: |
+    dnf module -y reset {{ item }} && dnf module -y enable {{ item }}
+  args:
+    warn: false
+  with_items: "{{ dnf_modules }}"
+  when: ansible_distribution_major_version == "8"
+
+- name: Upgrade nginx [RHEL8]
+  dnf:
+    name: '@{{ dnf_modules | select("match", "^nginx:") | list | first }}'
+    state: present
+  when: ansible_distribution_major_version == "8"

@@ -1,0 +1,10 @@
+---
+# defaults file for ansible-role-vmware-vm
+network_profile: DSwitch0-VM Network-ephemeral
+datastore: vsanDatastore
+datacenter: "NASA Datacenter"
+
+vm_mem: 2048
+vm_cpus: 2
+vm_disk_size: 30
+vm_name: new-vm

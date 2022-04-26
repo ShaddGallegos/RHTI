@@ -1,0 +1,15 @@
+#Management Platform Inventory 
+
+[libvirtserver]
+
+[controller]
+
+[satellite]
+
+[vmwareserver]
+
+[rhvserver]
+
+[automationhub]
+
+

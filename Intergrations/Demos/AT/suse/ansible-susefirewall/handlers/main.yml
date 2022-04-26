@@ -1,0 +1,5 @@
+---
+- name: restart susefirewall
+  service:
+    name: SuSEfirewall2
+    state: restarted

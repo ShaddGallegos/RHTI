@@ -1,0 +1,12 @@
+---
+- name: Configure the Rsyslog socket directory.
+  file: path=/var/run/awx-rsyslog state=directory owner=awx group=awx mode=0750
+
+- name: Create tmpfiles.d entry for rsyslog socket directory
+  template:
+    src: rsyslog_tmpd.conf
+    dest: /etc/tmpfiles.d/rsyslog.conf
+    force: yes
+    mode: '0640'
+    owner: root
+    group: root

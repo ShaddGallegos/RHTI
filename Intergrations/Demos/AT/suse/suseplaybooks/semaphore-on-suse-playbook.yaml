@@ -1,0 +1,241 @@
+---
+- hosts: localhost
+  vars:
+    mysql_database: semaphore
+    mysql_hostname: localhost
+    mysql_username: semaphore
+    mysql_password: semaphore
+    mysql_port: 3306
+    playbook_path: /home/ansible/semaphore
+    web_root:
+    output_dir: /usr/local/bin/
+    admin_username: admin
+    admin_email: roman.sokunov@rockit.consulting
+    admin_desc: "Roman Sokunov"
+    admin_password: rockit
+    semaphore_binary: https://github.com/ansible-semaphore/semaphore/releases/download/v2.5.1/semaphore_2.5.1_linux_amd64.tar.gz
+  tasks:
+
+  - name: remove mysql-community-common packages for mariadb
+    zypper:
+      name: "mysql-community-common"
+      state: absent
+
+  - name: remove mysql-community-libs packages for mariadb
+    zypper:
+      name: "mysql-community-libs"
+      state: absent
+
+  - name: remove - mysql-community-libs-compat packages for mariadb
+    zypper:
+      name: "- mysql-community-libs-compat"
+      state: absent      
+
+  - name: install mariadb
+    zypper:
+      name: "mariadb-server"
+      state: present
+
+  - name: install postfix
+    zypper:
+      name: "postfix"
+      state: present
+
+  - name: set mariadb to be enabled at boot en start it
+    systemd:
+      name: mariadb
+      enabled: yes
+      state: started
+      daemon_reload: yes
+
+#  - name: add wandisco repo for git 2.x
+#    zypper_repository:
+#      name: wandisco
+#      description: wandisco repo
+#      repo: http://opensource.wandisco.com/suse/11/git/x86_64/
+
+  - name: install git 2.x
+    zypper:
+      name: git
+      state: latest
+
+#  - name: disable wandisco repo
+#    zypper_repository:
+#      name: wandisco
+#      description: wandisco repo
+#      repo: http://opensource.wandisco.com/suse/11/git/x86_64/
+#      enabled: no
+
+  - name: create ansible user
+    user:
+      name: ansible
+      state: present
+
+  - name: get semaphore binary
+    unarchive:
+      src: "{{ semaphore_binary }}"
+      dest: /usr/local/bin/
+      remote_src: yes
+
+  - name: setup mysql
+    shell: |
+      mysql -u root -e "create database if not exists {{ mysql_database }};"
+      mysql -u root -e "grant all on {{ mysql_database }}.* to '{{ mysql_username }}'@'localhost' identified by '{{ mysql_password }}';"
+
+  - name: create playbook path
+    file:
+      dest: "{{ playbook_path }}"
+      state: directory
+      owner: ansible 
+      group: users
+#	  group: ansible	  
+
+  - name: create semaphore config file
+    shell: |
+      echo "{{ mysql_hostname }}:{{ mysql_port }}
+            {{ mysql_username }}
+            {{ mysql_password }}
+            {{ mysql_database }}
+            {{ playbook_path }}
+            {{ web_root }}
+            no
+            no
+            no
+            yes
+            {{ output_dir }}
+            {{ admin_username }}
+            {{ admin_email }}
+            {{ admin_desc }}
+            {{ admin_password }}" > {{ playbook_path }}/semaphore.conf
+    args:
+      creates: "{{ playbook_path }}/semaphore.conf"
+    become_user: ansible
+
+  - name: semaphore setup
+    shell: >
+      /usr/local/bin/semaphore -setup < {{ playbook_path }}/semaphore.conf
+    #args:
+      #creates: "{{ playbook_path }}/semaphore_config.json"
+    become_user: ansible
+
+  - name: create logging directory in /var/log/semaphore
+    file:
+      dest: /var/log/semaphore
+      state: directory
+      owner: ansible
+      group: users
+
+  - name: create a semaphore systemd service file
+    shell: |
+      echo "[Unit]
+            Description=The Ansible Semaphore server
+            After=network.target
+            [Service]
+            Type=simple
+            User=ansible
+            Group=users
+            ExecStart=/bin/sh -c '/usr/local/bin/semaphore -config /usr/local/bin/config.json >> /var/log/semaphore/semaphore.log 2>&1'
+            KillSignal=SIGKILL
+            PrivateTmp=true
+            [Install]
+            WantedBy=multi-user.target" > /usr/lib/systemd/system/semaphore.service
+    args:
+      creates: /usr/lib/systemd/system/semaphore.service
+
+  - name: set semaphore to be enabled at boot and start it
+    systemd:
+      name: semaphore
+      enabled: yes
+      state: started
+      daemon_reload: yes
+
+  - name: install nginx for semaphore ssl access
+    zypper:
+      name: nginx
+      state: present
+
+  - name: create self signed certificate for ssl
+    shell: >
+      openssl req -new -nodes -x509 -subj "/C=NL/ST=Noord Holland/L=Lutjebroek/CN={{ ansible_fqdn }}" -days 3650 -keyout /etc/nginx/server.key -out /etc/nginx/server.crt -extensions v3_ca
+    args:
+      creates: /etc/nginx/server.crt
+
+  - name: generate nginx ssl config
+    shell: |
+      echo "worker_processes  1;
+            events {
+              worker_connections  1024;
+            }
+            http {
+              include /etc/nginx/mime.types;
+              gzip  on;
+              gzip_http_version 1.1;
+              gzip_comp_level 2;
+              gzip_types text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+              server {
+                listen *:443;
+                ssl on;
+                server_name {{ ansible_fqdn }};
+                ssl_certificate /etc/nginx/server.crt;
+                ssl_certificate_key /etc/nginx/server.key;
+                location / {
+                  proxy_pass http://127.0.0.1:3000;
+                }
+              }
+            }" > /etc/nginx/nginx.conf
+  - name: restart nginx service
+    systemd:
+      name: nginx
+      enabled: yes
+      state: restarted
+
+  - name: set firewalld to be enabled at boot and start it
+    systemd:
+      name: firewalld
+      enabled: yes
+      state: started
+
+  - name: enable https port in the firewall
+    firewalld:
+      port: 443/tcp
+      state: enabled
+      permanent: yes
+      immediate: yes
+
+  - name: enable access http port 3000 in the firewall
+    firewalld:
+      port: 3000/tcp
+      state: enabled
+      permanent: yes
+      immediate: yes
+
+  - name: install python-selinux
+    zypper:
+      name: "python-selinux"
+      state: present
+
+  - name: install python-semanage
+    zypper:
+      name: "python-semanage"
+      state: present
+
+  - name: install python-xml
+    zypper:
+      name: "python-xml"
+      state: present
+
+# Hereinafter: excluded because of errors. Criticality or dependencies not having been proven.	    
+#  - name: install libsemanage-python-2.6
+#    zypper:
+#      name: "http://mirror.centos.org/centos/7/os/x86_64/Packages/libsemanage-python-2.5-14.el7.x86_64.rpm"
+#      name: "https://rpmfind.net/linux/fedora/linux/updates/27/x86_64/Packages/l/libsemanage-python-2.7-3.fc27.x86_64.rpm"
+#      name: "http://download.opensuse.org/repositories/home:/matthewdva:/build:/RedHat:/RHEL-7/complete/x86_64/libsemanage-python-2.1.10-16.el7.x86_64.rpm"
+#      name: "ftp://ftp.pbone.net/mirror/ftp.scientificlinux.org/linux/scientific/7.0/x86_64/os/Packages/libsemanage-python-2.1.10-16.el7.x86_64.rpm"
+#       name: "http://download.opensuse.org/repositories/home:/konstantsky/openSUSE_Leap_15.0/x86_64/libsemanage-python3-2.8-lp150.11.1.x86_64.rpm"
+#       state: installed
+
+#  - name: set seboolean httpd to allow network connections
+#    seboolean:
+#      name: httpd_can_network_connect
+#      state: yes
+#      persistent: yes

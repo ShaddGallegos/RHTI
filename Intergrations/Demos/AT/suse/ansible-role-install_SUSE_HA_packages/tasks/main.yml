@@ -1,0 +1,29 @@
+---
+# tasks file for install_SUSE_HA_packages
+
+- name: 'Install pattern ha_sles'
+  zypper:
+   name: 'ha_sles'
+   type: 'pattern'
+   state: 'present'
+  notify:
+    - "Reboot"
+    - "Wait for the machine(s) to be ready again"
+
+- name: "Install packages needed for SUSE HA"
+  package:
+   name:  "{{ suse_ha_packages }}"
+   state: "present"
+  notify:
+    - "Reboot"
+    - "Wait for the machine(s) to be ready again"
+
+- name: 'Force installation of kernel-default instead of kernel-default-base'
+  zypper:
+    name:
+      - '-kernel-default-base'
+      - 'kernel-default'
+    state: 'installed'
+  notify:
+    - "Reboot"
+    - "Wait for the machine(s) to be ready again"

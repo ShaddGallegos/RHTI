@@ -1,0 +1,8 @@
+---
+yum_repo_keys:
+  - 'RPM-GPG-KEY-redhat-release'
+
+# List of RHSM (RH Subscription Manager) repositories to enable
+redhat_rhsm_repos: []
+
+redhat_automationhub_rhsm_repo: automation-hub-4.2-for-rhel-8-x86_64-rpms

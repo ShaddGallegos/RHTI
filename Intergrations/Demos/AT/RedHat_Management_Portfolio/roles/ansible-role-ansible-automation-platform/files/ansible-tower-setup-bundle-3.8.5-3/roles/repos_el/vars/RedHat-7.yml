@@ -1,0 +1,15 @@
+---
+yum_repo_keys:
+  - 'RPM-GPG-KEY-redhat-release'
+
+# List of non-AWS RHUI (RH Update Infrastructure) repositories to enable
+redhat_rhui_repos:
+    - rhui-rhel-7-server-rhui-extras-rpms
+    - rhui-rhel-server-rhui-rhscl-7-rpms
+
+# List of RHSM (RH Subscription Manager) repositories to enable
+redhat_rhsm_repos:
+    - rhel-7-server-extras-rpms
+    - rhel-server-rhscl-7-rpms
+
+redhat_automationhub_rhsm_repo: rhel-7-server-automation-hub-4.2-rpms

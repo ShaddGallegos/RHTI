@@ -1,0 +1,34 @@
+---
+- block:
+    - name: Tower | Ensure that /etc/tower/ exists.
+      file:
+        group: root
+        mode: 0755
+        owner: root
+        path: /etc/tower/
+        state: directory
+
+    - name: Tower | Copy configuration files into /etc/tower/.
+      shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/conf/ /etc/tower/
+      when: has_host_archive | bool
+
+    - name: Tower | Write SECRET_KEY into /etc/tower/
+      shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/SECRET_KEY /etc/tower/
+
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- block:
+    - name: Automation Hub | Ensure that /etc/pulp/ exists.
+      file:
+        group: pulp
+        mode: 0755
+        owner: root
+        path: /etc/pulp/
+        state: directory
+
+    - name: Automation Hub | Copy pulp configuration files
+      shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/automationhub/conf-pulp/ /etc/pulp/
+
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])

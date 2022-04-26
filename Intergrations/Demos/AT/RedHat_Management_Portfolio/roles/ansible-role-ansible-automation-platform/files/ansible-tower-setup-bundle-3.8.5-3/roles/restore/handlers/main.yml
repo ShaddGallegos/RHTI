@@ -1,0 +1,21 @@
+---
+- name: Remove the restore directory.
+  file:
+    path: '{{ backup_dir.rstrip("/") }}/restore/'
+    state: absent
+
+- name: start web service.
+  service:
+    name: nginx
+    state: started
+
+- name: start supervisord.
+  service:
+    name: supervisord
+    state: started
+
+- name: start Automation Hub services.
+  service:
+    name: '{{ item }}'
+    state: started
+  loop: '{{ _pulpcore_services | flatten(1) }}'

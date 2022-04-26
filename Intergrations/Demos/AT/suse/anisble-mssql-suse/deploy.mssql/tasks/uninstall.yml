@@ -1,0 +1,65 @@
+---
+- name: Stop the MsSQL server
+  service:
+    name: mssql-server
+    state: stopped
+
+- name: Remove EPEL repository
+  yum_repository:
+    name: epel
+    state: absent
+
+- name: Remove the MsSQL server repo
+  yum_repository:
+    name: mssql
+    state: absent
+
+- name: Remove MsSQL command line tools repo
+  yum_repository:
+    name: mssql-cli-tools
+    state: absent
+
+- name: Remove unixODBC files
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{unixODBC_packages}}"
+
+- name: Remove pexpect pip module
+  pip:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - pexpect
+    - pymssql
+
+- name: Remove mssql-server packages
+  yum:
+    name: "{{item}}"
+    state: absent
+  with_items: "{{mssql_packages}}"
+
+- name: Uninstall EPEL rpm
+  yum:
+    name: epel-release
+    state: absent
+
+- name: Remove mssql-cli-tool
+  yum:
+    name: mssql-tools
+    state: absent
+
+- name: Remove mssql tools from .bashrc
+  lineinfile:
+    dest: "{{ ansible_user_dir}}/.bashrc"
+    state: absent
+    line: 'export PATH="$PATH:/opt/mssql-tools/bin"'
+
+- name: Remove firewalld settings
+  firewalld:
+    zone: public
+    port: 1433/tcp
+    permanent: true
+    state: disabled
+  when: enable_iptables
+  notify: restart iptables

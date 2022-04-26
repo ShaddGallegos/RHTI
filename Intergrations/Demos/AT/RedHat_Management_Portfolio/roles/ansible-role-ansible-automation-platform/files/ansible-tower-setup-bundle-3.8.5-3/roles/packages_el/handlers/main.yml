@@ -1,0 +1,6 @@
+---
+- name: start PostgreSQL
+  service:
+    name: '{{ postgres_init_name  }}'
+    state: started
+  when: config_dynamic_database == 'internal'

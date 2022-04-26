@@ -1,0 +1,339 @@
+---
+# Dependency package was installed earlier via pulp_preq_packages
+- name: Check if SELinux is enabled
+  setup:
+    gather_subset: selinux
+
+- name: Compile & install the pulpcore SELinux policy
+  block:
+
+    - name: Install SELinux policy build dependencies
+      yum:
+        name:
+          - selinux-policy-devel
+
+    - name: 'Ensure that /usr/local/share/selinux/{{ ansible_facts.selinux.type }} exists'
+      file:
+        path: '/usr/local/share/selinux/{{ ansible_facts.selinux.type }}'
+        state: directory
+        recurse: true
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: Clone SELinux policy from Git
+      git:
+        # TEMP: Temporary repo and branch for el8 and related set of features.
+        repo: '{{ __pulp_selinux_repo }}'
+        version: '{{ __pulp_selinux_version }}'
+        dest: '{{ pulp_user_home }}/pulpcore-selinux'
+      become: true
+      become_user: '{{ pulp_user }}'
+
+    - name: Compile the SELinux policies
+      make:
+        file: /usr/share/selinux/devel/Makefile
+        chdir: '{{ pulp_user_home }}/pulpcore-selinux'
+        target: '{{ item }}.pp'
+      loop: '{{ __pulp_selinux_policy_pkgs }}'
+      become: true
+      become_user: '{{ pulp_user }}'
+
+    - name: Install the SELinux policy packages on disk
+      copy:
+        src: '{{ pulp_user_home }}/pulpcore-selinux/{{ item }}.pp'
+        dest: '/usr/local/share/selinux/{{ ansible_facts.selinux.type }}/{{ item }}.pp'
+        remote_src: true
+        mode: 0644
+        owner: root
+        group: root
+      loop: '{{ __pulp_selinux_policy_pkgs }}'
+      notify:
+        - Load the SELinux policy packages
+        - Restore SELinux contexts on Pulp dirs that must exist
+        - Restore SELinux contexts on Pulp dirs that may exist
+
+  become: true
+  when:
+    - ansible_facts.os_family == 'RedHat'
+    # when permissive or enforcing. That would be stored in .mode & .config_mode
+    - ansible_facts.selinux.status == "enabled"
+
+- name: Create pulp install dir
+  file:
+    path: '{{ pulp_install_dir }}'
+    state: directory
+    owner: '{{ pulp_user }}'
+    group: '{{ pulp_group }}'
+  become: true
+
+- name: Prepare the virtualenv itself
+  block:
+
+    # Hack for use system-wide packages when enabled by user - Must be first usage of virtualenv
+    - name: Create a venv with system-wide packages setting if the venv does not exist
+      pip:
+        name: pip  # specifying pip is a safe hack to create the venv, since pip is automatically in every new venv.
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+        virtualenv_site_packages: yes
+      when: pulp_use_system_wide_pkgs | bool
+
+    - name: Upgrade to a recent edition of pip (supporting manylinux2014)
+      pip:
+        name: pip>20.2
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+
+    - name: Update any existing venv to allow system-wide packages
+      lineinfile:
+        path: "{{ pulp_install_dir }}/pyvenv.cfg"
+        regexp: '^include-system-site-packages'
+        line: "include-system-site-packages = true"
+      when: pulp_use_system_wide_pkgs | bool
+
+  become: true
+  become_user: '{{ pulp_user }}'
+
+- name: Prepare for preflight checks
+  block:
+
+    - name: Obtain list of packages in the venv to see if any plugins are installed
+      pip_package_info:
+        clients: "{{ pulp_install_dir }}/bin/pip"
+      register: pip_pkgs
+
+    - name: Create requirements.in file to check pulpcore/plugin compatibility
+      template:
+        src: templates/requirements.in.j2
+        dest: "{{ pulp_install_dir }}/requirements.in"
+
+    - name: Install pip-tools, which provides pip-compile to check version compatibility
+      pip:
+        name:
+          - pip-tools>=5.2.0
+          - importlib-metadata
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+
+  when: pulp_source_dir is undefined
+  become: true
+  become_user: '{{ pulp_user }}'
+
+# When there are no plugin prereqs roles
+- name: Run preflight check (no prereq roles)
+  include_tasks: preflight_function.yml
+  when:
+    - pulp_source_dir is undefined
+    - pulp_install_plugins_normalized | dict2items | selectattr('value.prereq_role', 'defined') | list | count == 0
+    - pulp_install_plugins_normalized['pulp-rpm'] is undefined
+
+# When there are plugin prereq roles
+# We are not using a block for these next few tasks; see preflight_function.yml
+#
+# Some plugins have deps that need to be installed for setup.py to load. When an error
+# occurs due to those missing deps, the version comparison will not occur.
+# So we will ignore all other errors this time. The version comparison occurs before
+# that error is raised. We only care about that contain this string.
+- name: Run preflight check before prereq roles
+  include_tasks: preflight_function.yml
+  vars:
+    failed_condition: '"Could not find a version" in compatibility.stderr'
+  # When there is at least 1 prereq role.
+  when:
+    - pulp_source_dir is undefined
+    - pulp_install_plugins_normalized | dict2items | selectattr('value.prereq_role', 'defined') | list | count > 0
+    - pulp_install_plugins_normalized['pulp-rpm'] is defined
+
+- name: Include pulp-rpm prereq role
+  include_role:
+    name: pulp_rpm_prerequisites
+  when: pulp_install_plugins_normalized['pulp-rpm'] is defined
+
+# Note: We would do a static import like in pulp_database, but
+# looping does not work with it, so we do a dynamic include.
+- name: Include plugins prereq roles
+  include_role:
+    name: "{{ item.value.prereq_role }}"
+  with_dict: "{{ pulp_install_plugins_normalized }}"
+  when:
+    - item.value.prereq_role is defined
+
+# No loop over pulp_install_plugins_normalized; let's run this only once.
+# Also, this time it must succeed, a return code of 0.
+- name: Re-run preflight check after plugin prereq roles
+  include_tasks: preflight_function.yml
+  vars:
+    failed_condition: >
+      (compatibility.rc != 0) and
+      ("AttributeError: module \'setuptools.build_meta\' has no attribute \'__legacy__\'" not in compatibility.stderr)
+  # if it didn't succeed last time
+  when:
+    - pulp_source_dir is undefined
+    - pulp_install_plugins_normalized | dict2items | selectattr('value.prereq_role', 'defined') | list | count > 0
+    - compatibility is defined
+    - compatibility.rc is defined
+    - compatibility.rc != 0
+
+- name: Install Pulp via Pip
+  block:
+
+    - name: Install the prereq_pip_packages
+      pip:
+        name: '{{ prereq_pip_packages }}'
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      when: prereq_pip_packages | length > 0
+
+    - name: Install patched versions of dependencies (FIPS only)
+      pip:
+        name:
+          - git+https://github.com/mdellweg/django.git@fips
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      when: ansible_fips
+
+    - name: Install pulpcore via PyPI
+      pip:
+        name: pulpcore
+        # pulp_upgrade true/false -> ansible pip module latest/present ->
+        # pip command "install --upgrade"/"install"
+        # Commented out because:
+        # "version is incompatible with state=latest"
+        # But we still need to handle upgrading dependencies.
+        # state: "{{ pulp_upgrade | ternary('latest','present') }}"
+        version: '{{ __pulp_version }}'
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      when: pulp_source_dir is undefined
+      environment:
+        SETUPTOOLS_USE_DISTUTILS: stdlib
+      notify:
+        - Collect static content
+        - Restart all Pulp services
+
+    - name: Clone or Checkout pulpcore source git repo
+      git:
+        repo: '{{ pulp_git_url }}'
+        dest: '{{ pulp_source_dir }}'
+        clone: yes
+        force: no
+        version: '{{ pulp_git_revision | default("master") }}'
+        update: yes
+      when: pulp_git_url is defined and pulp_source_dir is defined
+      tags:
+        - molecule-idempotence-notest
+
+    - name: Install pulpcore package from source
+      pip:
+        name: '{{ pulp_source_dir }}'
+        editable: '{{ pulp_pip_editable }}'
+        # For this task, `state` has no effect. It installs or upgrades/
+        # downgrades to the exact dir's or VCS URL's version regardless.
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      when: pulp_source_dir is defined
+      environment:
+        SETUPTOOLS_USE_DISTUTILS: stdlib
+      notify:
+        - Collect static content
+        - Restart all Pulp services
+      # Editable pip installs are always changed, which fails molecule's idempotence test.
+      # Unfortunately, this will prevent the handlers from being notified.
+      tags:
+        - molecule-idempotence-notest
+
+    # We have to do this separate task, even though the pip module should
+    # register the installed version, because when tested (Ansible 2.9, with no
+    # changes applied), the registered result from "Install pulpcore package
+    # from source" left the version field "null".
+    - name: Obtain list of packages & versions in the venv after pulpcore install
+      pip_package_info:
+        clients: "{{ pulp_install_dir }}/bin/pip"
+      register: pip_pkgs
+
+    # Needed because dynaconf bundles box, but dynaconf<3.1.1 conflicts with normally installed
+    # box.
+    - name: Upgrade dynaconf to 3.1.1rc2 pre-release if it is older than 3.1.1
+      pip:
+        name: dynaconf==3.1.1rc2
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      when: pip_pkgs.packages[pulp_install_dir + '/bin/pip'].dynaconf[0].version is version("3.1.1", "<")
+
+    - name: Create constraints file to lock the django and pulpcore version when plugins are installed
+      template:
+        src: "pip_constraints_for_plugins.txt.j2"
+        dest: "{{ pulp_install_dir }}/pip_constraints_for_plugins.txt"
+
+    - name: Install Pulp plugins via PyPI
+      pip:
+        name: '{{ item.key }}'
+        # item.upgrade true/false -> ansible pip module latest/present ->
+        # pip command "install --upgrade"/"install"
+        state: "{{ item.value.upgrade | default(false) | ternary('latest','present','present') }}"
+        # TODO: Handle the fact that "version is incompatible with state=latest"
+        # through proper means, rather than just telling users not to set both.
+        version: '{{ item.value.version | default(omit) }}'
+        extra_args: "-c {{ pulp_install_dir }}/pip_constraints_for_plugins.txt"
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_dict: '{{ pulp_install_plugins_normalized }}'
+      when: item.value.source_dir is undefined
+      environment:
+        SETUPTOOLS_USE_DISTUTILS: stdlib
+      notify:
+        - Collect static content
+        - Restart all Pulp services
+
+    - name: Clone or Checkout pulp plugins source git repos
+      git:
+        repo: '{{ item.value.git_url }}'
+        dest: '{{ item.value.source_dir }}'
+        clone: yes
+        force: no
+        version: '{{ item.value.git_revision | default("master") }}'
+        update: yes
+      with_dict: '{{ pulp_install_plugins_normalized }}'
+      when: item.value.git_url is defined and item.value.source_dir is defined
+      tags:
+        - molecule-idempotence-notest
+
+    - name: Install Pulp plugins from source
+      pip:
+        name: '{{ item.value.source_dir }}'
+        editable: '{{ pulp_pip_editable }}'
+        # For this task, `state` has no effect. It installs or upgrades/
+        # downgrades to the exact dir's or VCS URL's version regardless.
+        state: present
+        extra_args: "-c {{ pulp_install_dir }}/pip_constraints_for_plugins.txt"
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+      with_dict: '{{ pulp_install_plugins_normalized }}'
+      when: item.value.source_dir is defined
+      environment:
+        SETUPTOOLS_USE_DISTUTILS: stdlib
+      notify:
+        - Collect static content
+        - Restart all Pulp services
+      # Editable pip installs are always changed, which fails molecule's idempotence test.
+      # Unfortunately, this will prevent the handlers from being notified.
+      tags:
+        - molecule-idempotence-notest
+
+    - name: Install gunicorn via PyPI
+      pip:
+        name: gunicorn
+        state: present
+        virtualenv: '{{ pulp_install_dir }}'
+        virtualenv_command: '{{ pulp_python_interpreter }} -m venv'
+
+  become: true
+  become_user: '{{ pulp_user }}'
+...

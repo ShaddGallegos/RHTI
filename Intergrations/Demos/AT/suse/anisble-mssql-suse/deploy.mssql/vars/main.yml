@@ -1,0 +1,18 @@
+---
+end_user_license_aggreement_consent_server: Y # Must be Y or N
+end_user_license_aggreement_consent_cli: "YES" # Must be YES or NO in all caps within quotes
+edition: Developer
+
+# For use when creating, importing, or deleting databases
+db_name: testDB
+db_host: 127.0.0.1
+db_port: 1433
+db_user: SA
+db_password: P@ssWORD!
+
+import_file: /Users/kylebenson/Documents/Work/Vagrant/centos/Load_DB.sql
+import_file_dest: /tmp/Load_DB.sql
+
+#System Config options
+enable_iptables: false
+install_cli: false

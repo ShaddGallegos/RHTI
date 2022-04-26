@@ -1,0 +1,161 @@
+---
+- name: General system changes before installation
+  block:
+
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+      when: ansible_facts.distribution == 'Debian'
+      # This is a lie, but necessary for Idempotence test
+      changed_when: False
+
+    - name: Install prerequisites
+      package:
+        name: '{{ pulp_preq_packages }}'
+        state: present
+
+    # Become root so as to search paths like /usr/sbin.
+    - name: Find the nologin executable
+      command: which nologin
+      changed_when: False
+      check_mode: False
+      register: result
+
+    - name: Make sure {{ pulp_group }} group exists
+      group:
+        name: '{{ pulp_group }}'
+        gid: '{{ pulp_group_id }}'
+        state: present
+        system: true
+
+    # If we do not create it here, but it is separate from developer_user,
+    # the following task would create it incorrectly with default settings.
+    - name: Create user {{ pulp_user }}
+      user:
+        name: '{{ pulp_user }}'
+        uid: '{{ pulp_user_id }}'
+        shell: '{{ result.stdout.strip() }}'
+        home: '{{ pulp_user_home }}'
+        system: true
+        group: '{{ pulp_group }}'
+        groups:
+          - '{{ pulp_group }}'
+        append: true
+      # The check implicitly does an or for this check:
+      # developer_user is not defined
+      when: pulp_user != developer_user|default('')
+      notify: Restore SELinux contexts on Pulp dirs that must exist
+
+    - name: Add user {{ pulp_user }} to extra groups
+      user:
+        name: '{{ pulp_user }}'
+        groups: '{{ pulp_extra_groups }}'
+        append: true
+      when: pulp_extra_groups is defined
+
+    - name: Add user {{ developer_user }} to {{ pulp_group }} group
+      user:
+        name: '{{ developer_user }}'
+        groups:
+          - '{{ pulp_group }}'
+        append: true
+      when: developer_user is defined
+
+    - name: Reset ssh conn to allow user changes to affect when ssh user and pulp user are the same
+      meta: reset_connection
+
+    # World executable is needed for ngingx/apache to serve content at
+    # pulp_webserver_static_dir, which is the subdir pulpcore_static by default.
+    #
+    # We need to create it in case the pulp_user already exists
+    # and has a different home dir. Like "vagrant" for pulplift.
+    - name: Make sure {{ pulp_user_home }} is world executable, and exists
+      file:
+        path: '{{ pulp_user_home }}'
+        state: directory
+        mode: 'u+rwx,o+x'
+        owner: '{{ pulp_user }}'
+        group: '{{ pulp_group }}'
+
+    - name: Create artifact dir for Pulp
+      file:
+        path: '{{ __pulp_artifact_dir }}'
+        state: directory
+        owner: '{{ pulp_user }}'
+        group: '{{ pulp_group }}'
+        mode: "u+rwx,g+rwx,o+rx"
+
+    - name: Create cache dir for Pulp
+      file:
+        path: '{{ pulp_cache_dir }}'
+        state: directory
+        owner: '{{ pulp_user }}'
+        group: '{{ pulp_group }}'
+        mode: "u+rwx,g+rwx,o+rx"
+
+    # If so, owner will be apache
+    - name: Check if we have Pulp 2 installed
+      stat:
+        path: "{{ pulp_user_home }}"
+      register: pulp_user_home_stat
+
+    - name: Fix permissions if Pulp 2 is already installed (https://pulp.plan.io/issues/5553#note-5)
+      block:
+        - name: Add user 'apache' to '{{ pulp_group }}' group if it exists
+          user:
+            name: apache
+            groups:
+              - '{{ pulp_group }}'
+            append: true
+
+        - name: Set permissions on '{{ pulp_user_home }}' if pulp2 is installed
+          file:
+            path: '{{ pulp_user_home }}'
+            state: directory
+            group: '{{ pulp_group }}'
+            # The uppercase X says "only make dirs executable, not files"
+            mode: "g+rwX"
+            recurse: true
+
+        - name: Find subdirs without setgid
+          command: "find {{ pulp_user_home }} -type d -perm -g-s"
+          changed_when: false
+          check_mode: false
+          register: dirs_needing_setgid
+
+        # We need dirs to have setgid so that newly generated files by Pulp 2
+        # have the pulp group rather than the apache group.
+        # But you cannot make chmod or the file module only do setgid for dirs
+        # and not files.
+        - name: Set setgid on the {{ pulp_user_home }} subdirs
+          file:
+            path: "{{ item }}"
+            mode: g+s
+          with_items: "{{ dirs_needing_setgid.stdout_lines }}"
+          when: dirs_needing_setgid.stdout | length > 0
+
+      when: pulp_user_home_stat.stat.pw_name == "apache"
+
+    - name: Set group on all files in '{{ pulp_user_home }}'
+      file:
+        path: '{{ pulp_user_home }}'
+        state: directory
+        group: '{{ pulp_group }}'
+        recurse: true
+        follow: false
+
+  become: true
+
+- name: install pulp from {{ pulp_install_source }}
+  include_tasks: install_{{ pulp_install_source }}.yml
+
+# Needed for when Pulp was manually upgraded by the user before running
+# pulp_installer. Especially `yum update`/`apt upgrade`.
+# TODO: For usability purposes, auto-detect by inspecting the system.
+- name: Triggers handlers if pulp_upgraded_manually
+  debug:
+    msg: Triggering handlers because Pulp was updated manually
+  notify: Collect static content
+  when: pulp_upgraded_manually
+  changed_when: pulp_upgraded_manually
+...

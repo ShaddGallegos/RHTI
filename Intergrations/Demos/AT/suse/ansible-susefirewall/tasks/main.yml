@@ -1,0 +1,25 @@
+---
+- name: Install SuSEfirewall2 rpm
+  zypper:
+    name: SuSEfirewall2
+    state: present
+
+- name: Enable SuSEfirewall2_init service
+  service:
+    name: SuSEfirewall2_init
+    enabled: yes
+
+- name: Enable SuSEfirewall2 service
+  service:
+    name: SuSEfirewall2
+    enabled: yes
+
+- name: Install SuSEfirewall2 config
+  template:
+    src: SuSEfirewall2.j2
+    dest: /etc/sysconfig/SuSEfirewall2
+    owner: root
+    group: root
+    mode: 644
+  notify:
+    - restart susefirewall

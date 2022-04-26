@@ -1,0 +1,47 @@
+---
+- name: Load OS specific variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - always
+
+- block:
+
+    - name: Install Redis
+      package:
+        name: '{{ pulp_redis_package_name }}'
+        state: present
+
+    - name: Enable Redis SCL
+      template:
+        src: templates/redis_scl_profile.j2
+        dest: "/etc/profile.d/redis.sh"
+      when:
+        - ansible_facts.os_family == 'RedHat'
+        - ansible_facts.distribution_major_version|int == 7
+        - pulp_redis_package_name.startswith('rh-')
+
+    - name: Configure Redis to listen on Unix Domain Socket
+      include_tasks: configure_uds.yml
+      when: "pulp_redis_bind.startswith('unix:')"
+
+    - name: Configure Redis to listen on TCP socket
+      include_tasks: configure_tcp.yml
+      when: "not pulp_redis_bind.startswith('unix:')"
+
+    - name: Start Redis
+      systemd:
+        name: "{{ pulp_redis_server_name | default(_pulp_redis_server_name) }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+  become: true

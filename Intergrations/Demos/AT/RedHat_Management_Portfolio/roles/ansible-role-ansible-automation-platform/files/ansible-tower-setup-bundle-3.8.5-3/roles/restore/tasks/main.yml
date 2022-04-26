@@ -1,0 +1,20 @@
+---
+- include_tasks: vars.yml
+
+- include_tasks: init.yml
+
+- include_tasks: projects.yml
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- include_tasks: conf.yml
+
+- include_tasks: venv.yml
+  when:
+    - inventory_hostname not in groups['automationhub'] | default([])
+
+- include_tasks: automationhub_collections.yml
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])
+
+- include_tasks: postgres.yml

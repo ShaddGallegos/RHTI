@@ -1,0 +1,60 @@
+- name: Ensure Pulp is up and healthy
+  pulp.squeezer.status:
+    pulp_url: "{{ pulp_url }}"
+    username: "{{ pulp_admin_username }}"
+    password: "{{ pulp_default_admin_password }}"
+    validate_certs: "{{ pulp_validate_certs | bool }}"
+  register: result
+  until: >
+    result.status is defined and
+    result.status.database_connection.connected == true and
+    result.status.redis_connection.connected == true and
+    result.status.online_workers | map(attribute='name') | select('match', '^resource-manager$') | list | count > 0 and
+    result.status.online_workers | map(attribute='name') | select('match', '^[0-9]+@.*$') | list | count > 0
+  delay: 2
+  retries: 60
+
+- name: Create default repositories
+  pulp.squeezer.ansible_repository:
+    pulp_url: "{{ pulp_url }}"
+    username: "{{ pulp_admin_username }}"
+    password: "{{ pulp_default_admin_password }}"
+    validate_certs: "{{ pulp_validate_certs | bool }}"
+    name: "{{ item.repo_name }}"
+    description: "{{ item.description }}"
+    state: present
+  loop: "{{ pulp_ansible_repositories }}"
+
+- name: Create default distributions
+  pulp.squeezer.ansible_distribution:
+    pulp_url: "{{ pulp_url }}"
+    username: "{{ pulp_admin_username }}"
+    password: "{{ pulp_default_admin_password }}"
+    validate_certs: "{{ pulp_validate_certs | bool }}"
+    name: "{{ item.dist_name }}"
+    base_path: "{{ item.base_path }}"
+    repository: "{{ item.repo_name }}"
+    state: present
+  loop: "{{ pulp_ansible_repositories }}"
+
+- name: Create admins group and assign to the admin user
+  command: '{{ pulp_install_dir }}/bin/pulpcore-manager create-group admins --users {{ pulp_admin_username }}'
+  no_log: true
+  become: true
+  become_user: '{{ pulp_user }}'
+  environment:
+    PULP_SETTINGS: "{{ pulp_settings_file }}"
+
+- name: Assign permissions to the admins group
+  command: '{{ pulp_install_dir }}/bin/pulpcore-manager assign-permission admins {{ item }}'
+  become: true
+  become_user: '{{ pulp_user }}'
+  environment:
+    PULP_SETTINGS: "{{ pulp_settings_file }}"
+  loop: "{{ pulp_galaxy_permissions }}"
+
+- name: Configure content sync remotes
+  include_tasks: configure_remotes.yml
+
+- name: Configure galaxy-importer
+  include_tasks: galaxy_importer.yml

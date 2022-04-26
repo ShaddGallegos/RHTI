@@ -1,0 +1,10 @@
+tower_firewall_type: none
+
+tower_firewall_ports:
+  - "{{ firewalld_http_port }}"
+  - "{{ firewalld_https_port }}"
+
+database_firewall_ports:
+  - "{{ pg_port }}"
+
+tower_firewalld_zone: public

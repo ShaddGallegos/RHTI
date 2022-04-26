@@ -1,0 +1,33 @@
+---
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Get services
+  service_facts:
+
+- name: Listing Pulp services
+  debug:
+    msg: '{{ ansible_facts.services|dict2items|selectattr("key", "contains", "pulpcore")|list|items2dict }}'
+
+
+- name: Checking Pulp services
+  fail:
+    msg: "{{ item.value.name }} state: {{ item.value.state }}"
+  when: "item.value.name != 'pulpcore-worker@.service' and item.value.state != 'running'"
+  with_dict: '{{ ansible_facts.services|dict2items|selectattr("key", "contains", "pulpcore")|list|items2dict }}'
+
+- name: Ensure Pulp is up and healthy
+  uri:
+    url: "http://{{ __pulp_default_host if pulp_api_bind.startswith('unix:') else pulp_api_bind }}/pulp/api/v3/status/"
+    status_code: "200"
+    unix_socket: "{{ pulp_api_bind | regex_replace('^unix:', '') if pulp_api_bind.startswith('unix:') else omit }}"
+  register: result
+  until: >
+    result.json is defined and
+    result.json.database_connection.connected and
+    result.json.redis_connection.connected and
+    result.json.online_workers | map(attribute='name') | select('match', '^resource-manager$') | list | count > 0 and
+    result.json.online_workers | map(attribute='name') | select('match', '^[0-9]+@.*$') | list | count > 0
+  delay: 6
+  retries: 150
+  check_mode: false

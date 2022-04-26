@@ -1,0 +1,40 @@
+[Unit]
+Description=Pulp WSGI Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
+Environment="PULP_SETTINGS={{ pulp_settings_file }}"
+Environment="PATH={{ pulp_install_dir }}/bin:{{ default_bin_path }}"
+{% if pulp_ld_library_path is defined and pulp_ld_library_path != '' %}
+Environment="LD_LIBRARY_PATH={{ pulp_ld_library_path }}"
+{% endif %}
+User={{ pulp_user }}
+Group={{ pulp_group }}
+PIDFile=/run/pulpcore-api.pid
+RuntimeDirectory=pulpcore-api
+ExecStart={{ __pulp_daemons_dir }}/gunicorn pulpcore.app.wsgi:application \
+          --bind '{{ pulp_api_bind }}' \
+          --workers {{ pulp_api_workers }} \
+          --access-logfile - \
+          --access-logformat 'pulp [%({correlation-id}o)s]: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+
+# This provides reconnect support for PostgreSQL and Redis. Without reconnect support, if either
+# is not available at startup or becomes disconnected, this process will die and not respawn.
+Restart=always
+RestartSec=3
+
+# Enables tracking of process resource consumption at a unit & cgroup level.
+CPUAccounting=yes
+MemoryAccounting=yes
+
+# This directive is set to an absolute path in other Pulp units. Using an
+# absolute path is an abuse of the directive, as it should be a relative path,
+# not an absolute path. PIDFile is now used to ensure that PID files are laid
+# out in a standard way. If this directive had any other effects, it is better
+# to use the correct directive than to uncomment this.
+# WorkingDirectory=/var/run/pulpcore-api/
+
+[Install]
+WantedBy=multi-user.target

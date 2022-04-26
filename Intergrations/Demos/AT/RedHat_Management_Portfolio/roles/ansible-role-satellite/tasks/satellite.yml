@@ -1,0 +1,20 @@
+---
+# tasks file for updating host and install satellite
+
+- name: Upgrade all host packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install the latest version of Satellite
+  yum:
+    name: satellite
+    state: latest
+
+- name: Run the Satellite installer
+  command: |
+      satellite-installer --scenario satellite
+      --foreman-initial-organization {{ sat_org }}
+      --foreman-initial-location {{ sat_location }}
+      --foreman-initial-admin-username {{ sat_username }}
+      --foreman-initial-admin-password {{ sat_password }}

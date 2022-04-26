@@ -1,0 +1,26 @@
+---
+- name: Tower | Ensure that tower virtual environment directory exists.
+  file:
+    group: "root"
+    mode: 0755
+    owner: "root"
+    path: "/var/lib/awx/venv"
+    state: directory
+
+- name: Tower | Restore virtual environments
+  shell: rsync -aq {{ backup_dir.rstrip("/") }}/restore/venv/ /var/lib/awx/venv/
+  when: has_host_archive | bool
+
+- name: Tower | Get list of custom paths to restore
+  find:
+    paths:
+      - '{{ backup_dir.rstrip("/")  }}/restore/custom_venv_paths/'
+    file_type: directory
+    recurse: no
+  register: paths_to_restore
+  when: has_host_archive | bool
+
+- name: Tower | Restore custom virtual environments paths
+  shell: rsync -aq '{{ item.path }}/' '/{{ item.path | basename }}/'
+  with_items: '{{ paths_to_restore.files }}'
+  when: has_host_archive | bool

@@ -1,0 +1,32 @@
+---
+- name: 'include packages_el variables'
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'        # RedHat-7
+        - '{{ ansible_os_family }}.yml'                                                 # RedHat
+      paths: '../vars'
+
+- name: 'Make sure tower_package_version is set'
+  fail:
+    msg: 'Cannot install: tower_package_version not set'
+  when: 'tower_package_version is not defined'
+
+- include: install_deps.yml
+
+# Note: This must be run before the tower rpm is installed
+- include_tasks: upgrade_postgres_client.yml
+  when:
+  - packages_el_install_tower | bool
+  - ansible_distribution_major_version == "8"
+
+- include_tasks: install_tower.yml
+  when: packages_el_install_tower | bool
+
+- include_tasks: uninstall_rabbit.yml
+  when:
+    - inventory_hostname in groups['tower'] | default([])
+    - packages_el_install_tower | bool
+
+- include_tasks: install_postgres.yml
+  when: packages_el_install_postgres | bool

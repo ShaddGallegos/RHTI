@@ -1,0 +1,10 @@
+---
+- name: Reload systemd and restart pulp workers
+  systemd:
+    daemon_reload: true
+    name: pulpcore-worker@{{ __pulp_workers_worker_index }}.service
+    state: restarted
+  loop: "{{ range(1, pulp_workers + 1) | list }}"
+  loop_control:
+    loop_var: __pulp_workers_worker_index
+  become: true

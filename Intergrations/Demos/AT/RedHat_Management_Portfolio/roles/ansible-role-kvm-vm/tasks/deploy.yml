@@ -1,0 +1,78 @@
+---
+# tasks file for ansible-role-kvm-vm deploy
+
+- name: Download the base image
+  get_url:
+    url: "{{ base_img }}"
+    dest: "/tmp"
+  when: '"http" in base_img'
+
+- name: Copy image from host to kvm host
+  copy:
+    src: "files/{{ base_img }}"
+    dest: "/tmp/{{ base_img }}"
+  when: '"http" not in base_img'
+
+- name: Copy the template to build our host base
+  copy:
+    src: "/tmp/rhel7.9.qcow2"
+    dest: "/tmp/{{ item }}.qcow2"
+    remote_src: yes
+  with_items: "{{ virtual_machines }}"
+
+- name: define vm from xml and set autostart
+  virt:
+    command: define
+    xml: "{{ lookup('template', 'vm_template.xml.j2') }}"
+    autostart: yes
+  with_items: "{{ virtual_machines }}"
+
+- name: start vm
+  virt:
+    name: "{{ item }}"
+    state: running
+  with_items: "{{ virtual_machines }}"
+  register: start_vm
+
+- name: pause to wait awhile for vms boot
+  pause:
+    seconds: "{{ wait_time }}"
+  when: start_vm.changed
+
+- name: scan ip range with nmap
+  shell: "IP=`nmap -sn '{{ bridge_network }}' | grep 'Nmap scan' | awk '{print$5}'` ; for i in $IP ; do ping $i -c 1 ; done"
+  changed_when: false
+  when: start_vm.changed and '"bridged" == kvm_network'
+
+- name: get ip of vm
+  shell: virsh domifaddr "{{ item }}" | awk '{ print $4 }' | tail -2 | head -1 | cut -f 1 -d "/"
+  changed_when: false
+  register: vm_ip
+  with_items: "{{ virtual_machines }}"
+  when: '"" == kvm_network' 
+ 
+- name: get ip of vm
+  shell: arp -na | grep $(virsh domiflist "{{ item }}" | awk '$2=="bridge"{print $NF}') | awk -F"[()]" '{print $2}'
+  changed_when: false
+  register: bridge_vm_ip
+  with_items: "{{ virtual_machines }}"
+  when: '"bridged" == kvm_network' 
+
+- name: set vm hostname
+  hostname:
+    name: "{{ item.item }}" 
+    use: systemd
+  delegate_to: "{{ item.stdout }}"
+  when: '"bridged" == kvm_network and item.stdout is defined'
+  with_items: 
+    - "{{ vm_ip.results }}"
+    - "{{ bridge_vm_ip.results }}"
+  register: hostname
+
+- name: reboot vms
+  reboot:
+  delegate_to: "{{ item.stdout }}"
+  with_items: 
+    - "{{ vm_ip.results }}"
+    - "{{ bridge_vm_ip.results }}"
+  when: '"bridged" == kvm_network and hostname.changed and item.stdout is defined'

@@ -1,0 +1,64 @@
+---
+# installation of nginx on ubuntu doesn't do this automatically
+- name: Create nginx user
+  user:
+    name: nginx
+    system: true
+  when: ansible_facts.distribution == 'Ubuntu'
+  become: yes
+
+- block:
+
+    - name: Install Nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: Install Nginx configuration file
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: reload nginx
+
+    - name: Find pulp obsolete symlinks
+      find:
+        paths: /etc/nginx/conf.d
+        file_type: link
+        patterns: "pulp*"
+      register: old_pulp_symlinks
+      tags: cleanup
+
+    - name: Remove pulp obsolete symlinks
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ old_pulp_symlinks.files }}"
+      tags: cleanup
+
+    - name: Create directory for Pulp Nginx snippets
+      file:
+        path: "/etc/nginx/pulp/"
+        state: directory
+
+    # FIXME: The ansible output here over the results is very ugly.
+    # It may be a lot cleaner if we were to use the command module,
+    # above and/or create a temporary data structure.
+    - name: Symlink nginx snippets
+      file:
+        src: "{{ __pulp_webserver_snippet.stdout_lines | last }}"
+        dest: "/etc/nginx/pulp/{{ __pulp_webserver_snippet.__pulp_webserver_plugin.key | regex_replace('-', '_') }}.conf"
+        state: link
+      loop: '{{ snippets.results }}'
+      loop_control:
+        loop_var: __pulp_webserver_snippet
+      when: __pulp_webserver_snippet.rc == 0
+      notify: reload nginx
+
+    - name: Start and enable Nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: true
+        daemon_reload: true
+
+  become: true

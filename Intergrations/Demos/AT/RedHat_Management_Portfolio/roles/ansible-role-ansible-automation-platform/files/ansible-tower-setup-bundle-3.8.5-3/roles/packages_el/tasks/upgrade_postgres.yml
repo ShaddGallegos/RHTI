@@ -1,0 +1,80 @@
+---
+
+- name: Stop postgres 9.6
+  service:
+    name: "{{ pg_systemd_name }}"
+    state: stopped
+    enabled: no
+
+- name: init postgresql (el-only)
+  command: "{{ pg_initdb_command }}"
+  args:
+    creates: "{{ pg_conf_dir }}/PG_VERSION"
+
+- name: pg_upgrade [RHEL 7]
+  command: |
+    scl enable rh-postgresql10 "{{ pg_upgrade_location }} \
+      -d {{ existing_pg_dir }} \
+      -D {{ pg_conf_dir }} \
+      -b {{ existing_pg_bin }} \
+      -B {{ pg_conf_bin }}"
+  no_log: True
+  become: True
+  become_user: postgres
+  environment: '{{ extra_env | default(omit) }}'
+  args:
+    chdir: /var/opt/rh/rh-postgresql10/lib/pgsql/
+  when: ansible_distribution_major_version == "7"
+
+- name: Uninstall Postgresql 9.6 [RHEL 8]
+  shell: |
+    dnf module reset -y 'postgresql'
+  args:
+    warn: false
+  when: ansible_distribution_major_version == "8"
+
+- name: Install Postgresql Upgrade packages [RHEL 8]
+  yum:
+    name:
+      - postgresql-upgrade96
+    enablerepo: "{{ ansible_tower_dependency_repo }}"
+    disable_gpg_check: '{{ not gpgcheck | bool }}'
+    state: present
+  when: ansible_distribution_major_version == "8"
+
+- name: Enable postgresql 10 dnf modules
+  shell: |
+    dnf module -y enable 'postgresql:10'
+  when: ansible_distribution_major_version == "8"
+  args:
+    warn: false
+
+- name: Install Postgresql 10 [RHEL8]
+  dnf:
+    name: '@postgresql:10'
+    state: present
+  when: ansible_distribution_major_version == "8"
+
+- name: Upgrade Postgres 10 [RHEL 8]
+  command: /bin/postgresql-setup --upgrade --upgrade-from=postgresql-96
+  when: ansible_distribution_major_version == "8"
+
+- name: Uninstall Postgres 9.6 [RHEL7]
+  yum:
+    name: "{{ existing_pg_name }}*"
+    state: absent
+  when: ansible_distribution_major_version == "7"
+
+- name: Uninstall postgresql-upgrade96 package
+  yum:
+    name: "postgresql-upgrade96"
+    state: absent
+  when: ansible_distribution_major_version == "8"
+
+- include: install_deps.yml
+
+- name: Create file to signify Postgres has been upgraded
+  file:
+    path: "{{ existing_pg_dir }}/PG_VERSION.upgraded"
+    state: touch
+  when: upgrade_postgres

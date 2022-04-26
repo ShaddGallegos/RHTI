@@ -1,0 +1,21 @@
+- name: Enable base Tower firewall ports
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    state: present
+    regexp: "^.*INPUT.*tcp.*{{item}}.*ACCEPT"
+    insertafter: "^:OUTPUT "
+    line: "-A INPUT -p tcp --dport {{item}} -j ACCEPT"
+  when: inventory_hostname in groups['tower'] | default([])
+  with_items: "{{ tower_firewall_ports }}"
+  notify: restart iptables
+
+- name: Enable Standalone Database firewall ports
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    state: present
+    regexp: "^.*INPUT.*tcp.*{{item}}.*ACCEPT"
+    insertafter: "^:OUTPUT "
+    line: "-A INPUT -p tcp --dport {{item}} -j ACCEPT"
+  when: inventory_hostname in groups['database'] | default([])
+  with_items: "{{ database_firewall_ports }}"
+  notify: restart iptables

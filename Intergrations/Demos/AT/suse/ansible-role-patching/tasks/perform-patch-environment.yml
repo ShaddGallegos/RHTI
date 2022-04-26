@@ -1,0 +1,49 @@
+## roles/patching/tasks/perform-patch.yml
+---
+- name: "yum upgrade" # noqa 403
+  yum:
+    name: '*'
+    state: latest
+    exclude: "{{ patch_exclude | default('') }}"
+#  environment: "{{ patch_env | default('') }}"
+  when: "'yum' in ansible_pkg_mgr"
+
+- name: "dnf upgrade" # noqa 403
+  dnf:
+    name: '*'
+    state: latest
+    exclude: "{{ patch_exclude | default('') }}"
+#  environment: "{{ patch_env | default('') }}"
+  when: "'dnf' in ansible_pkg_mgr"
+
+- name: pacman clean
+  command: yes | pacman -Scc
+  when: "'pacman' in ansible_pkg_mgr"
+
+- name: pacman upgrade
+  pacman:
+    update_cache: yes
+    upgrade: yes
+#  environment: "{{ patch_env | default('') }}"
+  when: "'pacman' in ansible_pkg_mgr"
+
+- name: apt-get dist-upgrade
+  apt:
+    upgrade: dist
+    update_cache: yes
+#  environment: "{{ patch_env | default('') }}"
+  when: "'apt' in ansible_pkg_mgr"
+
+- name: zypper upgrade
+  zypper: # noqa 403
+    name: '*'
+    state: latest
+    type: patch
+# environment: "{{ patch_env | default('') }}"
+  when: "'zypper' in ansible_pkg_mgr"
+
+- name: Reboot nodes
+  reboot:
+    reboot_timeout: 600
+  when: patch_reboot
+...

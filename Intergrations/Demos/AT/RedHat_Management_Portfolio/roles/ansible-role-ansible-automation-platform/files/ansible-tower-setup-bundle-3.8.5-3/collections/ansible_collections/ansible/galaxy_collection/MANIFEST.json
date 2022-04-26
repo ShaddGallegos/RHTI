@@ -1,0 +1,35 @@
+{
+ "collection_info": {
+  "description": "Automation for managing a local Galaxy server", 
+  "repository": "http://github.com/ansible/galaxy_collection", 
+  "tags": [
+   "infrastructure", 
+   "galaxy"
+  ], 
+  "dependencies": {
+   "pulp.squeezer": "*"
+  }, 
+  "authors": [
+   "chouseknecht"
+  ], 
+  "issues": "http://github.com/ansible/galaxy_collection/issues", 
+  "name": "galaxy_collection", 
+  "license": [
+   "MIT"
+  ], 
+  "documentation": "", 
+  "namespace": "ansible", 
+  "version": "1.0.13", 
+  "readme": "README.md", 
+  "license_file": null, 
+  "homepage": "http://github.com/ansible/galaxy_collection"
+ }, 
+ "file_manifest_file": {
+  "format": 1, 
+  "ftype": "file", 
+  "chksum_sha256": "e1af59c30338ed141ee6213dcfd3c289ccf9e53c103a2f9e60e5a2597f141464", 
+  "name": "FILES.json", 
+  "chksum_type": "sha256"
+ }, 
+ "format": 1
+}

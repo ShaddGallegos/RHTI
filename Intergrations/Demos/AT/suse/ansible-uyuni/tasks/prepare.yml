@@ -1,0 +1,37 @@
+---
+- name: Install core utilities
+  zypper:
+    name: "{{ uyuni_core_packages }}"
+    state: present
+  become: true
+
+- name: Create a volume group for Uyuni
+  lvg:
+    vg: "{{ uyuni_vg }}"
+    pvs: "{{ uyuni_pv }}"
+  become: true
+  when: uyuni_use_lvm | bool
+
+- name: Create logical volumes, file systems and mount points
+  block:
+    - name: Create logical volumes
+      lvol:
+        vg: "{{ uyuni_vg }}"
+        lv: "{{ item.name }}"
+        size: "{{ item.size }}"
+      with_items: "{{ uyuni_filesystems }}"
+    - name: Create file systems
+      filesystem:
+        fstype: "{{ item.type }}"
+        dev: "/dev/mapper/{{ uyuni_vg }}-{{ item.name }}"
+      with_items: "{{ uyuni_filesystems }}"
+    - name: Create mount points
+      mount:
+        path: "{{ item.mountpoint }}"
+        src: "/dev/mapper/{{ uyuni_vg }}-{{ item.name }}"
+        fstype: "{{ item.type }}"
+        opts: auto
+        state: mounted
+      with_items: "{{ uyuni_filesystems }}"
+  become: true
+  when: uyuni_use_lvm | bool

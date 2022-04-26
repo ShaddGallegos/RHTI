@@ -1,0 +1,137 @@
+---
+- name: 'include vars'
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'        # RedHat-7
+        - '{{ ansible_os_family }}.yml'                                                 # RedHat
+      paths: '../vars'
+
+- block:
+  - name: Append .gz to database archive filename if use_compression
+    set_fact:
+      db_filename: tower.db.gz
+    when: (use_compression | bool)
+
+  - name: Cleanup common backup directory
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common/'
+      state: absent
+
+  - name: Copy temhporary sql files
+    copy:
+      src: '{{ item }}'
+      dest: '{{ backup_dir.rstrip("/") }}/common/'
+      owner: root
+      mode: '0600'
+    with_items:
+      - instance_group_map.sql
+      - instance_group_map_cleanup.sql
+
+  - name: Create (temporary) mapping between instance group ids / names
+    shell: |
+      {{ scl_command }} psql \
+        --host='{{ tower_db_settings.default.HOST }}' \
+        --port='{{ tower_db_settings.default.PORT }}' \
+        --username='{{ tower_db_settings.default.USER  }}' \
+        --dbname='{{ tower_db_settings.default.NAME }}' < instance_group_map.sql
+    args:
+      chdir: '{{ backup_dir.rstrip("/") }}/common/'
+    environment: "{{ {'PGPASSWORD': tower_db_settings.default.PASSWORD} | combine( extra_env | default({}) ) }}"
+    register: psql_command
+    failed_when: "'ERROR' in psql_command.stderr"
+    no_log: True
+
+  - name: Pre-create database dump to establish permissions
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common/{{ db_filename }}'
+      owner: root
+      mode: '0600'
+      state: touch
+
+  # clean drops the database
+  # create adds instructions to create the database
+  # Note: user needs access to postgres template when restoring
+  - name: Perform a PostgreSQL dump.
+    shell: |
+      {{ scl_command }} pg_dump \
+        --clean --create \
+        --host='{{ tower_db_settings.default.HOST }}' \
+        --port={{ tower_db_settings.default.PORT }} \
+        --username='{{ tower_db_settings.default.USER  }}' \
+        --dbname='{{ tower_db_settings.default.NAME }}' \
+        --exclude-table=main_instance \
+        --exclude-table=main_instancegroup \
+        --exclude-table=main_instancegroup_instances \
+        {{ '| gzip' if use_compression | bool else '' }} > {{ db_filename }}
+    args:
+      chdir: '{{ backup_dir.rstrip("/") }}/common/'
+    environment: "{{ {'PGPASSWORD': tower_db_settings.default.PASSWORD} | combine( extra_env | default({}) ) }}"
+    register: psql_command
+    failed_when: "'ERROR' in psql_command.stderr"
+    no_log: True
+
+  - name: Make sure PostgreSQL dump has the right permissions
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common/{{ db_filename }}'
+      owner: root
+      mode: '0600'
+      state: file
+
+  - name: Remove mapping between instance group ids / names
+    shell: |
+      {{ scl_command }} psql \
+        --host='{{ tower_db_settings.default.HOST }}' \
+        --port={{ tower_db_settings.default.PORT }} \
+        --username='{{ tower_db_settings.default.USER  }}' \
+        --dbname='{{ tower_db_settings.default.NAME }}' < instance_group_map_cleanup.sql
+    args:
+      chdir: '{{ backup_dir.rstrip("/") }}/common/'
+    environment: "{{ {'PGPASSWORD': tower_db_settings.default.PASSWORD} | combine( extra_env | default({}) ) }}"
+    register: psql_command
+    failed_when: "'ERROR' in psql_command.stderr"
+    no_log: True
+
+  - name: Remove temporary sql files
+    file:
+      path: '{{ backup_dir.rstrip("/") }}/common/{{ item }}'
+      state: absent
+    with_items:
+      - instance_group_map.sql
+      - instance_group_map_cleanup.sql
+
+  when:
+    - groups['tower'] | default([]) | length
+    - inventory_hostname == groups['tower'][0]
+
+- block:
+    - name: Pre-create database dump to establish permissions
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/automationhub/automationhub/automationhub.db'
+        owner: root
+        mode: '0600'
+        state: touch
+
+    - name: Perform a PostgreSQL dump.
+      shell: |
+        {{ scl_command }} pg_dump \
+          --clean --create \
+          --host='{{ automationhub_db_settings.default.HOST }}' \
+          --port={{ automationhub_db_settings.default.PORT }} \
+          --username='{{ automationhub_db_settings.default.USER  }}' \
+          --dbname='{{ automationhub_db_settings.default.NAME }}' > automationhub.db
+      args:
+        chdir: '{{ backup_dir.rstrip("/") }}/automationhub/automationhub'
+      environment: "{{ {'PGPASSWORD': automationhub_db_settings.default.PASSWORD} | combine( extra_env | default({}) ) }}"
+      register: psql_command
+      failed_when: "'ERROR' in psql_command.stderr"
+
+    - name: Make sure PostgreSQL dump has the right permissions
+      file:
+        path: '{{ backup_dir.rstrip("/") }}/automationhub/automationhub/automationhub.db'
+        owner: root
+        mode: '0600'
+        state: file
+
+  when:
+    - inventory_hostname in groups['automationhub'] | default([])

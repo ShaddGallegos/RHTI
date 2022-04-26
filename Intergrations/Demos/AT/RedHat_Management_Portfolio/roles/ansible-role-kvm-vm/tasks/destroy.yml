@@ -1,0 +1,14 @@
+---
+# tasks file for ansible-role-kvm-vm destroy
+
+- name: destroy vm
+  virt:
+    name: "{{ item }}"
+    state: destroyed
+  with_items: "{{ virtual_machines }}"
+
+- name: undefine vm
+  virt:
+    name: "{{ item }}"
+    command: undefine
+  with_items: "{{ virtual_machines }}"

@@ -1,0 +1,159 @@
+{
+ "files": [
+  {
+   "format": 1, 
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": ".", 
+   "chksum_type": null
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "1b4effc21e378e985c40ee46f430f402520ee14d92ce5dbf2f0d77e96a8d9b98", 
+   "name": "LICENSE", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/vars", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "b46e625cfd46979370ba20330c0b08aa707920e08ad6456b61481fa6ecae6ca1", 
+   "name": "roles/post_install_config/vars/main.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/tasks", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "4647b8aba9290a6ab8b4df51f37a5a01e95f2706bce7329d2454f75aee375290", 
+   "name": "roles/post_install_config/tasks/galaxy_importer.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "c1265749f8c7b0ea4c2b972f813f333585f1825e06bb8ab7c3b57a651cfd8022", 
+   "name": "roles/post_install_config/tasks/configure_remotes.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "25ec85f517f508cce5eb1c6fdddb18712d304e50cea7e60d6ebd694498e500a8", 
+   "name": "roles/post_install_config/tasks/main.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/meta", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "60abda97c25a130e9c23d712535fbd8774a062335bea4fef73d29902743aa989", 
+   "name": "roles/post_install_config/meta/main.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "88a41529cf36b25a31044af063ceab3e301888cc38a9bd454ef27d8283ca1219", 
+   "name": "roles/post_install_config/README.md", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/defaults", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "389c35f61d96f55b083854c23cf7a31f69a500d2237e89a2fdbb0e167d8bdb15", 
+   "name": "roles/post_install_config/defaults/main.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/files", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "cfe45ac2dc2ff4f4c79c06e3a376ebb97011433a0529cb10f43b6e52668e8b1a", 
+   "name": "roles/post_install_config/files/galaxy-importer.cfg", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "800354aaccb11d48ca84c4df4ddd3eec41a825e32ad29324dad810a28247c76e", 
+   "name": "roles/post_install_config/files/requirements.yml", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "dir", 
+   "chksum_sha256": null, 
+   "name": "roles/post_install_config/templates", 
+   "chksum_type": null, 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "b1fb8bd074737b7a113e40ab2a79f4d062187d75061da888ccab407ab23c9b21", 
+   "name": "roles/post_install_config/templates/galaxy-importer.cfg.j2", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "8680bb86480431d0a5b82eae597214acea56ad291150165b3eb59c922da69bcd", 
+   "name": "README.md", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }, 
+  {
+   "ftype": "file", 
+   "chksum_sha256": "79b6f8054f8ef5e9e78c18174bf57caf29b11410166b9268d6923e87520eb88f", 
+   "name": ".gitignore", 
+   "chksum_type": "sha256", 
+   "format": 1
+  }
+ ], 
+ "format": 1
+}

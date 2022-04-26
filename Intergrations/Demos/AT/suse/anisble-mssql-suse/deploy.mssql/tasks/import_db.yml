@@ -1,0 +1,15 @@
+---
+- name: Place SQL file on system for import
+  copy:
+    src: "{{ import_file }}"
+    dest: "{{ import_file_dest }}"
+
+- name: Import SQL File
+  mssql_db:
+    name: "{{ db_name }}"
+    state: import
+    target: "{{ import_file_dest }}"
+    login_host: "{{db_host}}"
+    login_port: "{{db_port}}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"

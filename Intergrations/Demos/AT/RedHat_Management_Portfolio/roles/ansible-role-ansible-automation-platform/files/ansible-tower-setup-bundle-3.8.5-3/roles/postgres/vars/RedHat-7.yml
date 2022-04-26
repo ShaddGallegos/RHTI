@@ -1,0 +1,15 @@
+---
+pg_conf_dir: '/var/opt/rh/rh-postgresql10/lib/pgsql/data'
+pg_conf_bin: '/opt/rh/rh-postgresql10/root/bin'
+pg_upgrade_location: '{{ pg_conf_bin }}/pg_upgrade'
+pg_systemd_name: 'postgresql-9.6'
+existing_pg_name: 'postgresql96'
+existing_pg_dir: '/var/lib/pgsql/9.6/data'
+existing_pg_bin: '/usr/pgsql-9.6/bin'
+pg_conf_location: '{{ pg_conf_dir }}/postgresql.conf'
+pg_hba_location: '{{ pg_conf_dir }}/pg_hba.conf'
+postgres_init_name: 'rh-postgresql10-postgresql'
+pg_initdb_command: '{{ pg_conf_bin }}/postgresql-setup initdb'
+pg_bash: 'scl enable rh-postgresql10 --'
+extra_env:
+  LD_LIBRARY_PATH: '/opt/rh/rh-postgresql10/root/usr/lib64'

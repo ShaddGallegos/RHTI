@@ -130,8 +130,9 @@ if test $status -eq 1
 then
 echo "System is not registered, Please provide Red Hat CDN username and password when prompted"
 subscription-manager register --auto-attach
-subscription-manager attach --pool=$(subscription-manager list --available --matches "Red Hat Ansible Automation Platform, Standard (100 Managed Nodes)" |grep "Pool ID:" |awk -F ' ' '{print $3}')
 else
+subscription-manager attach --pool=$(subscription-manager list --available --matches "Red Hat Ansible Automation Platform" |grep "Pool ID:"  |awk -F ':             ' '{print $2}')
+
 echo "System is registered with Red Hat or Red Hat Satellite, Continuing!"
 sleep 2 
 fi
@@ -247,7 +248,7 @@ echo "********************************"
 yum-config-manager --enable epel 
 yum clean all 
 rm -rf /var/cache/yum
-yum -q list installed Ansible Controller-cli &>/dev/null && echo "Ansible Controller-cli is installed" || dnf install -y Ansible Controller-cli --skip-broken --noplugins 
+yum -q list installed automation-controller-cli &>/dev/null && echo "automation-controller-cli is installed" || dnf install -y automation-controller-cli --skip-broken --noplugins 
 yum -q list installed wget &>/dev/null && echo "wget is installed" || dnf install -y wget --skip-broken --noplugins --best --allowerasing
 yum -q list installed python3-pip &>/dev/null && echo "python3-pip is installed" || dnf install -y python3-pip --skip-broken --noplugins --best --allowerasing
 yum -q list installed platform-python-pip &>/dev/null && echo "platform-python-pip is installed" || dnf install -y platform-python-pip --skip-broken --noplugins --best --allowerasing
@@ -284,7 +285,7 @@ echo '*********************************************'
 dnf install -y python3-pip ansible ansible-doc --skip-broken --best --allowerasing 
 source /var/lib/awx/venv/ansible/bin/activate
 umask "0022"
- sudo -u  awx pip3 install --user --upgrade pip boto3 Ansible Controller-cli boto botocore requests requests-credssp cryptography pywinrm PyVmomi azure-mgmt-compute azure-mgmt-resource azure-keyvault-secrets six netaddr passlib
+ sudo -u  awx pip3 install --user --upgrade pip boto3 boto botocore requests requests-credssp cryptography pywinrm PyVmomi azure-mgmt-compute azure-mgmt-resource azure-keyvault-secrets six netaddr passlib
 deactivate
 }
 
@@ -297,7 +298,7 @@ echo 'Getting, Expanding, and installing Ansible Controller 2.1 for RHEL8'
 echo '****************************************************************'
 mkdir ~/Downloads
 cd ~/Downloads
-#wget https://releases.ansible.com/Ansible Controller/setup-bundle/ansible-automation-platform-setup-bundle-2.1.0-1.tar.gz.tar.gz
+wget https://releases.ansible.com/Ansible Controller/setup-bundle/ansible-automation-platform-setup-bundle-2.1.0-1.tar.gz.tar.gz
 
 tar -zxvf ~/Downloads/ansible-automation-platform-setup-bundle-2.1.0-1.tar.gz.tar.gz 
 cd ~/Downloads/ansible-automation-platform-setup-bundle-2.1.0-1 
