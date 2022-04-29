@@ -1,0 +1,7 @@
+---
+- name: find ntp.conf
+  hosts: all
+  become: true 
+
+  roles: 
+    - line_in_file

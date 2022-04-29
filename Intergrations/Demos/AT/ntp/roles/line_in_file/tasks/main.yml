@@ -1,0 +1,25 @@
+---
+# tasks file for line_in_file
+- name: "find ntp.conf"
+  find:
+    paths: /
+    patterns: 'ntp.conf'
+    recurse: yes
+  register: find_ntp
+
+- name: "list ntp.conf"
+  debug:
+    var: "{{ 'item.path' }}"
+  with_items: "{{ find_ntp.files }}"
+
+- name: "Add timeserver to ntp file"
+  lineinfile:
+    path: "{{ find_ntp.files[0].path }}"  
+    line: "{{ item }}" 
+  loop:
+    - "192.168.1.101 foo1.lab.net foo1"
+    - "192.168.1.102 foo2.lab.net foo2"
+    - "192.168.1.103 foo3.lab.net foo3"
+    - "192.168.1.104 foo1.lab.net foo4"
+    - "192.168.1.105 foo1.lab.net foo5"
+    - "192.168.1.106 foo1.lab.net foo6"
