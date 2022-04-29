@@ -1,2 +1,6 @@
 ---
 # handlers file for line_in_file
+- name: Restart ntp
+  service:
+    name: ntp
+    state: restarted

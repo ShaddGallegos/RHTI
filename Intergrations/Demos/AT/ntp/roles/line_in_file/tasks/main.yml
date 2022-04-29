@@ -23,3 +23,5 @@
     - "192.168.1.104 foo1.lab.net foo4"
     - "192.168.1.105 foo1.lab.net foo5"
     - "192.168.1.106 foo1.lab.net foo6"
+  notify:
+    - Restart ntp
