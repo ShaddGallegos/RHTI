@@ -1,0 +1,17 @@
+---
+- name: find ntp.conf
+  hosts: all
+  become: true
+  tasks:
+    - name: "find ntp.conf"
+      find:
+        paths: /
+        patterns: 'ntp.conf'
+        recurse: yes
+      register: find_ntp
+
+    - name: "list ntp.conf"
+      debug:
+        var: "{{ 'item.path' }}"
+      with_items: "{{ find_ntp.files }}"
+
