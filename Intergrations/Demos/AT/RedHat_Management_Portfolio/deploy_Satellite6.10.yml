@@ -1,5 +1,0 @@
----
-- hosts: satellite
-  become: true
-  roles:
-    - ansible-role-satellite

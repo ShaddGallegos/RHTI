@@ -1,9 +1,0 @@
----
-- include: vars.yml
-
-- include_tasks: init.yml
-  when: not postgres_exec_vars_only | bool
-
-- include_tasks: conf.yml
-  when: not postgres_exec_vars_only | bool
-

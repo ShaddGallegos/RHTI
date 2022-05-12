@@ -1,7 +1,0 @@
----
-tower_package_name: 'ansible-tower'
-tower_package_version: '3.8.5'
-tower_package_release: '3'
-
-automationhub_package_name: 'automation-hub'
-automationhub_package_version: '4.2.7'

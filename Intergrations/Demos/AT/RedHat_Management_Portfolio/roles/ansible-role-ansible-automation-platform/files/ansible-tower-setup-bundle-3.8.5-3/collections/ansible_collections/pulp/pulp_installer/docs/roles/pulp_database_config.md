@@ -1,1 +1,0 @@
-../../roles/pulp_database_config/README.md

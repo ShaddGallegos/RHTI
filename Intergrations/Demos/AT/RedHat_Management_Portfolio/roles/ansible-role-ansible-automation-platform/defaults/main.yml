@@ -1,8 +1,0 @@
----
-# defaults file for ansible-role-ansible-automation-platform
-
-tower_password: redhat
-pg_password: redhat
-
-rhn_username: 
-rhn_password: 

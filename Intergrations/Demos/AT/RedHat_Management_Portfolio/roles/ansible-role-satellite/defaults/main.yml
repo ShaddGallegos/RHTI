@@ -1,8 +1,0 @@
----
-# defaults file for ansible-role-satellite
-sat_username: admin
-sat_password: redhat
-sat_org: REDHAT
-sat_location: Denver
-rhn_username:
-rhn_password:

@@ -1,7 +1,0 @@
----
-test_resources:
-  - organization: "Test Organization"
-    domain: "test.invalid"
-  - organization: "Facts Organization"
-    domain: "facts.invalid"
-...

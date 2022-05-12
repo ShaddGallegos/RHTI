@@ -1,3 +1,0 @@
----
-ansible_ssh_pipelining: True
-__pulp_database_config_run_once: false

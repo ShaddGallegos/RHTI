@@ -1,6 +1,0 @@
----
-# FIXME: This should be reverted after https://github.com/ansible/ansible/pull/67684 goes in
-collections:
-  - ansible.posix
-  - community.general
-  - amazon.aws

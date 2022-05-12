@@ -1,5 +1,0 @@
-{
-    "ansible_facts": {
-        "ansible_userspace_architecture": "x86_64"
-    }
-}

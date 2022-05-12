@@ -1,1 +1,0 @@
-../../roles/pulp_devel/README.md

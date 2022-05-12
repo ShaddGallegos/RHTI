@@ -1,5 +1,0 @@
----
-- hosts: controller
-  become: true
-  roles:
-    - ansible-role-ansible-automation-platform

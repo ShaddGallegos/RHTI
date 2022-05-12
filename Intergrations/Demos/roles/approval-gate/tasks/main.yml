@@ -1,3 +1,0 @@
----
-- include_tasks: approval-gate.yml
-  delegate_to: localhost

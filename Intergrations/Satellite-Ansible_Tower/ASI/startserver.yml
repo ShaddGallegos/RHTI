@@ -1,5 +1,0 @@
-- virt:
-    uri: qemu+ssh://root@10.168.0.1/system
-    name:  "{{ newnodez }}"
-    state: running
-
