@@ -1,15 +1,21 @@
 [satellite]
-satellite.test.spg  ansible_host=10.168.1.1
+satellite.prod.spg  ansible_host=10.168.1.1
 
-[ansible]
-ansible.test.spg    ansible_host=10.168.1.2
+[controller]
+controller.prod.spg    ansible_host=10.168.1.2
 
-[git]
-git.test.spg        ansible_host=10.168.1.3
+[automationhub]
+automationhub.prod.spg    ansible_host=10.168.1.3 
 
-[compute]
-node01.test.spg     ansible_host=10.168.1.101
-node02.test.spg     ansible_host=10.168.1.102
-node03.test.spg     ansible_host=10.168.1.103
-node04.test.spg     ansible_host=10.168.1.104
-node05.test.spg     ansible_host=10.168.1.105
+[gitlab]
+gitlab.prod.spg        ansible_host=10.168.1.4
+
+[node]
+node01.prod.spg     ansible_host=10.168.128.101
+node02.prod.spg     ansible_host=10.168.128.102
+node03.prod.spg     ansible_host=10.168.128.103
+node04.prod.spg     ansible_host=10.168.128.104
+node05.prod.spg     ansible_host=10.168.128.105
+node06.prod.spg     ansible_host=10.168.128.106
+node07.prod.spg     ansible_host=10.168.128.107
+
