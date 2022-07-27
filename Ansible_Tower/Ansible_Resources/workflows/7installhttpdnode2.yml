@@ -4,16 +4,16 @@
 
   tasks:
     - name: install httpd node02
-      when: ansible_hostname != 'node02' 
+      when: ansible_hostname != 'node02.prod.spg' 
       yum: name=firewalld state=present
 
     - name: open up port 80 for tcp node02
-      when: ansible_hostname != 'node02'
+      when: ansible_hostname != 'node02.prod.spg'
       firewalld: port=80/tcp permanent=yes state=enabled
       notify: restart httpd
 
     - name: ensure that httpd is started and enable at boot node02
-      when: ansible_hostname != 'node02'
+      when: ansible_hostname != 'node02.prod.spg'
       service: name=httpd enabled=yes state=started
 
   handlers:
