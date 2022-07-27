@@ -4,12 +4,12 @@
 
   tasks:
     - name: install firewalld
-      when: ansible_hostname != 'node03' 
+      when: ansible_hostname != 'node03.prod.spg' 
       yum: name=firewalld state=present
       notify: restart firewalld
 
     - name: ensure that firewalld is started and enable at boot
-      when: ansible_hostname != 'node03'
+      when: ansible_hostname != 'node03.prod.spg'
       service: name=firewalld enabled=yes state=started
 
   handlers:
