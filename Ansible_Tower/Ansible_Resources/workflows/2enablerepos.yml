@@ -3,9 +3,9 @@
   become: root
 
   tasks:
-    - name: Enabling RHEL 6 needed repos on nodes
-      command: subscription-manager repos --enable rhel-6-server-rpms
-      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+    - name: Enabling RHEL 8 needed repos on nodes
+      command: subscription-manager repos --enable rhel-8-for-x86_64-baseos-rpms --enable rhel-8-for-x86_64-appstream-rpms
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8")
 
     - name: Enabling RHEL 7 needed repos on nodes
       command: subscription-manager repos --enable rhel-7-server-rpms
