@@ -1,8 +1,0 @@
----
-- name: Enable Firewall ports for satellite
-  firewalld:
-    port: "{{ item.port }}"
-    permanent: yes
-    state: enabled
-  with_items:
-    - "{{ satellite_ports }}"

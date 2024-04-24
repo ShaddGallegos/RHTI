@@ -1,9 +1,0 @@
----
-# TASKS
-
-- name: Ensure that there's a line for the short host name and full hostname
-  lineinfile:
-    path: /etc/hosts
-    regexp: "{{ ansible_fqdn }}"
-    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
-    state: present

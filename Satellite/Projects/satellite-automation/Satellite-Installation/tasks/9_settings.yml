@@ -1,9 +1,0 @@
-- name: satellite settings | common settings
-  redhat.satellite.setting:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
-    server_url: "{{ satellite_server_url }}"
-    name: "{{ item.name }}"
-    value: "{{ item.value }}"
-  with_items:
-    - "{{ satellite_settings }}"
