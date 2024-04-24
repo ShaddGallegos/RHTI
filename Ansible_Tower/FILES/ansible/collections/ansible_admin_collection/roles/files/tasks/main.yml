@@ -1,7 +1,0 @@
----
-
-# Attributes
-- import_tasks: attributes.yml
-  tags:
-    - manala_files
-    - manala_files.attributes

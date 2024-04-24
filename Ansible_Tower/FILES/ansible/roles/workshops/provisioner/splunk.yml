@@ -1,7 +1,0 @@
----
-- name: INSTALL AND CONFIGURE SPLUNK ENTERPRISE
-  hosts: splunk
-  become: true
-  gather_facts: true
-  roles:
-    - role: splunk_enterprise

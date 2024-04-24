@@ -1,6 +1,0 @@
-  - name: restart firewalld
-    service: name=firewalld state=reloaded
-
-  - name: restart iptables
-    service: name=iptables state=restarted
-

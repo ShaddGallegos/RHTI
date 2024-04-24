@@ -1,4 +1,0 @@
----
-
-- name: systemd reload
-  command: systemctl daemon-reload # noqa 303

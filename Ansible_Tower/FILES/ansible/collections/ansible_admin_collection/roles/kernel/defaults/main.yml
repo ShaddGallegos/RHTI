@@ -1,7 +1,0 @@
----
-
-# Kernel modules to enable/disable
-manala_kernel_modules: []
-
-# Kernel parameters to configure
-manala_kernel_parameters: []

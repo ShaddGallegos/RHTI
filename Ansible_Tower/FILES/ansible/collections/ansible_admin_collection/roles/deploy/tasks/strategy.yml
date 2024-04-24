@@ -1,4 +1,0 @@
----
-
-- name: strategy
-  include_tasks: "strategy/{{ manala_deploy_strategy }}.yml"

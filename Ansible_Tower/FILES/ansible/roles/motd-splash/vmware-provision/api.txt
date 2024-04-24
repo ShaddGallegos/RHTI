@@ -1,1 +1,0 @@
-curl -s -f -k -H 'Content-Type: application/json' -XPOST -d '{ "name": "1.2.3.4", "description": "This is my new server", "inventory": "5", "enabled": true, "instance_id": "", "variables": "somevar=1,other=2" }' --user kev:kev https://ansibletower.kev/api/v1/hosts/

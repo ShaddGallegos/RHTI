@@ -1,9 +1,0 @@
----
-
-- name: tasks/raw
-  tags:
-    - manala_deploy
-  block:
-
-    - name: tasks/raw > "{{ item.options }}"
-      raw: "{{ item.options }}"

@@ -1,8 +1,0 @@
----
-- include_tasks: teardown.yml
-  when: teardown|bool
-
-- name: provision aws resources and instances
-  include_tasks: provision.yml
-  tags: provisioned
-  when: not teardown|bool

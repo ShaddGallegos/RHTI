@@ -1,6 +1,0 @@
----
-
-- name: elasticsearch restart
-  service:
-    name: elasticsearch
-    state: restarted

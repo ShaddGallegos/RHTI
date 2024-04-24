@@ -1,6 +1,0 @@
----
-
-- name: apparmor reload
-  service:
-    name: apparmor
-    state: reloaded

@@ -1,7 +1,0 @@
----
-
-# Install
-- import_tasks: install.yml
-  tags:
-    - manala_sqlite
-    - manala_sqlite.install
