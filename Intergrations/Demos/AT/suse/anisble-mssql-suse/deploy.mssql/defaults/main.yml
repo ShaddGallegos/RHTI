@@ -1,9 +1,0 @@
----
-unixODBC_packages:
-  - unixODBC-utf16
-  - unixODBC-utf16-devel
-mssql_packages:
-  - unixODBC-devel
-  - mssql-server
-  - python-pip
-  #- python-devel

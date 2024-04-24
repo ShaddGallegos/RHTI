@@ -1,4 +1,0 @@
----
-- name: Restart Uyuni
-  command: spacewalk-service restart
-  become: true

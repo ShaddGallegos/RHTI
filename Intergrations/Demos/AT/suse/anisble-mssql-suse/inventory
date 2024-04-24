@@ -1,8 +1,0 @@
-[mssql_rhel_nodes]
-<IP> ansible_ssh_user=root ansible_ssh_pass=<pwd>
-<IP> ansible_ssh_user=root ansible_ssh_pass=<pwd>
-
-[mssql_suse_nodes]
-<IP> ansible_ssh_user=root ansible_ssh_pass=<pwd>
-<IP> ansible_ssh_user=root ansible_ssh_pass=<pwd>
-

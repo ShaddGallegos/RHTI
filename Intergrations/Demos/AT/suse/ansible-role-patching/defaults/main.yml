@@ -1,5 +1,0 @@
-## roles/ansible-role-patching/defaults/main.yml
-# vim:ft=ansible:
----
-patch_reboot: no
-...

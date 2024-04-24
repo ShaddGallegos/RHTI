@@ -1,9 +1,0 @@
----
-# defaults file for b1-systems.suseconnect
-suseconnect_products: []
-suseconnect_status: {}
-suseconnect_reregister: False
-suseconnect_register_only_products: False
-
-# do not remove subscriptions by default
-suseconnect_remove_subscriptions: false

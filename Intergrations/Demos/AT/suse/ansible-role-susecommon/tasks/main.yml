@@ -1,7 +1,0 @@
----
-
-- name: Repository version
-  include_tasks: "version.yml"
-
-- name: Packages to install
-  include_tasks: "pkg.yml"

@@ -1,4 +1,0 @@
-integration_tests_dependencies:
-- ansible.windows
-- community.general
-unit_tests_dependencies: []
